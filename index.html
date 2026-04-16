@@ -976,7 +976,7 @@
     /* ── PLANNER: CLEARANCE TOAST ───────────────────────────── */
     .clearance-toast {
       position: absolute;
-      top: 66px;
+      top: 82px;
       left: 50%;
       transform: translateX(-50%);
       background: rgba(83, 82, 102, 0.9);
@@ -2765,6 +2765,14 @@ function initPlanner() {
   centerPod();
   resizeObs.observe(canvas.parentElement);
   resizeCanvas();
+  // Pin toast below the actual rendered tab bar height (avoids clipping on real devices)
+  const tabs  = document.querySelector('.planner-pod-tabs');
+  const toast = document.getElementById('clearance-toast');
+  if (tabs && toast) {
+    const pinToast = () => { toast.style.top = (tabs.offsetHeight + 10) + 'px'; };
+    pinToast();
+    new ResizeObserver(pinToast).observe(tabs);
+  }
 }
 
 /* ── INIT ─────────────────────────────────────────────────── */
