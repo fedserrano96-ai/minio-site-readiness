@@ -1,0 +1,3249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="theme-color" content="#FFFFFF">
+  <title>Mini·O Site Readiness Assessment</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    /* ── RESET ─────────────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
+
+    /* ── BRAND VARIABLES ────────────────────────────────────── */
+    :root {
+      --red:       #ED3648;
+      --dark-blue: #535266;
+      --slate:     #9398A5;
+      --sand:      #E3CDBF;
+      --white:     #FFFFFF;
+
+      --status-ready:    #4CAF50;
+      --status-action:   #F5A623;
+      --status-find-out: #9398A5;
+      --status-blocker:  #ED3648;
+
+      --nav-height: 68px;
+    }
+
+    /* ── BASE ───────────────────────────────────────────────── */
+    html {
+      height: 100%;
+      scroll-behavior: smooth;
+    }
+
+    body {
+      min-height: 100%;
+      font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+      font-size: 16px;
+      color: var(--dark-blue);
+      background: var(--white);
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    /* ── APP SHELL ──────────────────────────────────────────── */
+    .app {
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+      min-height: 100dvh;
+    }
+
+    /* ── HEADER ─────────────────────────────────────────────── */
+    .app-header {
+      position: sticky;
+      top: 0;
+      z-index: 200;
+      background: var(--white);
+      box-shadow: 0 1px 0 rgba(147, 152, 165, 0.2);
+    }
+
+    .header-bar {
+      display: flex;
+      align-items: center;
+      padding: 10px 16px;
+      gap: 12px;
+    }
+
+    .header-logo {
+      display: flex;
+      align-items: center;
+      flex-shrink: 0;
+    }
+
+    .header-logo svg {
+      height: 44px;
+      width: auto;
+    }
+
+    .header-step-badge {
+      margin-left: auto;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--slate);
+      white-space: nowrap;
+      letter-spacing: 0.01em;
+    }
+
+    .progress-track {
+      height: 4px;
+      background: rgba(147, 152, 165, 0.22);
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: var(--red);
+      transition: width 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .step-label-bar {
+      padding: 5px 16px 8px;
+    }
+
+    .step-label-text {
+      font-size: 11px;
+      font-weight: 500;
+      color: var(--slate);
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+
+    /* ── MAIN CONTENT ───────────────────────────────────────── */
+    .app-content {
+      flex: 1;
+      width: 100%;
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 28px 16px calc(var(--nav-height) + 28px);
+    }
+
+    /* Steps hidden by default, visible when active */
+    .step-panel {
+      display: none;
+    }
+
+    .step-panel.active {
+      display: block;
+    }
+
+    /* ── STEP HEADINGS ──────────────────────────────────────── */
+    .step-heading {
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--dark-blue);
+      line-height: 1.25;
+      margin-bottom: 8px;
+    }
+
+    .step-subheading {
+      font-size: 15px;
+      font-weight: 400;
+      color: var(--slate);
+      line-height: 1.6;
+      margin-bottom: 32px;
+    }
+
+    /* ── FORM ELEMENTS ──────────────────────────────────────── */
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-bottom: 28px;
+    }
+
+    .form-group:last-of-type {
+      margin-bottom: 0;
+    }
+
+    .form-label {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--dark-blue);
+      line-height: 1;
+    }
+
+    .form-label .optional-tag {
+      font-size: 12px;
+      font-weight: 400;
+      color: var(--slate);
+      margin-left: 5px;
+    }
+
+    .form-input {
+      width: 100%;
+      height: 52px;
+      padding: 0 14px;
+      border: 1.5px solid rgba(147, 152, 165, 0.35);
+      border-radius: 8px;
+      font-family: 'Inter', system-ui, sans-serif;
+      font-size: 16px;
+      font-weight: 400;
+      color: var(--dark-blue);
+      background: var(--white);
+      -webkit-appearance: none;
+      appearance: none;
+      transition: border-color 0.15s, box-shadow 0.15s;
+      touch-action: manipulation;
+    }
+
+    .form-input:focus {
+      outline: none;
+      border-color: var(--dark-blue);
+      box-shadow: 0 0 0 3px rgba(83, 82, 102, 0.08);
+    }
+
+    .form-input.input-error {
+      border-color: var(--red);
+    }
+
+    .form-input::placeholder {
+      color: rgba(147, 152, 165, 0.65);
+    }
+
+    .form-input--address {
+      /* same height, just semantic differentiation for now */
+    }
+
+    .form-row-tablet-wrapper {
+      margin-bottom: 28px;
+    }
+
+    .field-hint {
+      font-size: 12px;
+      color: var(--slate);
+      line-height: 1.4;
+      margin-top: -2px;
+    }
+
+    .field-error {
+      font-size: 12px;
+      color: var(--red);
+      font-weight: 500;
+      line-height: 1.4;
+      margin-top: -2px;
+      display: none;
+    }
+
+    .field-error.visible {
+      display: block;
+    }
+
+    /* ── BOTTOM NAVIGATION ──────────────────────────────────── */
+    .app-nav {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: var(--nav-height);
+      background: var(--white);
+      border-top: 1px solid rgba(147, 152, 165, 0.2);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 16px;
+      padding-bottom: env(safe-area-inset-bottom, 0px);
+      z-index: 200;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      height: 48px;
+      border-radius: 8px;
+      font-family: 'Inter', system-ui, sans-serif;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: background 0.15s, opacity 0.15s, box-shadow 0.15s;
+      touch-action: manipulation;
+      border: none;
+      user-select: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .btn:disabled {
+      cursor: default;
+      pointer-events: none;
+    }
+
+    .btn-back {
+      padding: 0 24px;
+      background: transparent;
+      border: 1.5px solid rgba(147, 152, 165, 0.4);
+      color: var(--dark-blue);
+      min-width: 96px;
+    }
+
+    .btn-back:hover {
+      background: rgba(147, 152, 165, 0.08);
+    }
+
+    .btn-back:disabled {
+      opacity: 0.35;
+    }
+
+    .btn-next {
+      padding: 0 32px;
+      background: var(--red);
+      color: var(--white);
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      min-width: 112px;
+    }
+
+    .btn-next:hover:not(:disabled) {
+      background: #d62f41;
+      box-shadow: 0 2px 12px rgba(237, 54, 72, 0.3);
+    }
+
+    .btn-next:disabled {
+      background: rgba(147, 152, 165, 0.3);
+      color: rgba(255, 255, 255, 0.7);
+    }
+
+    /* ── PLACEHOLDER STEPS ──────────────────────────────────── */
+    .placeholder-content {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      padding: 48px 0;
+      gap: 14px;
+    }
+
+    .placeholder-icon {
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      background: var(--sand);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--slate);
+    }
+
+    .placeholder-content h2 {
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--dark-blue);
+    }
+
+    .placeholder-content p {
+      font-size: 15px;
+      color: var(--slate);
+      line-height: 1.55;
+      max-width: 280px;
+    }
+
+    .phase-tag {
+      display: inline-block;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--slate);
+      background: rgba(147, 152, 165, 0.12);
+      border: 1px solid rgba(147, 152, 165, 0.25);
+      border-radius: 20px;
+      padding: 4px 12px;
+    }
+
+    /* ── EMAIL VALIDATION STATE ─────────────────────────────── */
+    .validation-row {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-top: -2px;
+    }
+
+    .validation-row svg {
+      flex-shrink: 0;
+    }
+
+    /* ── TABLET / DESKTOP ───────────────────────────────────── */
+    @media (min-width: 768px) {
+      .app-content {
+        padding: 36px 24px calc(var(--nav-height) + 36px);
+      }
+
+      .header-bar {
+        padding: 12px 24px;
+      }
+
+      .step-label-bar {
+        padding: 5px 24px 10px;
+      }
+
+      .app-nav {
+        padding: 0 24px;
+      }
+
+      .step-heading {
+        font-size: 28px;
+      }
+
+      .step-subheading {
+        font-size: 16px;
+        margin-bottom: 36px;
+      }
+
+      .form-row-tablet {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 16px;
+      }
+
+      .form-row-tablet .form-group {
+        margin-bottom: 0;
+      }
+
+      .form-row-tablet-wrapper {
+        margin-bottom: 28px;
+      }
+    }
+
+    @media (min-width: 1024px) {
+      .app-content {
+        padding: 48px 32px calc(var(--nav-height) + 48px);
+        max-width: 680px;
+      }
+    }
+
+    /* ── QUESTION STEPS ──────────────────────────────────────── */
+    .step-intro {
+      padding: 24px 16px 12px;
+    }
+    .step-intro-title {
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--dark-blue);
+      margin-bottom: 8px;
+    }
+    .step-intro-text {
+      font-size: 15px;
+      color: var(--slate);
+      line-height: 1.6;
+    }
+    .question-list {
+      padding: 0 16px 120px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+    .question-card {
+      background: var(--white);
+      border: 1.5px solid rgba(147, 152, 165, 0.22);
+      border-radius: 10px;
+      padding: 20px;
+    }
+    .question-text {
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--dark-blue);
+      line-height: 1.45;
+      margin-bottom: 14px;
+    }
+    .option-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .option-btn {
+      width: 100%;
+      min-height: 52px;
+      padding: 12px 16px;
+      background: var(--white);
+      border: 1.5px solid rgba(83, 82, 102, 0.28);
+      border-radius: 8px;
+      font-family: 'Inter', sans-serif;
+      font-size: 15px;
+      font-weight: 500;
+      color: var(--dark-blue);
+      text-align: left;
+      cursor: pointer;
+      transition: background 0.15s, border-color 0.15s, color 0.15s;
+      -webkit-tap-highlight-color: transparent;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      line-height: 1.35;
+    }
+    .option-btn.selected {
+      background: var(--dark-blue);
+      border-color: var(--dark-blue);
+      color: var(--white);
+    }
+    .option-btn.opt-unsure {
+      border-color: var(--slate);
+      color: var(--slate);
+    }
+    .option-btn.opt-unsure.selected {
+      background: var(--slate);
+      border-color: var(--slate);
+      color: var(--white);
+    }
+    .option-radio {
+      width: 18px;
+      height: 18px;
+      flex-shrink: 0;
+      border: 1.5px solid currentColor;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .option-btn.selected .option-radio::after {
+      content: '';
+      width: 8px;
+      height: 8px;
+      background: currentColor;
+      border-radius: 50%;
+      display: block;
+    }
+    .option-extra-input {
+      width: 100%;
+      margin-top: 10px;
+      padding: 10px 14px;
+      border: 1.5px solid rgba(83, 82, 102, 0.28);
+      border-radius: 8px;
+      font-family: 'Inter', sans-serif;
+      font-size: 15px;
+      color: var(--dark-blue);
+      background: #f9f9f9;
+      resize: vertical;
+      min-height: 56px;
+      display: none;
+      box-sizing: border-box;
+    }
+    .option-extra-input.visible {
+      display: block;
+    }
+    .option-extra-input:focus {
+      outline: none;
+      border-color: var(--dark-blue);
+      background: var(--white);
+    }
+    .micro-guide {
+      display: none;
+      margin-top: 12px;
+      background: var(--sand);
+      border-left: 4px solid var(--slate);
+      border-radius: 0 8px 8px 0;
+      padding: 14px 14px 14px 16px;
+      gap: 10px;
+      align-items: flex-start;
+    }
+    .micro-guide.visible {
+      display: flex;
+    }
+    .micro-guide-icon {
+      flex-shrink: 0;
+      color: var(--slate);
+      margin-top: 1px;
+    }
+    .micro-guide-label {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.07em;
+      text-transform: uppercase;
+      color: var(--slate);
+      margin-bottom: 5px;
+    }
+    .micro-guide-text {
+      font-size: 14px;
+      color: var(--dark-blue);
+      line-height: 1.55;
+    }
+    .cond-section.hidden {
+      display: none;
+    }
+    .section-divider {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 8px 0;
+    }
+    .section-divider-line {
+      flex: 1;
+      height: 1px;
+      background: rgba(147, 152, 165, 0.3);
+    }
+    .section-divider-label {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--slate);
+      white-space: nowrap;
+    }
+
+    /* ── READINESS REPORT ────────────────────────────────────── */
+    .report-wrapper {
+      display: none;
+      padding: 0 0 100px;
+      animation: fadeSlideUp 0.4s ease;
+    }
+    .report-wrapper.visible {
+      display: block;
+    }
+    @keyframes fadeSlideUp {
+      from { opacity: 0; transform: translateY(16px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .contact-form-wrapper {
+      transition: opacity 0.2s ease;
+    }
+    .contact-form-wrapper.hidden {
+      display: none;
+    }
+    .report-hero {
+      padding: 28px 16px 20px;
+      border-bottom: 1px solid rgba(147,152,165,0.2);
+    }
+    .report-hero-label {
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--slate);
+      margin-bottom: 6px;
+    }
+    .report-hero-title {
+      font-size: 24px;
+      font-weight: 700;
+      color: var(--dark-blue);
+      line-height: 1.25;
+      margin-bottom: 8px;
+    }
+    .report-hero-sub {
+      font-size: 15px;
+      color: var(--slate);
+      line-height: 1.5;
+    }
+    .report-section-cards {
+      padding: 20px 16px 0;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .report-card {
+      background: var(--white);
+      border: 1.5px solid rgba(147,152,165,0.2);
+      border-radius: 10px;
+      padding: 16px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+    .report-card-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .report-card-body {
+      flex: 1;
+      min-width: 0;
+    }
+    .report-card-title {
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--dark-blue);
+      margin-bottom: 2px;
+    }
+    .report-card-status {
+      font-size: 13px;
+      font-weight: 500;
+    }
+    .status-ready    { color: #4CAF50; }
+    .status-action   { color: #F5A623; }
+    .status-find-out { color: var(--slate); }
+    .status-blocker  { color: var(--red); }
+    .status-ready-bg    { background: rgba(76,175,80,0.12); }
+    .status-action-bg   { background: rgba(245,166,35,0.12); }
+    .status-find-out-bg { background: rgba(147,152,165,0.12); }
+    .status-blocker-bg  { background: rgba(237,54,72,0.12); }
+    .report-delivery {
+      margin: 20px 16px 0;
+      background: var(--dark-blue);
+      border-radius: 12px;
+      padding: 20px;
+      color: var(--white);
+    }
+    .report-delivery-label {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      opacity: 0.6;
+      margin-bottom: 6px;
+    }
+    .report-delivery-method {
+      font-size: 18px;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+    .report-delivery-note {
+      font-size: 14px;
+      line-height: 1.55;
+      opacity: 0.82;
+    }
+    .report-checklist-section {
+      margin: 20px 16px 0;
+    }
+    .report-checklist-heading {
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--dark-blue);
+      margin-bottom: 14px;
+    }
+    .checklist-group {
+      margin-bottom: 16px;
+    }
+    .checklist-group-label {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.07em;
+      text-transform: uppercase;
+      color: var(--slate);
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .checklist-group-line {
+      flex: 1;
+      height: 1px;
+      background: rgba(147,152,165,0.3);
+    }
+    .checklist-item {
+      background: var(--white);
+      border: 1.5px solid rgba(147,152,165,0.2);
+      border-radius: 10px;
+      padding: 14px 16px;
+      margin-bottom: 10px;
+    }
+    .checklist-item-q {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--dark-blue);
+      margin-bottom: 8px;
+      line-height: 1.4;
+    }
+    .checklist-item-guide {
+      font-size: 13px;
+      color: var(--slate);
+      line-height: 1.55;
+    }
+    .report-evidence {
+      margin: 20px 16px 0;
+    }
+    .report-evidence-heading {
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--dark-blue);
+      margin-bottom: 6px;
+    }
+    .report-evidence-sub {
+      font-size: 14px;
+      color: var(--slate);
+      line-height: 1.5;
+      margin-bottom: 14px;
+    }
+    .evidence-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      padding: 14px 0;
+      border-bottom: 1px solid rgba(147,152,165,0.15);
+    }
+    .evidence-item:last-child { border-bottom: none; }
+    .evidence-checkbox {
+      width: 22px;
+      height: 22px;
+      flex-shrink: 0;
+      border: 2px solid rgba(147,152,165,0.5);
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: background 0.15s, border-color 0.15s;
+      margin-top: 1px;
+    }
+    .evidence-checkbox.checked {
+      background: var(--dark-blue);
+      border-color: var(--dark-blue);
+    }
+    .evidence-checkbox.checked::after {
+      content: '';
+      width: 12px;
+      height: 7px;
+      border-left: 2px solid white;
+      border-bottom: 2px solid white;
+      transform: rotate(-45deg) translateY(-1px);
+      display: block;
+    }
+    .evidence-text {
+      flex: 1;
+    }
+    .evidence-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--dark-blue);
+      margin-bottom: 2px;
+    }
+    .evidence-desc {
+      font-size: 13px;
+      color: var(--slate);
+      line-height: 1.45;
+    }
+    .report-submit-area {
+      margin: 24px 16px 0;
+    }
+    .btn-submit-report {
+      width: 100%;
+      height: 56px;
+      background: var(--red);
+      color: var(--white);
+      border: none;
+      border-radius: 12px;
+      font-family: 'Inter', sans-serif;
+      font-size: 15px;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .btn-submit-report:active { opacity: 0.88; }
+    .btn-submit-report:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+    .report-submitted-msg {
+      display: none;
+      text-align: center;
+      padding: 20px;
+    }
+    .report-submitted-msg.visible {
+      display: block;
+    }
+    .submitted-icon {
+      width: 56px;
+      height: 56px;
+      background: rgba(76,175,80,0.12);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 16px;
+    }
+    .submitted-title {
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--dark-blue);
+      margin-bottom: 10px;
+    }
+    .submitted-body {
+      font-size: 15px;
+      color: var(--slate);
+      line-height: 1.6;
+    }
+
+    /* ── PLANNER: FULL-HEIGHT LOCK ──────────────────────────── */
+    .app.planner-step {
+      height: 100dvh;
+      overflow: hidden;
+    }
+
+    .app.planner-step .app-content {
+      padding: 0 0 68px;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      flex: 1;
+      min-height: 0;
+    }
+
+    .app.planner-step #panel-0.active {
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+      min-height: 0;
+      overflow: hidden;
+    }
+
+    /* Planner body fills everything */
+    .app.planner-step .planner-body {
+      flex: 1;
+      min-height: 0;
+    }
+
+    /* ── PLANNER: POD TABS OVERLAY (top of canvas) ──────────── */
+    .planner-pod-tabs {
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      z-index: 15;
+      display: flex;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      gap: 8px;
+      padding: 10px 12px;
+      background: rgba(255, 255, 255, 0.92);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border-bottom: 1px solid rgba(147, 152, 165, 0.15);
+      scrollbar-width: none;
+    }
+    .planner-pod-tabs::-webkit-scrollbar { display: none; }
+
+    .pod-tab {
+      flex-shrink: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 3px;
+      padding: 10px 16px;
+      border: 1.5px solid rgba(147, 152, 165, 0.3);
+      border-radius: 10px;
+      background: var(--white);
+      cursor: pointer;
+      transition: all 0.15s;
+      touch-action: manipulation;
+      min-width: 120px;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .pod-tab:hover { border-color: var(--dark-blue); }
+    .pod-tab.active {
+      border-color: var(--dark-blue);
+      background: var(--dark-blue);
+    }
+    .pod-tab-name {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--dark-blue);
+    }
+    .pod-tab.active .pod-tab-name { color: var(--white); }
+    .pod-tab-size {
+      font-size: 11px;
+      color: var(--slate);
+    }
+    .pod-tab.active .pod-tab-size { color: rgba(255,255,255,0.65); }
+
+    /* ── PLANNER: BODY ──────────────────────────────────────── */
+    .planner-body {
+      display: flex;
+      flex: 1;
+      min-height: 0;
+      overflow: hidden;
+    }
+
+    /* ── PLANNER: SIDEBAR (tablet+, hidden on mobile) ───────── */
+    .planner-sidebar {
+      display: none;
+    }
+
+    /* ── PLANNER: CANVAS AREA ───────────────────────────────── */
+    .planner-canvas-area {
+      flex: 1;
+      position: relative;
+      min-height: 0;
+      overflow: hidden;
+      background: #EEF2EB;
+    }
+
+    #yard-canvas {
+      position: absolute;
+      inset: 0;
+      display: block;
+      width: 100%;
+      height: 100%;
+      touch-action: none;
+    }
+
+    /* ── PLANNER: CLEARANCE TOAST ───────────────────────────── */
+    .clearance-toast {
+      position: absolute;
+      top: 66px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(83, 82, 102, 0.9);
+      color: var(--white);
+      font-family: 'Inter', system-ui, sans-serif;
+      font-size: 12px;
+      font-weight: 500;
+      padding: 6px 14px;
+      border-radius: 20px;
+      white-space: nowrap;
+      pointer-events: none;
+      z-index: 10;
+      transition: background 0.2s;
+    }
+    .clearance-toast.warning {
+      background: rgba(237, 54, 72, 0.9);
+    }
+
+    /* ── PLANNER: SETTINGS FAB (floating pill over canvas) ───── */
+    .settings-fab {
+      position: absolute;
+      bottom: 14px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 15;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      height: 40px;
+      padding: 0 18px;
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      border: 1px solid rgba(147, 152, 165, 0.28);
+      border-radius: 20px;
+      box-shadow: 0 2px 16px rgba(0, 0, 0, 0.13);
+      font-family: 'Inter', system-ui, sans-serif;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--dark-blue);
+      cursor: pointer;
+      white-space: nowrap;
+      touch-action: manipulation;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    /* ── PLANNER: SHEET BACKDROP ─────────────────────────────── */
+    .sheet-backdrop {
+      position: absolute;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.25);
+      z-index: 20;
+      display: none;
+    }
+    .sheet-backdrop.visible { display: block; }
+
+    /* ── PLANNER: SETTINGS BOTTOM SHEET ─────────────────────── */
+    .settings-sheet {
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      background: var(--white);
+      border-radius: 16px 16px 0 0;
+      box-shadow: 0 -4px 32px rgba(0, 0, 0, 0.14);
+      max-height: 68%;
+      overflow-y: auto;
+      z-index: 25;
+      transform: translateY(100%);
+      transition: transform 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .settings-sheet.open { transform: translateY(0); }
+
+    .sheet-handle {
+      display: flex;
+      justify-content: center;
+      padding: 10px 0 2px;
+      cursor: grab;
+    }
+    .sheet-handle-bar {
+      width: 36px;
+      height: 4px;
+      background: rgba(147, 152, 165, 0.35);
+      border-radius: 2px;
+    }
+
+    .sheet-inner {
+      padding: 8px 16px 28px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    /* Old drawer: hidden (replaced by sheet) */
+    .planner-drawer { display: none; }
+
+    /* ── PLANNER: SHARED CONTROL STYLES ─────────────────────── */
+    .control-label {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.07em;
+      text-transform: uppercase;
+      color: var(--slate);
+      margin-bottom: 8px;
+    }
+
+    .yard-dim-row {
+      display: flex;
+      align-items: flex-end;
+      gap: 8px;
+    }
+
+    .dim-field {
+      flex: 1;
+      position: relative;
+    }
+
+    .dim-field label {
+      display: block;
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--slate);
+      margin-bottom: 5px;
+    }
+
+    .dim-input {
+      width: 100%;
+      height: 44px;
+      padding: 0 28px 0 12px;
+      border: 1.5px solid rgba(147, 152, 165, 0.35);
+      border-radius: 8px;
+      font-family: 'Inter', system-ui, sans-serif;
+      font-size: 16px;
+      color: var(--dark-blue);
+      background: var(--white);
+      -webkit-appearance: none;
+      appearance: none;
+      -moz-appearance: textfield;
+    }
+    .dim-input::-webkit-inner-spin-button,
+    .dim-input::-webkit-outer-spin-button { -webkit-appearance: none; }
+    .dim-input:focus { outline: none; border-color: var(--dark-blue); }
+
+    .dim-unit {
+      position: absolute;
+      right: 10px;
+      bottom: 13px;
+      font-size: 12px;
+      color: var(--slate);
+      pointer-events: none;
+    }
+
+    .dim-sep {
+      font-size: 18px;
+      color: var(--slate);
+      padding-bottom: 10px;
+      flex-shrink: 0;
+    }
+
+    .orient-row {
+      display: flex;
+      gap: 8px;
+    }
+
+    .orient-btn {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      height: 42px;
+      border: 1.5px solid rgba(147, 152, 165, 0.35);
+      border-radius: 8px;
+      background: var(--white);
+      font-family: 'Inter', system-ui, sans-serif;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--dark-blue);
+      cursor: pointer;
+      transition: all 0.15s;
+      touch-action: manipulation;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .orient-btn.active {
+      border-color: var(--dark-blue);
+      background: var(--dark-blue);
+      color: var(--white);
+    }
+
+    .pod-use-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+
+    .pod-use-btn {
+      height: 42px;
+      border: 1.5px solid rgba(147, 152, 165, 0.35);
+      border-radius: 8px;
+      background: var(--white);
+      font-family: 'Inter', system-ui, sans-serif;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--dark-blue);
+      cursor: pointer;
+      transition: all 0.15s;
+      touch-action: manipulation;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .pod-use-btn.active {
+      border-color: var(--dark-blue);
+      background: var(--dark-blue);
+      color: var(--white);
+    }
+
+    /* ── PLANNER: YARD OBJECT PICKER ────────────────────────── */
+    .yard-obj-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 6px;
+    }
+
+    .add-obj-btn {
+      height: 38px;
+      border: 1.5px solid rgba(147, 152, 165, 0.3);
+      border-radius: 8px;
+      background: var(--white);
+      font-family: 'Inter', system-ui, sans-serif;
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--dark-blue);
+      cursor: pointer;
+      transition: border-color 0.12s, background 0.12s;
+      touch-action: manipulation;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .add-obj-btn:hover {
+      border-color: var(--dark-blue);
+      background: rgba(83, 82, 102, 0.05);
+    }
+    .add-obj-btn:active {
+      background: rgba(83, 82, 102, 0.1);
+    }
+
+    /* ── PLANNER: TABLET / DESKTOP ──────────────────────────── */
+    @media (min-width: 768px) {
+      .app.planner-step #panel-0.active {
+        flex-direction: row;
+      }
+
+      .planner-pod-tabs { display: none !important; }
+      .settings-fab { display: none !important; }
+      .sheet-backdrop { display: none !important; }
+      .settings-sheet { display: none !important; }
+
+      .planner-sidebar {
+        display: flex;
+        flex-direction: column;
+        width: 272px;
+        flex-shrink: 0;
+        border-right: 1px solid rgba(147, 152, 165, 0.18);
+        overflow-y: auto;
+        padding: 20px 16px;
+        gap: 24px;
+        background: var(--white);
+      }
+
+      .sidebar-pod-cards {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+      }
+
+      .sidebar-pod-card {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 12px 14px;
+        border: 1.5px solid rgba(147, 152, 165, 0.3);
+        border-radius: 10px;
+        background: var(--white);
+        cursor: pointer;
+        transition: all 0.15s;
+        touch-action: manipulation;
+        text-align: left;
+        width: 100%;
+        -webkit-tap-highlight-color: transparent;
+      }
+      .sidebar-pod-card:hover { border-color: var(--dark-blue); }
+      .sidebar-pod-card.active {
+        border-color: var(--dark-blue);
+        background: var(--dark-blue);
+      }
+
+      .sidebar-pod-card-name {
+        font-size: 14px;
+        font-weight: 600;
+        color: var(--dark-blue);
+      }
+      .sidebar-pod-card.active .sidebar-pod-card-name { color: var(--white); }
+
+      .sidebar-pod-card-dims {
+        font-size: 12px;
+        color: var(--slate);
+        margin-top: 2px;
+      }
+      .sidebar-pod-card.active .sidebar-pod-card-dims { color: rgba(255,255,255,0.6); }
+
+      .sidebar-pod-card-badge {
+        font-size: 11px;
+        font-weight: 600;
+        color: var(--slate);
+        background: rgba(147, 152, 165, 0.12);
+        border-radius: 20px;
+        padding: 3px 9px;
+        flex-shrink: 0;
+      }
+      .sidebar-pod-card.active .sidebar-pod-card-badge {
+        color: rgba(255,255,255,0.75);
+        background: rgba(255,255,255,0.12);
+      }
+
+      .planner-body { flex: 1; min-width: 0; }
+      .planner-drawer { display: none; }
+    }
+
+    /* ── REDUCED MOTION ─────────────────────────────────────── */
+    @media (prefers-reduced-motion: reduce) {
+      .progress-fill { transition: none; }
+      .btn { transition: none; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="app" id="app">
+
+  <!-- ── STICKY HEADER ─────────────────────────────────────── -->
+  <header class="app-header" id="app-header">
+    <div class="header-bar">
+      <!-- Mini·O logo (red version, inline SVG) -->
+      <div class="header-logo" aria-label="Mini·O">
+        <svg viewBox="186 225 242 162" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false">
+          <style>.l{fill:#ED3648}</style>
+          <g>
+            <path class="l" d="M360.2,376H196.4v-98.4l55.5-41.6h163.8v98.4L360.2,376z M204.3,368.1h153.2l50.2-37.6v-86.5H254.5
+              l-50.2,37.6V368.1z"/>
+            <path class="l" d="M274.7,319.6h-7v-15.9c0-3.2-1.6-5-4.2-5c-2.5,0-4.3,1.9-4.3,5.1v15.9h-7v-16.2c0-3-1.5-4.8-4.1-4.8
+              c-2.5,0-4.3,1.9-4.3,5v15.9h-7V293h6.9v3.1c1-1.8,3.3-3.8,6.9-3.8c3.4,0,5.9,1.5,7.3,4c1.6-2.4,4.3-4,7.9-4c6.1,0,9.1,4,9.1,9.7
+              V319.6z"/>
+            <path class="l" d="M280.1,293h7v26.6h-7V293z"/>
+            <path class="l" d="M315.8,304.3v15.4h-7v-16.2c0-3-2-4.8-4.4-4.8c-2.9,0-4.7,2.1-4.7,5v16h-7V293h6.9v3.1
+              c1.1-1.8,3.7-3.8,7.1-3.8C314.2,292.4,315.8,298.6,315.8,304.3z"/>
+            <path class="l" d="M321.1,293h7v26.6h-7V293z"/>
+            <path class="l" d="M333.1,301h10.6v6.3h-10.6V301z"/>
+            <path class="l" d="M354.4,319.6h14.6c3.5,0,6.4-2.8,6.4-6.4l0-14.6c0-3.5-2.8-6.4-6.4-6.4h-14.6c-3.5,0-6.4,2.8-6.4,6.4
+              l0,14.6C348,316.8,350.8,319.6,354.4,319.6z M368.2,312.6H355v-13.2h13.2V312.6z"/>
+          </g>
+        </svg>
+      </div>
+      <span class="header-step-badge" id="step-badge" aria-live="polite">Step 1 of 6</span>
+    </div>
+
+    <div class="progress-track" role="progressbar" aria-valuenow="17" aria-valuemin="0" aria-valuemax="100" aria-label="Assessment progress">
+      <div class="progress-fill" id="progress-fill" style="width: 16.67%"></div>
+    </div>
+
+    <div class="step-label-bar">
+      <span class="step-label-text" id="step-label-text">Your Space</span>
+    </div>
+  </header>
+
+  <!-- ── MAIN CONTENT ──────────────────────────────────────── -->
+  <main class="app-content" id="app-content">
+
+    <!-- Step 1: Your Space — Backyard Planner -->
+    <section class="step-panel active" id="panel-0" aria-labelledby="step0-heading">
+
+      <!-- Planner body: sidebar + canvas -->
+      <div class="planner-body">
+
+        <!-- TABLET+: Sidebar -->
+        <aside class="planner-sidebar" aria-label="Planner controls" id="step0-heading">
+
+          <div>
+            <div class="control-label">Choose your pod</div>
+            <div class="sidebar-pod-cards">
+              <button class="sidebar-pod-card active" data-pod="twelve">
+                <div>
+                  <div class="sidebar-pod-card-name">The Twelve</div>
+                  <div class="sidebar-pod-card-dims">12 × 8 ft</div>
+                </div>
+                <span class="sidebar-pod-card-badge">96 sq ft</span>
+              </button>
+              <button class="sidebar-pod-card" data-pod="station">
+                <div>
+                  <div class="sidebar-pod-card-name">The Station</div>
+                  <div class="sidebar-pod-card-dims">30 × 10 ft</div>
+                </div>
+                <span class="sidebar-pod-card-badge">300 sq ft</span>
+              </button>
+              <button class="sidebar-pod-card" data-pod="sixteen">
+                <div>
+                  <div class="sidebar-pod-card-name">The Sixteen</div>
+                  <div class="sidebar-pod-card-dims">16 × 10 ft</div>
+                </div>
+                <span class="sidebar-pod-card-badge">160 sq ft</span>
+              </button>
+            </div>
+          </div>
+
+          <div>
+            <div class="control-label">Yard size</div>
+            <div class="yard-dim-row">
+              <div class="dim-field">
+                <label for="yard-w-sidebar">Width</label>
+                <input class="dim-input" type="number" id="yard-w-sidebar" value="40" min="10" max="200" inputmode="numeric">
+                <span class="dim-unit">ft</span>
+              </div>
+              <span class="dim-sep">×</span>
+              <div class="dim-field">
+                <label for="yard-d-sidebar">Depth</label>
+                <input class="dim-input" type="number" id="yard-d-sidebar" value="30" min="10" max="200" inputmode="numeric">
+                <span class="dim-unit">ft</span>
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <div class="control-label">Orientation</div>
+            <div class="orient-row">
+              <button class="orient-btn active" data-rotation="0">
+                <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true"><rect x="1" y="3" width="12" height="8" rx="1.5" stroke="currentColor" stroke-width="1.5"/></svg>
+                Landscape
+              </button>
+              <button class="orient-btn" data-rotation="90">
+                <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true"><rect x="3" y="1" width="8" height="12" rx="1.5" stroke="currentColor" stroke-width="1.5"/></svg>
+                Portrait
+              </button>
+            </div>
+          </div>
+
+          <div>
+            <div class="control-label">How will you use it?</div>
+            <div class="pod-use-grid">
+              <button class="pod-use-btn active" data-use="office">Office</button>
+              <button class="pod-use-btn" data-use="studio">Studio</button>
+              <button class="pod-use-btn" data-use="guest">Guest Suite</button>
+              <button class="pod-use-btn" data-use="other">Other</button>
+            </div>
+          </div>
+
+          <div>
+            <div class="control-label">Add to yard</div>
+            <div class="yard-obj-grid">
+              <button class="add-obj-btn" data-obj-type="tree">Tree</button>
+              <button class="add-obj-btn" data-obj-type="bush">Bush</button>
+              <button class="add-obj-btn" data-obj-type="pool">Pool</button>
+              <button class="add-obj-btn" data-obj-type="patio">Patio</button>
+              <button class="add-obj-btn" data-obj-type="deck">Deck</button>
+              <button class="add-obj-btn" data-obj-type="shed">Shed</button>
+              <button class="add-obj-btn" data-obj-type="garden">Garden</button>
+              <button class="add-obj-btn" data-obj-type="hottub">Hot tub</button>
+            </div>
+          </div>
+
+        </aside>
+
+        <!-- Canvas (fills full height; all mobile controls overlay it) -->
+        <div class="planner-canvas-area">
+
+          <!-- Pod tabs overlay (mobile) -->
+          <div class="planner-pod-tabs" role="tablist" aria-label="Choose your pod">
+            <button class="pod-tab active" role="tab" aria-selected="true" data-pod="twelve">
+              <span class="pod-tab-name">The Twelve</span>
+              <span class="pod-tab-size">12 × 8 ft</span>
+            </button>
+            <button class="pod-tab" role="tab" aria-selected="false" data-pod="sixteen">
+              <span class="pod-tab-name">The Sixteen</span>
+              <span class="pod-tab-size">16 × 10 ft</span>
+            </button>
+            <button class="pod-tab" role="tab" aria-selected="false" data-pod="station">
+              <span class="pod-tab-name">The Station</span>
+              <span class="pod-tab-size">30 × 10 ft</span>
+            </button>
+          </div>
+
+          <div class="clearance-toast" id="clearance-toast" aria-live="polite"></div>
+          <canvas id="yard-canvas" aria-label="Backyard planner. Tap anywhere in the yard to place your pod."></canvas>
+
+          <!-- Settings FAB (mobile) -->
+          <button class="settings-fab" id="settings-fab" aria-label="Open yard settings" aria-expanded="false" aria-controls="settings-sheet">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+              <circle cx="7" cy="7" r="2.5" stroke="currentColor" stroke-width="1.5"/>
+              <path d="M7 1v1M7 12v1M1 7h1M12 7h1M2.93 2.93l.7.7M10.37 10.37l.7.7M10.37 3.63l-.7.7M3.63 10.37l-.7.7" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+            </svg>
+            Yard settings
+          </button>
+
+          <!-- Backdrop -->
+          <div class="sheet-backdrop" id="sheet-backdrop"></div>
+
+          <!-- Settings bottom sheet (mobile) -->
+          <div class="settings-sheet" id="settings-sheet" role="dialog" aria-label="Yard settings">
+            <div class="sheet-handle"><div class="sheet-handle-bar"></div></div>
+            <div class="sheet-inner">
+              <div>
+                <div class="control-label">Yard size</div>
+                <div class="yard-dim-row">
+                  <div class="dim-field">
+                    <label for="yard-w-mobile">Width</label>
+                    <input class="dim-input" type="number" id="yard-w-mobile" value="40" min="10" max="200" inputmode="numeric">
+                    <span class="dim-unit">ft</span>
+                  </div>
+                  <span class="dim-sep">×</span>
+                  <div class="dim-field">
+                    <label for="yard-d-mobile">Depth</label>
+                    <input class="dim-input" type="number" id="yard-d-mobile" value="30" min="10" max="200" inputmode="numeric">
+                    <span class="dim-unit">ft</span>
+                  </div>
+                </div>
+              </div>
+              <div>
+                <div class="control-label">Orientation</div>
+                <div class="orient-row">
+                  <button class="orient-btn active" data-rotation="0">
+                    <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true"><rect x="1" y="3" width="12" height="8" rx="1.5" stroke="currentColor" stroke-width="1.5"/></svg>
+                    Landscape
+                  </button>
+                  <button class="orient-btn" data-rotation="90">
+                    <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true"><rect x="3" y="1" width="8" height="12" rx="1.5" stroke="currentColor" stroke-width="1.5"/></svg>
+                    Portrait
+                  </button>
+                </div>
+              </div>
+              <div>
+                <div class="control-label">How will you use it?</div>
+                <div class="pod-use-grid">
+                  <button class="pod-use-btn active" data-use="office">Office</button>
+                  <button class="pod-use-btn" data-use="studio">Studio</button>
+                  <button class="pod-use-btn" data-use="guest">Guest Suite</button>
+                  <button class="pod-use-btn" data-use="other">Other</button>
+                </div>
+              </div>
+              <div>
+                <div class="control-label">Add to yard</div>
+                <div class="yard-obj-grid">
+                  <button class="add-obj-btn" data-obj-type="tree">Tree</button>
+                  <button class="add-obj-btn" data-obj-type="bush">Bush</button>
+                  <button class="add-obj-btn" data-obj-type="pool">Pool</button>
+                  <button class="add-obj-btn" data-obj-type="patio">Patio</button>
+                  <button class="add-obj-btn" data-obj-type="deck">Deck</button>
+                  <button class="add-obj-btn" data-obj-type="shed">Shed</button>
+                  <button class="add-obj-btn" data-obj-type="garden">Garden</button>
+                  <button class="add-obj-btn" data-obj-type="hottub">Hot tub</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+      </div><!-- /.planner-body -->
+
+
+    </section>
+
+    <!-- Step 2: Access Path -->
+    <section class="step-panel" id="panel-1" aria-labelledby="panel-1-heading">
+      <h2 class="sr-only" id="panel-1-heading">Access Path</h2>
+    </section>
+
+    <!-- Step 3: Foundation & Placement -->
+    <section class="step-panel" id="panel-2" aria-labelledby="panel-2-heading">
+      <h2 class="sr-only" id="panel-2-heading">Foundation and Placement</h2>
+    </section>
+
+    <!-- Step 4: Utilities -->
+    <section class="step-panel" id="panel-3" aria-labelledby="panel-3-heading">
+      <h2 class="sr-only" id="panel-3-heading">Utilities</h2>
+    </section>
+
+    <!-- Step 5: Permitting & HOA -->
+    <section class="step-panel" id="panel-4" aria-labelledby="panel-4-heading">
+      <h2 class="sr-only" id="panel-4-heading">Permitting and HOA</h2>
+    </section>
+
+    <!-- Step 6: Contact details — gates the readiness report -->
+    <section class="step-panel" id="panel-5" aria-labelledby="step5-heading">
+      <div class="contact-form-wrapper" id="contact-form-wrapper">
+        <h1 class="step-heading" id="step5-heading">You're done. Let's send you your results.</h1>
+        <p class="step-subheading">Enter your details below and we'll show you your personalized readiness report. We'll also email you a copy so you can share it with your contractor or revisit it later.</p>
+
+        <div class="form-row-tablet-wrapper">
+          <div class="form-row-tablet">
+            <div class="form-group">
+              <label class="form-label" for="first-name">First Name</label>
+              <input
+                class="form-input"
+                type="text"
+                id="first-name"
+                name="firstName"
+                placeholder="Jane"
+                autocomplete="given-name"
+                inputmode="text"
+                required
+              >
+              <span class="field-error" id="first-name-error">Please enter your first name.</span>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="last-name">Last Name</label>
+              <input
+                class="form-input"
+                type="text"
+                id="last-name"
+                name="lastName"
+                placeholder="Smith"
+                autocomplete="family-name"
+                inputmode="text"
+                required
+              >
+              <span class="field-error" id="last-name-error">Please enter your last name.</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="email">Email Address</label>
+          <input
+            class="form-input"
+            type="email"
+            id="email"
+            name="email"
+            placeholder="jane@example.com"
+            autocomplete="email"
+            inputmode="email"
+            required
+          >
+          <span class="field-error" id="email-error">Please enter a valid email address.</span>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="phone">
+            Phone Number
+            <span class="optional-tag">(optional)</span>
+          </label>
+          <input
+            class="form-input"
+            type="tel"
+            id="phone"
+            name="phone"
+            placeholder="(555) 000-0000"
+            autocomplete="tel"
+            inputmode="tel"
+          >
+          <span class="field-hint">We will only call you if you want us to.</span>
+        </div>
+      </div><!-- /contact-form-wrapper -->
+
+      <div class="report-wrapper" id="report-wrapper"></div>
+    </section>
+
+  </main>
+
+  <!-- ── STICKY BOTTOM NAV ─────────────────────────────────── -->
+  <nav class="app-nav" id="app-nav" aria-label="Assessment navigation">
+    <button class="btn btn-back" id="btn-back" disabled aria-label="Go to previous step">
+      Back
+    </button>
+    <button class="btn btn-next" id="btn-next" disabled aria-label="Continue to next step">
+      Next
+    </button>
+  </nav>
+
+</div><!-- /.app -->
+
+<script>
+'use strict';
+
+/* ── STEP CONFIGURATION ───────────────────────────────────── */
+const STEPS = [
+  { label: 'Your Space',               stepNum: 1 },
+  { label: 'Access Path',              stepNum: 2 },
+  { label: 'Foundation and Placement', stepNum: 3 },
+  { label: 'Utilities',                stepNum: 4 },
+  { label: 'Permitting and HOA',       stepNum: 5 },
+  { label: 'Your Readiness Report',    stepNum: 6 },
+];
+
+const TOTAL_STEPS = STEPS.length;
+const STORAGE_KEY = 'minio-assessment-v1';
+
+/* ── STATE ────────────────────────────────────────────────── */
+let state = {
+  currentStep: 0,
+  contact: {
+    firstName: '',
+    lastName: '',
+    email: '',
+    phone: '',
+  },
+  answers:     {},  // { questionId: selectedValue }
+  answersText: {},  // { questionId: free-text content }
+};
+
+/* ── PERSISTENCE ──────────────────────────────────────────── */
+function saveState() {
+  try {
+    sessionStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+  } catch (e) {
+    // sessionStorage unavailable; continue without persistence
+  }
+}
+
+function loadState() {
+  try {
+    const raw = sessionStorage.getItem(STORAGE_KEY);
+    if (raw) {
+      const saved = JSON.parse(raw);
+      // Merge saved state carefully so new fields aren't lost
+      state.currentStep = saved.currentStep || 0;
+      if (saved.contact) {
+        state.contact = { ...state.contact, ...saved.contact };
+      }
+    }
+  } catch (e) {
+    // Corrupted storage; start fresh
+  }
+}
+
+/* ── DOM REFS ─────────────────────────────────────────────── */
+const progressFill  = document.getElementById('progress-fill');
+const stepBadge     = document.getElementById('step-badge');
+const stepLabelText = document.getElementById('step-label-text');
+const btnBack       = document.getElementById('btn-back');
+const btnNext       = document.getElementById('btn-next');
+const panels        = Array.from(document.querySelectorAll('.step-panel'));
+
+/* ── STEP 6 FORM REFS ─────────────────────────────────────── */
+const fieldFirstName = document.getElementById('first-name');
+const fieldLastName  = document.getElementById('last-name');
+const fieldEmail     = document.getElementById('email');
+const fieldPhone     = document.getElementById('phone');
+
+const errFirstName = document.getElementById('first-name-error');
+const errLastName  = document.getElementById('last-name-error');
+const errEmail     = document.getElementById('email-error');
+
+/* ── VALIDATION ───────────────────────────────────────────── */
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+
+function isValidEmail(v) {
+  return EMAIL_RE.test((v || '').trim());
+}
+
+function isStep5Valid() {
+  const c = state.contact;
+  return (
+    c.firstName.trim().length > 0 &&
+    c.lastName.trim().length > 0 &&
+    isValidEmail(c.email)
+  );
+}
+
+function isCurrentStepValid() {
+  const s = state.currentStep;
+  if (s === 5) return isStep5Valid();
+  if (s >= 1 && s <= 4) return isStepAnswered(s);
+  return true;
+}
+
+/* ── HEADER + PROGRESS UPDATE ─────────────────────────────── */
+function updateHeader() {
+  const step = STEPS[state.currentStep];
+  const pct  = ((state.currentStep + 1) / TOTAL_STEPS * 100).toFixed(2);
+
+  progressFill.style.width = pct + '%';
+  progressFill.parentElement.setAttribute('aria-valuenow', Math.round(pct));
+  stepBadge.textContent     = `Step ${step.stepNum} of ${TOTAL_STEPS}`;
+  stepLabelText.textContent = step.label;
+}
+
+/* ── NAV BUTTON STATE ─────────────────────────────────────── */
+function updateNavButtons() {
+  const isFirst = state.currentStep === 0;
+  const isLast  = state.currentStep === TOTAL_STEPS - 1;
+  const valid   = isCurrentStepValid();
+
+  btnBack.disabled = isFirst;
+  btnNext.disabled = !valid;
+
+  if (isLast) {
+    btnNext.textContent = 'SEE MY RESULTS';
+    btnNext.setAttribute('aria-label', 'Submit your details and see your readiness report');
+  } else {
+    btnNext.textContent = 'NEXT';
+    btnNext.setAttribute('aria-label', 'Continue to next step');
+  }
+}
+
+/* ── PANEL DISPLAY ────────────────────────────────────────── */
+function showStep(index) {
+  panels.forEach((panel, i) => {
+    panel.classList.toggle('active', i === index);
+  });
+  // Scroll content to top when step changes
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+/* ── RENDER ───────────────────────────────────────────────── */
+function render() {
+  updateHeader();
+  showStep(state.currentStep);
+  updateNavButtons();
+  // Planner step needs a special full-height layout
+  document.getElementById('app').classList.toggle('planner-step', state.currentStep === 0);
+}
+
+/* ── NAVIGATION ───────────────────────────────────────────── */
+function goNext() {
+  if (!isCurrentStepValid()) return;
+  if (state.currentStep === TOTAL_STEPS - 1) {
+    handleSubmit();
+    return;
+  }
+  state.currentStep = Math.min(state.currentStep + 1, TOTAL_STEPS - 1);
+  saveState();
+  render();
+}
+
+function goBack() {
+  if (state.currentStep === 0) return;
+  state.currentStep = Math.max(state.currentStep - 1, 0);
+  saveState();
+  render();
+}
+
+btnNext.addEventListener('click', goNext);
+btnBack.addEventListener('click', goBack);
+
+/* ── KEYBOARD NAVIGATION ──────────────────────────────────── */
+document.addEventListener('keydown', e => {
+  // Allow Enter/Right on non-input elements to advance
+  if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+  if ((e.key === 'ArrowRight' || e.key === 'Enter') && !btnNext.disabled) {
+    goNext();
+  }
+  if (e.key === 'ArrowLeft' && !btnBack.disabled) {
+    goBack();
+  }
+});
+
+/* ── STEP 1A: FORM SYNC ───────────────────────────────────── */
+function syncContactFromDOM() {
+  state.contact.firstName = fieldFirstName.value;
+  state.contact.lastName  = fieldLastName.value;
+  state.contact.email     = fieldEmail.value;
+  state.contact.phone     = fieldPhone.value;
+  saveState();
+  updateNavButtons();
+}
+
+// Populate DOM from restored state
+function populateContactForm() {
+  const c = state.contact;
+  if (c.firstName) fieldFirstName.value = c.firstName;
+  if (c.lastName)  fieldLastName.value  = c.lastName;
+  if (c.email)     fieldEmail.value     = c.email;
+  if (c.phone)     fieldPhone.value     = c.phone;
+}
+
+// Inline validation on blur (show errors only after user has touched the field)
+function validateFieldOnBlur(input, errorEl, checkFn) {
+  input.addEventListener('blur', () => {
+    const invalid = !checkFn(input.value);
+    input.classList.toggle('input-error', invalid);
+    errorEl.classList.toggle('visible', invalid);
+  });
+  // Clear error on focus
+  input.addEventListener('focus', () => {
+    input.classList.remove('input-error');
+    errorEl.classList.remove('visible');
+  });
+}
+
+validateFieldOnBlur(fieldFirstName, errFirstName, v => v.trim().length > 0);
+validateFieldOnBlur(fieldLastName,  errLastName,  v => v.trim().length > 0);
+validateFieldOnBlur(fieldEmail,     errEmail,     v => isValidEmail(v));
+
+[fieldFirstName, fieldLastName, fieldEmail, fieldPhone].forEach(el => {
+  el.addEventListener('input', syncContactFromDOM);
+});
+
+/* ── READINESS REPORT ENGINE ──────────────────────────────── */
+
+const STATUS_CONFIG = {
+  ready:    { label: "You're set",               cssClass: 'status-ready',    bgClass: 'status-ready-bg',    icon: '✓' },
+  action:   { label: 'A few things to sort out', cssClass: 'status-action',   bgClass: 'status-action-bg',   icon: '!' },
+  find_out: { label: "Let's figure this out",    cssClass: 'status-find-out', bgClass: 'status-find-out-bg', icon: '?' },
+  blocker:  { label: "Let's talk about this",    cssClass: 'status-blocker',  bgClass: 'status-blocker-bg',  icon: '!' },
+};
+
+function computeReport() {
+  const a = state.answers || {};
+
+  // ── Access Path
+  let accessStatus = 'ready';
+  if (a.access_width === 'lt10' || a.overhead_clearance === 'lt12' || a.equipment_exit === 'no') {
+    accessStatus = 'blocker';
+  } else if (['access_width','overhead_clearance','sharp_turns','slope','truck_access','equipment_exit'].some(k => a[k] === 'unsure')) {
+    accessStatus = 'find_out';
+  } else if (a.access_width === '10to12' || a.overhead_clearance === '12to13_5' || a.sharp_turns === 'yes' || a.slope === 'slope') {
+    accessStatus = 'action';
+  }
+
+  // ── Foundation
+  let foundationStatus = 'ready';
+  if (['surface_type','ground_level','clearance_around','foundation_status'].some(k => a[k] === 'unsure')) {
+    foundationStatus = 'find_out';
+  } else if (a.ground_level === 'slope' || a.foundation_status === 'not_prepared' || a.clearance_around === 'no') {
+    foundationStatus = 'action';
+  }
+
+  // ── Electrical
+  let electricalStatus = 'ready';
+  if (a.panel_location_known === 'no' || a.service_amperage === 'unsure' || a.panel_distance === 'unsure' || a.wiring_obstacles === 'unsure') {
+    electricalStatus = 'find_out';
+  } else if (a.panel_distance === 'gt100' || a.wiring_obstacles === 'yes') {
+    electricalStatus = 'action';
+  }
+
+  // ── Permitting
+  let permittingStatus = 'ready';
+  if (a.permit_checked === 'not_checked' || a.permit_checked === 'unsure' || a.hoa_status === 'unsure' || a.setback_awareness === 'unsure') {
+    permittingStatus = 'find_out';
+  } else if (a.permit_checked === 'required' || a.hoa_status === 'yes') {
+    permittingStatus = 'action';
+  }
+
+  // ── Delivery recommendation
+  const accessKeys = ['access_width','overhead_clearance','sharp_turns','truck_access','equipment_exit'];
+  const unsureCount = accessKeys.filter(k => a[k] === 'unsure').length;
+  let delivery = 'tbd';
+  if (unsureCount >= 2) {
+    delivery = 'tbd';
+  } else if (a.access_width === 'lt10' || a.overhead_clearance === 'lt12') {
+    delivery = 'crane';
+  } else if (a.access_width === 'gt12' && (a.overhead_clearance === 'gt13_5') && a.sharp_turns === 'no' && a.truck_access === 'yes' && a.equipment_exit === 'yes') {
+    delivery = 'shed_mule';
+  } else {
+    delivery = 'shed_mule_adjusted';
+  }
+
+  // ── Overall status
+  const statuses = [accessStatus, foundationStatus, electricalStatus, permittingStatus];
+  let overallStatus = 'ready';
+  if (statuses.includes('blocker')) overallStatus = 'blocker';
+  else if (statuses.includes('action')) overallStatus = 'action';
+  else if (statuses.includes('find_out')) overallStatus = 'find_out';
+
+  return { accessStatus, foundationStatus, electricalStatus, permittingStatus, delivery, overallStatus };
+}
+
+function overallStatusLine(report, firstName) {
+  const name = firstName ? firstName + ', your' : 'Your';
+  if (report.overallStatus === 'ready') return `${name} property looks great for a Mini·O pod.`;
+  if (report.overallStatus === 'blocker') return `${name} property has a couple of things we should discuss together. Don't worry, there's almost always a solution.`;
+  const actionCount = [report.accessStatus, report.foundationStatus, report.electricalStatus, report.permittingStatus].filter(s => s === 'action' || s === 'find_out').length;
+  return `${name} property is in good shape. Here are ${actionCount} thing${actionCount !== 1 ? 's' : ''} to take care of before your next call with us.`;
+}
+
+function buildSectionCardHTML(icon, title, status) {
+  const cfg = STATUS_CONFIG[status] || STATUS_CONFIG.find_out;
+  const svgIcons = {
+    access:     `<svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M4 10h12M10 4l6 6-6 6" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
+    foundation: `<svg width="20" height="20" viewBox="0 0 20 20" fill="none"><rect x="3" y="13" width="14" height="3" rx="1" stroke="currentColor" stroke-width="1.6"/><path d="M6 13V8M10 13V6M14 13V8" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>`,
+    electrical: `<svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M11 3L5 11h6l-2 6 8-9h-6l2-5z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg>`,
+    permitting: `<svg width="20" height="20" viewBox="0 0 20 20" fill="none"><rect x="4" y="3" width="12" height="14" rx="2" stroke="currentColor" stroke-width="1.6"/><path d="M7 8h6M7 11h4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>`,
+  };
+  return `<div class="report-card">
+    <div class="report-card-icon ${cfg.bgClass}">
+      <span class="${cfg.cssClass}">${svgIcons[icon] || ''}</span>
+    </div>
+    <div class="report-card-body">
+      <div class="report-card-title">${title}</div>
+      <div class="report-card-status ${cfg.cssClass}">${cfg.label}</div>
+    </div>
+  </div>`;
+}
+
+function buildDeliveryHTML(delivery) {
+  const methods = {
+    shed_mule: {
+      name: 'Shed Mule Delivery',
+      note: 'Your pod will be delivered on a trailer and moved into position using a shed mule. This is the simplest and most common installation method.',
+    },
+    shed_mule_adjusted: {
+      name: 'Shed Mule Delivery (With Adjustments)',
+      note: "Ground delivery should work for your property, but a few things need closer review. We'll confirm the best approach on your call.",
+    },
+    crane: {
+      name: 'Crane Delivery Likely',
+      note: "A crane will lift your pod over obstacles and place it directly into position. This is common and works well for properties with limited ground access. On your call, we'll help you get a crane quote.",
+    },
+    tbd: {
+      name: 'Delivery Method: To Be Determined',
+      note: "We need a few more details about your access path before recommending a delivery method. We'll figure it out together on your call.",
+    },
+  };
+  const m = methods[delivery] || methods.tbd;
+  return `<div class="report-delivery">
+    <div class="report-delivery-label">Delivery Recommendation</div>
+    <div class="report-delivery-method">${m.name}</div>
+    <div class="report-delivery-note">${m.note}</div>
+  </div>`;
+}
+
+function buildChecklistHTML() {
+  const a = state.answers || {};
+  const findOutItems = [];
+  const actionItems = [];
+
+  // Collect all questions across all steps and check for guided answers
+  const allQuestions = [];
+  [1, 2].forEach(stepIdx => {
+    const def = STEP_DEFS[stepIdx];
+    if (def && def.questions) def.questions.forEach(q => allQuestions.push(q));
+  });
+  // Step 3 sections
+  const def3 = STEP_DEFS[3];
+  if (def3 && def3.sections) {
+    def3.sections.forEach(sec => {
+      if (sec.always) sec.questions.forEach(q => allQuestions.push(q));
+    });
+  }
+  // Step 4
+  const def4 = STEP_DEFS[4];
+  if (def4 && def4.questions) def4.questions.forEach(q => allQuestions.push(q));
+
+  allQuestions.forEach(q => {
+    const val = a[q.id];
+    if (!val) return;
+    if (!q.guides || !q.guides[val]) return;
+    const item = { q: q.text, guide: q.guides[val] };
+    if (val === 'unsure') findOutItems.push(item);
+    else actionItems.push(item);
+  });
+
+  if (!findOutItems.length && !actionItems.length) {
+    return `<div class="report-checklist-section">
+      <div class="report-checklist-heading">Your Checklist</div>
+      <p style="font-size:15px;color:var(--slate);line-height:1.6;">Great news, you answered everything with confidence. Nothing to look up before your call.</p>
+    </div>`;
+  }
+
+  let html = `<div class="report-checklist-section"><div class="report-checklist-heading">Your Checklist</div>`;
+
+  if (findOutItems.length) {
+    html += `<div class="checklist-group">
+      <div class="checklist-group-label"><span>Things to find out</span><div class="checklist-group-line"></div></div>
+      ${findOutItems.map(item => `<div class="checklist-item"><div class="checklist-item-q">${escapeHtml(item.q)}</div><div class="checklist-item-guide">${escapeHtml(item.guide)}</div></div>`).join('')}
+    </div>`;
+  }
+
+  if (actionItems.length) {
+    html += `<div class="checklist-group">
+      <div class="checklist-group-label"><span>Things to sort out</span><div class="checklist-group-line"></div></div>
+      ${actionItems.map(item => `<div class="checklist-item"><div class="checklist-item-q">${escapeHtml(item.q)}</div><div class="checklist-item-guide">${escapeHtml(item.guide)}</div></div>`).join('')}
+    </div>`;
+  }
+
+  html += '</div>';
+  return html;
+}
+
+function buildEvidenceHTML() {
+  const items = [
+    { title: 'Walkthrough video', desc: 'Record yourself walking from the street to the pod spot. Point out any tight spots, low branches, or obstacles.' },
+    { title: 'Access path measurements', desc: 'Photos of tape measure at the narrowest and lowest clearance points.' },
+    { title: 'Pod spot photo', desc: 'A photo of the area where the pod will sit, showing the ground surface and surroundings.' },
+    { title: 'Electrical panel photo', desc: 'Open the panel door and photograph the label showing your amperage.' },
+    { title: 'Distance measurements', desc: 'Step count or tape measure from panel to pod spot.' },
+  ];
+  return `<div class="report-evidence">
+    <div class="report-evidence-heading">Before Your Call</div>
+    <div class="report-evidence-sub">These aren't required, but having them ready will make your first call with Mini·O much more productive.</div>
+    ${items.map((item) => `
+      <div class="evidence-item">
+        <div class="evidence-checkbox" role="checkbox" aria-checked="false" tabindex="0" aria-label="${escapeAttr(item.title)}"></div>
+        <div class="evidence-text">
+          <div class="evidence-title">${escapeHtml(item.title)}</div>
+          <div class="evidence-desc">${escapeHtml(item.desc)}</div>
+        </div>
+      </div>`).join('')}
+  </div>`;
+}
+
+function buildReport() {
+  const report = computeReport();
+  const firstName = state.contact.firstName || '';
+
+  return `
+    <div class="report-hero">
+      <div class="report-hero-label">Your Readiness Report</div>
+      <div class="report-hero-title">Here's where you stand${firstName ? ', ' + escapeHtml(firstName) : ''}.</div>
+      <div class="report-hero-sub">${overallStatusLine(report, firstName)}</div>
+    </div>
+
+    <div class="report-section-cards">
+      ${buildSectionCardHTML('access',     'Access Path',           report.accessStatus)}
+      ${buildSectionCardHTML('foundation', 'Foundation',            report.foundationStatus)}
+      ${buildSectionCardHTML('electrical', 'Electrical',            report.electricalStatus)}
+      ${buildSectionCardHTML('permitting', 'Permitting and HOA',    report.permittingStatus)}
+    </div>
+
+    ${buildDeliveryHTML(report.delivery)}
+    ${buildChecklistHTML()}
+    ${buildEvidenceHTML()}
+
+    <div class="report-submit-area">
+      <button class="btn-submit-report" id="btn-send-results" type="button">
+        Send My Results to Mini·O
+      </button>
+      <div class="report-submitted-msg" id="report-submitted-msg">
+        <div class="submitted-icon">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M5 12l5 5L19 7" stroke="#4CAF50" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+        <div class="submitted-title">Results sent!</div>
+        <div class="submitted-body">Thanks, ${escapeHtml(firstName || 'there')}. One of our pod specialists will review your results and reach out within 2 business days. In the meantime, work through any checklist items and we'll pick up where you left off.</div>
+      </div>
+    </div>
+  `;
+}
+
+async function submitToAirtable() {
+  const btn = document.getElementById('btn-send-results');
+  const msg = document.getElementById('report-submitted-msg');
+  if (btn) { btn.disabled = true; btn.textContent = 'Sending...'; }
+
+  // Compute report scores to include in payload
+  const report = computeReport();
+
+  // Snapshot the planner state (global `planner` object)
+  const plannerSnap = {
+    podName:  planner.pod ? planner.pod.name : '',
+    podUse:   planner.podUse || '',
+    yardW:    planner.yardW,
+    yardD:    planner.yardD,
+    rotation: planner.rotation,
+  };
+
+  const payload = {
+    contact:     state.contact,
+    answers:     state.answers     || {},
+    answersText: state.answersText || {},
+    plannerSnap,
+    report,
+  };
+
+  try {
+    const res = await fetch('/.netlify/functions/submit', {
+      method:  'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body:    JSON.stringify(payload),
+    });
+
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err.error || `Server error ${res.status}`);
+    }
+
+    // Success
+    if (btn) btn.style.display = 'none';
+    if (msg) msg.classList.add('visible');
+    state.submitted = true;
+    saveState();
+
+  } catch (err) {
+    console.error('Submission failed:', err);
+    if (btn) {
+      btn.disabled = false;
+      btn.textContent = 'Send My Results to Mini·O';
+    }
+    // Show inline error below button
+    let errEl = document.getElementById('submit-error');
+    if (!errEl) {
+      errEl = document.createElement('p');
+      errEl.id = 'submit-error';
+      errEl.style.cssText = 'color:var(--red);font-size:14px;margin-top:10px;text-align:center;';
+      btn.parentElement.appendChild(errEl);
+    }
+    errEl.textContent = 'Something went wrong. Please try again.';
+  }
+}
+
+/* ── SUBMISSION ───────────────────────────────────────────── */
+function handleSubmit() {
+  if (!isStep5Valid()) return;
+  const formWrapper = document.getElementById('contact-form-wrapper');
+  const reportWrapper = document.getElementById('report-wrapper');
+  if (formWrapper) formWrapper.classList.add('hidden');
+  if (reportWrapper) {
+    reportWrapper.innerHTML = buildReport();
+    reportWrapper.classList.add('visible');
+  }
+  const nav = document.getElementById('app-nav');
+  if (nav) nav.style.display = 'none';
+  const panel = document.getElementById('panel-5');
+  if (panel) panel.scrollTop = 0;
+  // Wire checkboxes
+  if (reportWrapper) {
+    reportWrapper.querySelectorAll('.evidence-checkbox').forEach(cb => {
+      cb.addEventListener('click', () => {
+        const checked = cb.classList.toggle('checked');
+        cb.setAttribute('aria-checked', checked ? 'true' : 'false');
+      });
+    });
+    const submitBtn = document.getElementById('btn-send-results');
+    if (submitBtn) submitBtn.addEventListener('click', submitToAirtable);
+  }
+  state.reportShown = true;
+  saveState();
+}
+
+/* ── PLANNER DATA ─────────────────────────────────────── */
+const PODS = [
+  { id: 'twelve',  name: 'The Twelve',  w: 12, d: 8,  label: '96 sq ft'  },
+  { id: 'sixteen', name: 'The Sixteen', w: 16, d: 10, label: '160 sq ft' },
+  { id: 'station', name: 'The Station', w: 30, d: 10, label: '300 sq ft' },
+];
+
+const YARD_OBJECT_DEFS = {
+  tree:   { label: 'Tree',       w: 6,  h: 6,  shape: 'circle', fill: '#5B8B48', stroke: '#3D6030' },
+  pool:   { label: 'Pool',       w: 10, h: 18, shape: 'rect',   fill: '#74BBDB', stroke: '#4E8FAD' },
+  patio:  { label: 'Patio',      w: 14, h: 12, shape: 'rect',   fill: '#C2B49A', stroke: '#9A8E7A' },
+  shed:   { label: 'Shed',       w: 8,  h: 10, shape: 'rect',   fill: '#A07848', stroke: '#7A5A32' },
+  garden: { label: 'Garden',     w: 4,  h: 8,  shape: 'rect',   fill: '#6C9A54', stroke: '#4E7038' },
+  hottub: { label: 'Hot tub',    w: 7,  h: 7,  shape: 'circle', fill: '#8AB8D4', stroke: '#5A8CAE' },
+  bush:   { label: 'Bush',       w: 4,  h: 4,  shape: 'circle', fill: '#4E7A38', stroke: '#345228' },
+  deck:   { label: 'Deck',       w: 16, h: 12, shape: 'rect',   fill: '#C8A878', stroke: '#A08050' },
+};
+
+const SETBACK    = 5;   // feet
+const HIT_EXPAND = 20;  // px extra hit area for finger dragging
+
+/* ── PLANNER STATE ─────────────────────────────────────── */
+const planner = {
+  pod:         PODS[0],
+  rotation:    0,
+  yardW:       40,
+  yardD:       30,
+  podX:        0,
+  podY:        0,
+  podUse:      'office',
+  scale:       1,
+  offsetX:     0,
+  offsetY:     0,
+  dragging:    false,
+  dragOffX:    0,
+  dragOffY:    0,
+  dragTarget:  'pod', // 'pod' or object index
+  objects:     [],    // placed yard objects
+  selectedObj: -1,    // index of selected object, -1 = none
+};
+
+function syncPlannerToState() {
+  const { w, h } = podDims();
+  state.planner = {
+    pod_model:       planner.pod.id,
+    pod_dimensions:  w + ' x ' + h + ' ft',
+    yard_width:      planner.yardW,
+    yard_depth:      planner.yardD,
+    pod_position_x:  +planner.podX.toFixed(1),
+    pod_position_y:  +planner.podY.toFixed(1),
+    pod_orientation: planner.rotation === 0 ? '0deg' : '90deg',
+    pod_use:         planner.podUse,
+  };
+  saveState();
+}
+
+/* ── CANVAS SETUP ──────────────────────────────────────── */
+const canvas = document.getElementById('yard-canvas');
+const ctx    = canvas.getContext('2d');
+
+function resizeCanvas() {
+  const area = canvas.parentElement;
+  if (!area) return;
+  const dpr = window.devicePixelRatio || 1;
+  const w = area.clientWidth;
+  const h = area.clientHeight;
+  if (!w || !h) return;
+  canvas.width  = Math.round(w * dpr);
+  canvas.height = Math.round(h * dpr);
+  canvas.style.width  = w + 'px';
+  canvas.style.height = h + 'px';
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  fitToView();
+}
+
+const resizeObs = new ResizeObserver(() => resizeCanvas());
+
+/* ── COORDINATE HELPERS ────────────────────────────────── */
+function podDims() {
+  const { w, d } = planner.pod;
+  return planner.rotation === 90 ? { w: d, h: w } : { w, h: d };
+}
+
+function ftToPx(ft) { return ft * planner.scale; }
+
+function yardToCanvas(fx, fy) {
+  return [planner.offsetX + fx * planner.scale, planner.offsetY + fy * planner.scale];
+}
+
+function canvasToYard(cx, cy) {
+  return [(cx - planner.offsetX) / planner.scale, (cy - planner.offsetY) / planner.scale];
+}
+
+function clampPod(fx, fy) {
+  const { w, h } = podDims();
+  return [
+    Math.max(w / 2, Math.min(planner.yardW - w / 2, fx)),
+    Math.max(h / 2, Math.min(planner.yardD - h / 2, fy)),
+  ];
+}
+
+function fitToView() {
+  const cssW = canvas.clientWidth;
+  const cssH = canvas.clientHeight;
+  if (!cssW || !cssH) return;
+  const PAD = 44;
+  const scaleX = (cssW - PAD * 2) / planner.yardW;
+  const scaleY = (cssH - PAD * 2) / planner.yardD;
+  planner.scale   = Math.min(scaleX, scaleY, 22);
+  planner.offsetX = (cssW - planner.yardW * planner.scale) / 2;
+  planner.offsetY = (cssH - planner.yardD * planner.scale) / 2;
+  draw();
+}
+
+/* ── DRAW ──────────────────────────────────────────────── */
+function draw() {
+  const cssW = canvas.clientWidth;
+  const cssH = canvas.clientHeight;
+  if (!cssW || !cssH) return;
+
+  ctx.clearRect(0, 0, cssW, cssH);
+
+  const ox = planner.offsetX, oy = planner.offsetY;
+  const yw = ftToPx(planner.yardW);
+  const yd = ftToPx(planner.yardD);
+
+  // Yard fill
+  ctx.fillStyle = '#ECF2E8';
+  rrPath(ox, oy, yw, yd, 6); ctx.fill();
+
+  // Grid
+  ctx.strokeStyle = 'rgba(147,152,165,0.18)';
+  ctx.lineWidth = 0.75;
+  for (let x = 0; x <= planner.yardW; x += 5) {
+    const px = ox + ftToPx(x);
+    ctx.beginPath(); ctx.moveTo(px, oy); ctx.lineTo(px, oy + yd); ctx.stroke();
+  }
+  for (let y = 0; y <= planner.yardD; y += 5) {
+    const py = oy + ftToPx(y);
+    ctx.beginPath(); ctx.moveTo(ox, py); ctx.lineTo(ox + yw, py); ctx.stroke();
+  }
+
+  // Setback zone
+  const sb = ftToPx(SETBACK);
+  ctx.strokeStyle = 'rgba(147,152,165,0.4)';
+  ctx.lineWidth = 1.5;
+  ctx.setLineDash([5, 4]);
+  ctx.strokeRect(ox + sb, oy + sb, yw - sb * 2, yd - sb * 2);
+  ctx.setLineDash([]);
+
+  // Setback label
+  ctx.fillStyle = 'rgba(147,152,165,0.65)';
+  ctx.font = '500 ' + Math.max(9, Math.round(ftToPx(0.68))) + 'px Inter,system-ui,sans-serif';
+  ctx.textAlign = 'left';
+  ctx.fillText('5 ft setback', ox + sb + 4, oy + sb - 5);
+
+  // Yard border
+  ctx.strokeStyle = '#535266';
+  ctx.lineWidth = 2;
+  rrPath(ox, oy, yw, yd, 6); ctx.stroke();
+
+  // Yard dimension labels
+  ctx.fillStyle = 'rgba(83,82,102,0.45)';
+  ctx.font = '500 ' + Math.max(10, Math.round(ftToPx(0.7))) + 'px Inter,system-ui,sans-serif';
+  ctx.textAlign = 'center';
+  ctx.fillText(planner.yardW + ' ft', ox + yw / 2, oy - 9);
+  ctx.save();
+  ctx.translate(ox - 11, oy + yd / 2);
+  ctx.rotate(-Math.PI / 2);
+  ctx.fillText(planner.yardD + ' ft', 0, 0);
+  ctx.restore();
+
+  // Yard objects (drawn under pod)
+  drawObjects();
+
+  // Pod
+  const { w, h } = podDims();
+  const [pcx, pcy] = yardToCanvas(planner.podX, planner.podY);
+  const pw = ftToPx(w), ph = ftToPx(h);
+  const pL = pcx - pw / 2, pT = pcy - ph / 2;
+  const inside = isInsideSetback();
+
+  // Shadow
+  ctx.fillStyle = 'rgba(83,82,102,0.1)';
+  rrPath(pL + 3, pT + 5, pw, ph, 5); ctx.fill();
+
+  // Pod fill
+  ctx.fillStyle = inside ? 'rgba(83,82,102,0.9)' : 'rgba(237,54,72,0.85)';
+  rrPath(pL, pT, pw, ph, 5); ctx.fill();
+
+  // Pod border
+  ctx.strokeStyle = inside ? '#3d3c52' : '#c42035';
+  ctx.lineWidth = 1.5;
+  rrPath(pL, pT, pw, ph, 5); ctx.stroke();
+
+  // Pod inner line
+  const inset = Math.min(pw, ph) * 0.1;
+  if (inset > 3) {
+    ctx.strokeStyle = 'rgba(255,255,255,0.18)';
+    ctx.lineWidth = 1;
+    rrPath(pL + inset, pT + inset, pw - inset * 2, ph - inset * 2, 3);
+    ctx.stroke();
+  }
+
+  // Pod name label
+  const nfs = Math.max(9, Math.min(13, Math.round(pw * 0.12)));
+  ctx.fillStyle = 'rgba(255,255,255,0.95)';
+  ctx.font = '600 ' + nfs + 'px Inter,system-ui,sans-serif';
+  ctx.textAlign = 'center';
+  ctx.fillText(planner.pod.name, pcx, pcy - 2);
+  ctx.font = '400 ' + Math.max(8, nfs - 2) + 'px Inter,system-ui,sans-serif';
+  ctx.fillStyle = 'rgba(255,255,255,0.6)';
+  ctx.fillText(w + ' x ' + h + ' ft', pcx, pcy + nfs + 1);
+  ctx.textAlign = 'left';
+
+  updateToast();
+  syncPlannerToState();
+}
+
+function rrPath(x, y, w, h, r) {
+  r = Math.min(r, w / 2, h / 2);
+  ctx.beginPath();
+  ctx.moveTo(x + r, y);
+  ctx.lineTo(x + w - r, y);
+  ctx.quadraticCurveTo(x + w, y, x + w, y + r);
+  ctx.lineTo(x + w, y + h - r);
+  ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+  ctx.lineTo(x + r, y + h);
+  ctx.quadraticCurveTo(x, y + h, x, y + h - r);
+  ctx.lineTo(x, y + r);
+  ctx.quadraticCurveTo(x, y, x + r, y);
+  ctx.closePath();
+}
+
+function isInsideSetback() {
+  const { w, h } = podDims();
+  return (
+    planner.podX - w / 2 >= SETBACK &&
+    planner.podX + w / 2 <= planner.yardW - SETBACK &&
+    planner.podY - h / 2 >= SETBACK &&
+    planner.podY + h / 2 <= planner.yardD - SETBACK
+  );
+}
+
+/* ── YARD OBJECTS ──────────────────────────────────────── */
+function drawObjects() {
+  planner.objects.forEach((obj, i) => {
+    const [cx, cy] = yardToCanvas(obj.x, obj.y);
+    const pw = ftToPx(obj.w), ph = ftToPx(obj.h);
+    const sel = planner.selectedObj === i;
+    const def = obj.def;
+
+    ctx.save();
+    ctx.globalAlpha = 0.88;
+
+    if (def.shape === 'circle') {
+      const r = ftToPx(obj.w / 2);
+      // Shadow
+      ctx.fillStyle = 'rgba(0,0,0,0.1)';
+      ctx.beginPath(); ctx.arc(cx + 2, cy + 3, r, 0, Math.PI * 2); ctx.fill();
+      // Fill
+      ctx.fillStyle = def.fill;
+      ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI * 2); ctx.fill();
+      ctx.strokeStyle = def.stroke; ctx.lineWidth = 1.5;
+      ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI * 2); ctx.stroke();
+      // Label
+      const lfs = Math.max(8, Math.min(11, Math.round(r * 0.55)));
+      ctx.globalAlpha = 1;
+      ctx.fillStyle = 'rgba(255,255,255,0.92)';
+      ctx.font = '600 ' + lfs + 'px Inter,system-ui,sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText(def.label, cx, cy + lfs * 0.38);
+    } else {
+      // Shadow
+      ctx.fillStyle = 'rgba(0,0,0,0.08)';
+      rrPath(cx - pw/2 + 2, cy - ph/2 + 4, pw, ph, 4); ctx.fill();
+      // Fill
+      ctx.fillStyle = def.fill;
+      rrPath(cx - pw/2, cy - ph/2, pw, ph, 4); ctx.fill();
+      ctx.strokeStyle = def.stroke; ctx.lineWidth = 1.5;
+      rrPath(cx - pw/2, cy - ph/2, pw, ph, 4); ctx.stroke();
+      // Label
+      const lfs = Math.max(8, Math.min(11, Math.round(Math.min(pw, ph) * 0.12)));
+      ctx.globalAlpha = 1;
+      ctx.fillStyle = 'rgba(255,255,255,0.92)';
+      ctx.font = '600 ' + lfs + 'px Inter,system-ui,sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText(def.label, cx, cy + lfs * 0.38);
+    }
+
+    ctx.globalAlpha = 1;
+
+    // Selection ring
+    if (sel) {
+      ctx.strokeStyle = 'rgba(255,255,255,0.95)';
+      ctx.lineWidth = 2;
+      ctx.setLineDash([4, 3]);
+      if (def.shape === 'circle') {
+        const r = ftToPx(obj.w / 2) + 5;
+        ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI * 2); ctx.stroke();
+      } else {
+        rrPath(cx - pw/2 - 5, cy - ph/2 - 5, pw + 10, ph + 10, 7); ctx.stroke();
+      }
+      ctx.setLineDash([]);
+    }
+
+    ctx.textAlign = 'left';
+    ctx.restore();
+  });
+}
+
+function hitTestObject(cx, cy, i) {
+  const obj = planner.objects[i];
+  const [ocx, ocy] = yardToCanvas(obj.x, obj.y);
+  const exp = 12;
+  if (obj.def.shape === 'circle') {
+    const r = ftToPx(obj.w / 2) + exp;
+    return Math.hypot(cx - ocx, cy - ocy) <= r;
+  }
+  const pw = ftToPx(obj.w), ph = ftToPx(obj.h);
+  return cx >= ocx - pw/2 - exp && cx <= ocx + pw/2 + exp &&
+         cy >= ocy - ph/2 - exp && cy <= ocy + ph/2 + exp;
+}
+
+function addObject(type) {
+  const def = YARD_OBJECT_DEFS[type];
+  const sameType = planner.objects.filter(o => o.type === type).length;
+  const offset = sameType * 1.5;
+  const x = Math.max(def.w/2, Math.min(planner.yardW - def.w/2, planner.yardW/2 + offset));
+  const y = Math.max(def.h/2, Math.min(planner.yardD - def.h/2, planner.yardD/2 - def.h/2 - 2 - offset));
+  planner.objects.push({ type, x, y, w: def.w, h: def.h, def });
+  planner.selectedObj = planner.objects.length - 1;
+  draw();
+}
+
+/* ── TOAST ─────────────────────────────────────────────── */
+function updateToast() {
+  const toast = document.getElementById('clearance-toast');
+  if (!toast) return;
+
+  if (planner.selectedObj >= 0 && planner.selectedObj < planner.objects.length) {
+    const obj = planner.objects[planner.selectedObj];
+    toast.textContent = obj.def.label + ' selected. Tap again to remove.';
+    toast.classList.remove('warning');
+    return;
+  }
+
+  const { w, h } = podDims();
+  const minC = Math.min(
+    planner.podX - w / 2,
+    planner.yardW - (planner.podX + w / 2),
+    planner.podY - h / 2,
+    planner.yardD - (planner.podY + h / 2)
+  );
+  const inside = isInsideSetback();
+  toast.textContent = inside
+    ? minC.toFixed(1) + ' ft clearance. Good placement.'
+    : 'Outside setback zone. Move the pod inward.';
+  toast.classList.toggle('warning', !inside);
+}
+
+/* ── CENTER POD ────────────────────────────────────────── */
+function centerPod() {
+  planner.podX = planner.yardW / 2;
+  planner.podY = planner.yardD / 2;
+  [planner.podX, planner.podY] = clampPod(planner.podX, planner.podY);
+}
+
+/* ── INTERACTION ───────────────────────────────────────── */
+function getCanvasXY(e) {
+  const rect = canvas.getBoundingClientRect();
+  const src  = e.touches ? e.touches[0] : e;
+  return [src.clientX - rect.left, src.clientY - rect.top];
+}
+
+function hitTest(cx, cy) {
+  const { w, h } = podDims();
+  const [pcx, pcy] = yardToCanvas(planner.podX, planner.podY);
+  const pw = ftToPx(w), ph = ftToPx(h);
+  const e = HIT_EXPAND;
+  return cx >= pcx - pw/2 - e && cx <= pcx + pw/2 + e &&
+         cy >= pcy - ph/2 - e && cy <= pcy + ph/2 + e;
+}
+
+function inYard(cx, cy) {
+  const ox = planner.offsetX, oy = planner.offsetY;
+  return cx >= ox && cx <= ox + ftToPx(planner.yardW) &&
+         cy >= oy && cy <= oy + ftToPx(planner.yardD);
+}
+
+canvas.addEventListener('mousedown', pointerDown);
+canvas.addEventListener('touchstart', pointerDown, { passive: false });
+
+function pointerDown(e) {
+  const [cx, cy] = getCanvasXY(e);
+  const [fx, fy] = canvasToYard(cx, cy);
+
+  // Check objects in reverse order (last added = on top)
+  for (let i = planner.objects.length - 1; i >= 0; i--) {
+    if (hitTestObject(cx, cy, i)) {
+      if (e.cancelable) e.preventDefault();
+      if (planner.selectedObj === i) {
+        // Second tap on selected object: remove it
+        planner.objects.splice(i, 1);
+        planner.selectedObj = -1;
+        draw();
+        return;
+      }
+      // First tap: select and prepare drag
+      planner.selectedObj = i;
+      planner.dragging = true;
+      planner.dragTarget = i;
+      planner.dragOffX = fx - planner.objects[i].x;
+      planner.dragOffY = fy - planner.objects[i].y;
+      draw();
+      return;
+    }
+  }
+
+  // Check pod
+  if (hitTest(cx, cy)) {
+    if (e.cancelable) e.preventDefault();
+    planner.selectedObj = -1;
+    planner.dragging = true;
+    planner.dragTarget = 'pod';
+    planner.dragOffX = fx - planner.podX;
+    planner.dragOffY = fy - planner.podY;
+  } else if (inYard(cx, cy)) {
+    if (e.cancelable) e.preventDefault();
+    planner.selectedObj = -1;
+    [planner.podX, planner.podY] = clampPod(fx, fy);
+    draw();
+  } else {
+    planner.selectedObj = -1;
+    draw();
+  }
+}
+
+window.addEventListener('mousemove', pointerMove);
+canvas.addEventListener('touchmove', touchMove, { passive: false });
+
+function applyDrag(fx, fy) {
+  if (planner.dragTarget === 'pod') {
+    [planner.podX, planner.podY] = clampPod(fx - planner.dragOffX, fy - planner.dragOffY);
+  } else {
+    const i   = planner.dragTarget;
+    const obj = planner.objects[i];
+    obj.x = Math.max(obj.w/2, Math.min(planner.yardW - obj.w/2, fx - planner.dragOffX));
+    obj.y = Math.max(obj.h/2, Math.min(planner.yardD - obj.h/2, fy - planner.dragOffY));
+  }
+}
+
+function pointerMove(e) {
+  if (!planner.dragging) return;
+  const [cx, cy] = getCanvasXY(e);
+  applyDrag(...canvasToYard(cx, cy));
+  draw();
+}
+
+function touchMove(e) {
+  if (!planner.dragging) return;
+  if (e.cancelable) e.preventDefault();
+  const [cx, cy] = getCanvasXY(e);
+  applyDrag(...canvasToYard(cx, cy));
+  draw();
+}
+
+window.addEventListener('mouseup',  () => { planner.dragging = false; });
+window.addEventListener('touchend', () => { planner.dragging = false; });
+
+/* ── POD SELECTION ─────────────────────────────────────── */
+function selectPod(id) {
+  planner.pod = PODS.find(p => p.id === id);
+  document.querySelectorAll('.pod-tab').forEach(el =>
+    el.classList.toggle('active', el.dataset.pod === id));
+  document.querySelectorAll('.pod-tab').forEach(el =>
+    el.setAttribute('aria-selected', String(el.dataset.pod === id)));
+  document.querySelectorAll('.sidebar-pod-card').forEach(el =>
+    el.classList.toggle('active', el.dataset.pod === id));
+  centerPod();
+  draw();
+}
+
+document.querySelectorAll('.pod-tab, .sidebar-pod-card').forEach(btn =>
+  btn.addEventListener('click', () => selectPod(btn.dataset.pod)));
+
+/* ── ORIENTATION ───────────────────────────────────────── */
+function setRotation(deg) {
+  planner.rotation = deg;
+  document.querySelectorAll('.orient-btn').forEach(btn =>
+    btn.classList.toggle('active', +btn.dataset.rotation === deg));
+  centerPod();
+  draw();
+}
+
+document.querySelectorAll('.orient-btn').forEach(btn =>
+  btn.addEventListener('click', () => setRotation(+btn.dataset.rotation)));
+
+/* ── POD USE ───────────────────────────────────────────── */
+function setPodUse(use) {
+  planner.podUse = use;
+  document.querySelectorAll('.pod-use-btn').forEach(btn =>
+    btn.classList.toggle('active', btn.dataset.use === use));
+}
+
+document.querySelectorAll('.pod-use-btn').forEach(btn =>
+  btn.addEventListener('click', () => setPodUse(btn.dataset.use)));
+
+/* ── YARD OBJECT BUTTONS ───────────────────────────────── */
+document.querySelectorAll('.add-obj-btn').forEach(btn =>
+  btn.addEventListener('click', () => addObject(btn.dataset.objType)));
+
+/* ── YARD DIMENSIONS ───────────────────────────────────── */
+const yardInputIds = ['yard-w-mobile', 'yard-d-mobile', 'yard-w-sidebar', 'yard-d-sidebar'];
+
+function syncYardInput(id) {
+  const val = Math.max(10, Math.min(200, parseInt(document.getElementById(id).value) || 10));
+  const isWidth = id.includes('-w-');
+  if (isWidth) planner.yardW = val; else planner.yardD = val;
+  // Keep both inputs in sync
+  yardInputIds.filter(i => i.includes(isWidth ? '-w-' : '-d-')).forEach(i => {
+    const el = document.getElementById(i);
+    if (el && el !== document.getElementById(id)) el.value = val;
+  });
+  centerPod();
+  fitToView();
+}
+
+yardInputIds.forEach(id => {
+  const el = document.getElementById(id);
+  if (el) el.addEventListener('input', () => syncYardInput(id));
+});
+
+/* ── SETTINGS SHEET TOGGLE ─────────────────────────────── */
+const settingsFab  = document.getElementById('settings-fab');
+const settingsSheet = document.getElementById('settings-sheet');
+const sheetBackdrop = document.getElementById('sheet-backdrop');
+
+function openSheet() {
+  settingsSheet && settingsSheet.classList.add('open');
+  sheetBackdrop && sheetBackdrop.classList.add('visible');
+  settingsFab && settingsFab.setAttribute('aria-expanded', 'true');
+}
+
+function closeSheet() {
+  settingsSheet && settingsSheet.classList.remove('open');
+  sheetBackdrop && sheetBackdrop.classList.remove('visible');
+  settingsFab && settingsFab.setAttribute('aria-expanded', 'false');
+}
+
+if (settingsFab) {
+  settingsFab.addEventListener('click', () => {
+    const open = settingsFab.getAttribute('aria-expanded') === 'true';
+    open ? closeSheet() : openSheet();
+  });
+}
+
+if (sheetBackdrop) {
+  sheetBackdrop.addEventListener('click', closeSheet);
+}
+
+/* ── PLANNER INIT ──────────────────────────────────────── */
+function initPlanner() {
+  centerPod();
+  resizeObs.observe(canvas.parentElement);
+  resizeCanvas();
+}
+
+/* ── INIT ─────────────────────────────────────────────────── */
+function init() {
+  loadState();
+  populateContactForm();
+  render();
+  initPlanner();
+  initQuestionSteps();
+}
+
+/* ── QUESTION SYSTEM ──────────────────────────────────────── */
+
+const MICRO_ICON = `<svg class="micro-guide-icon" width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true"><circle cx="9" cy="9" r="8" stroke="currentColor" stroke-width="1.5"/><path d="M9 8v5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><circle cx="9" cy="5.5" r="0.75" fill="currentColor"/></svg>`;
+
+const STEP_DEFS = {
+
+  1: {
+    intro: {
+      title: 'Access Path',
+      text: "Let's figure out how your pod gets from the street to its final spot. We need to check the path for clearance, obstacles, and tight turns. Don't worry if you're not sure about some of these. We'll tell you exactly what to check.",
+    },
+    questions: [
+      {
+        id: 'access_width',
+        text: 'What is the narrowest width along the path from the street to the pod location?',
+        options: [
+          { value: 'gt12',   label: 'More than 12 feet' },
+          { value: '10to12', label: 'Between 10 and 12 feet' },
+          { value: 'lt10',   label: 'Less than 10 feet' },
+          { value: 'unsure', label: "I'm not sure", unsure: true },
+        ],
+        guides: {
+          unsure: 'Grab a tape measure and measure the narrowest point between the street and where you want the pod. Include gate openings, gaps between structures, and any spots where fences or walls create a bottleneck. Take a photo of each measurement.',
+        },
+      },
+      {
+        id: 'overhead_clearance',
+        text: 'What is the lowest overhead clearance along the path? (tree branches, wires, eaves, pergolas)',
+        options: [
+          { value: 'gt13_5',   label: 'More than 13 feet 6 inches' },
+          { value: '12to13_5', label: 'Between 12 and 13 feet 6 inches' },
+          { value: 'lt12',     label: 'Less than 12 feet' },
+          { value: 'unsure',   label: "I'm not sure", unsure: true },
+        ],
+        guides: {
+          unsure: 'Walk the full path from the street to the pod spot and look up. Note any low-hanging branches, power lines, cable lines, or structures that cross overhead. If you can, estimate the height or measure with a tape measure held vertically.',
+        },
+      },
+      {
+        id: 'sharp_turns',
+        text: 'Are there any 90-degree turns or sharp corners along the path?',
+        options: [
+          { value: 'no',    label: "No, it's a straight or gently curving path" },
+          { value: 'yes',   label: 'Yes, there is at least one sharp turn' },
+          { value: 'unsure', label: "I'm not sure", unsure: true },
+        ],
+        guides: {
+          yes: 'Sharp turns require a turning radius of 20 to 24 feet depending on the pod model. If the turn is tight, a crane or on-site assembly may be the better option. Take a photo of the turn so we can evaluate it.',
+        },
+      },
+      {
+        id: 'slope',
+        text: 'Is there a significant slope along the path?',
+        options: [
+          { value: 'flat',  label: "No, it's mostly flat" },
+          { value: 'slope', label: 'Yes, there is a noticeable slope or hill' },
+          { value: 'unsure', label: "I'm not sure", unsure: true },
+        ],
+      },
+      {
+        id: 'truck_access',
+        text: 'Can a truck back in from the street to your backyard?',
+        options: [
+          { value: 'yes',   label: 'Yes, there is a driveway or clear path for a truck' },
+          { value: 'no',    label: 'No, the truck would need to park on the street' },
+          { value: 'unsure', label: "I'm not sure", unsure: true },
+        ],
+      },
+      {
+        id: 'equipment_exit',
+        text: 'After the pod is placed, is there room for the delivery equipment to exit the property?',
+        options: [
+          { value: 'yes',   label: 'Yes' },
+          { value: 'no',    label: 'No, it would be blocked' },
+          { value: 'unsure', label: "I'm not sure", unsure: true },
+        ],
+        guides: {
+          unsure: "The shed mule (the machine that carries the pod into your backyard) needs to be able to drive out after placing the pod. Check if there is enough space for it to back out or turn around. The mule needs about 5 feet of length beyond the pod.",
+        },
+      },
+    ],
+  },
+
+  2: {
+    intro: {
+      title: 'Foundation and Placement',
+      text: "Now let's look at the spot where your pod will sit. The ground needs to be level and solid. Here's what to check.",
+    },
+    questions: [
+      {
+        id: 'surface_type',
+        text: 'What is the surface where the pod will be placed?',
+        options: [
+          { value: 'grass',    label: 'Grass / lawn' },
+          { value: 'gravel',   label: 'Gravel' },
+          { value: 'concrete', label: 'Concrete / patio slab' },
+          { value: 'deck',     label: 'Wood deck' },
+          { value: 'other',    label: 'Something else', extraText: true, extraPlaceholder: 'Please describe...' },
+          { value: 'unsure',   label: "I'm not sure", unsure: true },
+        ],
+      },
+      {
+        id: 'ground_level',
+        text: 'Is the ground level at the pod location?',
+        options: [
+          { value: 'level', label: 'Yes, it looks flat' },
+          { value: 'slope', label: 'No, there is a noticeable slope' },
+          { value: 'unsure', label: "I'm not sure", unsure: true },
+        ],
+        guides: {
+          unsure: "Open the Measure app on your iPhone (or a free level app on Android), tap \"Level,\" and place your phone flat on the ground where you want the pod. Take a screenshot of the reading. Anything under 2 degrees is good. If the slope is more than that, a gravel or concrete pad can usually solve it.",
+          slope: "The ground needs to be level within about 1/4 inch per foot to avoid issues with the pod's sliding doors. If there's a slope, a properly built gravel or concrete pad can level things out. This is something your site prep contractor handles before delivery.",
+        },
+      },
+      {
+        id: 'temporary_removals',
+        text: 'Does anything need to be temporarily removed for installation? (fences, planters, ramps, garden beds)',
+        options: [
+          { value: 'clear',  label: 'No, the area is clear' },
+          { value: 'yes',    label: 'Yes', extraText: true, extraPlaceholder: 'Describe what needs to be moved...' },
+          { value: 'unsure', label: "I'm not sure", unsure: true },
+        ],
+      },
+      {
+        id: 'clearance_around',
+        text: 'Is there at least 3 feet of clearance around the pod location on all sides?',
+        options: [
+          { value: 'yes',   label: 'Yes' },
+          { value: 'no',    label: 'No' },
+          { value: 'unsure', label: "I'm not sure", unsure: true },
+        ],
+        guides: {
+          unsure: "Measure from the edges of where the pod will sit to the nearest wall, fence, or structure on each side. You need at least 3 feet on each side for installation access. More clearance is needed if using a shed mule (2 feet wider than the pod's narrow side).",
+        },
+      },
+      {
+        id: 'foundation_status',
+        text: 'Do you already have a foundation or pad prepared?',
+        options: [
+          { value: 'concrete',     label: 'Yes, concrete slab' },
+          { value: 'gravel',       label: 'Yes, gravel pad' },
+          { value: 'not_prepared', label: "No, I haven't prepared anything yet" },
+          { value: 'unsure',       label: "I'm not sure what I need", unsure: true },
+        ],
+        guides: {
+          not_prepared: "Most pods sit on a gravel or concrete pad. The pad should match the pod's footprint and extend about 12 inches beyond each side for drainage. The ground underneath needs to be compacted and level. We recommend working with a local site prep company for this.",
+          unsure: "Most pods sit on a gravel or concrete pad. The pad should match the pod's footprint and extend about 12 inches beyond each side for drainage. The ground underneath needs to be compacted and level. We recommend working with a local site prep company for this.",
+        },
+      },
+    ],
+  },
+
+  3: {
+    intro: {
+      title: 'Utilities',
+      text: "Your pod needs to be connected to your home's electrical system. If you're adding a bathroom, we'll also need to know about water and sewer. Let's see what your setup looks like.",
+    },
+    sections: [
+      {
+        label: 'Electrical',
+        id: 'electrical',
+        always: true,
+        questions: [
+          {
+            id: 'panel_location_known',
+            text: "Do you know where your home's main electrical panel is?",
+            options: [
+              { value: 'yes', label: 'Yes' },
+              { value: 'no',  label: 'No' },
+            ],
+            guides: {
+              no: "Your electrical panel is usually a gray metal box, about 1 foot wide and 2 feet tall. Common locations: garage, basement, utility room, or on an exterior wall near the electric meter. When you find it, take a photo of the panel with the door open. The label inside the door shows your home's total amperage.",
+            },
+          },
+          {
+            id: 'service_amperage',
+            text: "What is your home's electrical service amperage?",
+            options: [
+              { value: '200',   label: '200 amps' },
+              { value: '100',   label: '100 amps' },
+              { value: 'other', label: 'Other', extraText: true, extraPlaceholder: 'Please describe...' },
+              { value: 'unsure', label: "I don't know", unsure: true },
+            ],
+            guides: {
+              unsure: "Open your electrical panel door and look at the main breaker at the top. It will have a number on it (usually 100 or 200). That's your home's total amperage. Take a photo and share it with us. Your pod needs a 50-amp connection, and most homes with 200-amp service can handle this easily.",
+            },
+          },
+          {
+            id: 'panel_distance',
+            text: 'Approximately how far is your electrical panel from the pod location?',
+            options: [
+              { value: 'lt25',    label: 'Less than 25 feet' },
+              { value: '25to50',  label: '25 to 50 feet' },
+              { value: '50to100', label: '50 to 100 feet' },
+              { value: 'gt100',   label: 'More than 100 feet' },
+              { value: 'unsure',  label: "I'm not sure", unsure: true },
+            ],
+            guides: {
+              unsure: 'Walk from your electrical panel to the pod spot and count your steps. Each step is roughly 2.5 feet. Multiply your step count by 2.5 for an approximate distance. This helps your electrician estimate the wiring cost.',
+            },
+          },
+          {
+            id: 'wiring_obstacles',
+            text: 'Are there any obstacles between the panel and the pod location that would make running a wire difficult? (driveways, patios, retaining walls)',
+            options: [
+              { value: 'clear',  label: "No, it's a clear path through soil / grass" },
+              { value: 'yes',    label: 'Yes', extraText: true, extraPlaceholder: 'Describe the obstacles...' },
+              { value: 'unsure', label: "I'm not sure", unsure: true },
+            ],
+          },
+        ],
+      },
+      {
+        label: 'Plumbing',
+        id: 'plumbing',
+        guestSuiteOnly: true,
+        questions: [
+          {
+            id: 'water_line_known',
+            text: "Do you know where your home's nearest water line access point is?",
+            options: [
+              { value: 'yes', label: 'Yes' },
+              { value: 'no',  label: 'No' },
+            ],
+            guides: {
+              no: "Your water line typically enters the house near the water meter (usually at the front of the house or in the basement). You can also look for outdoor hose bibs (outdoor faucets) as potential connection points. If you have your home's blueprint or site plan, it will show utility locations.",
+            },
+          },
+          {
+            id: 'water_distance',
+            text: 'How far is the nearest water line from the pod location?',
+            options: [
+              { value: 'lt25',    label: 'Less than 25 feet' },
+              { value: '25to50',  label: '25 to 50 feet' },
+              { value: '50to100', label: '50 to 100 feet' },
+              { value: 'gt100',   label: 'More than 100 feet' },
+              { value: 'unsure',  label: "I don't know", unsure: true },
+            ],
+          },
+          {
+            id: 'sewer_type',
+            text: 'Do you have sewer or septic?',
+            options: [
+              { value: 'sewer',  label: 'Sewer (connected to city / municipal system)' },
+              { value: 'septic', label: 'Septic tank' },
+              { value: 'unsure', label: "I don't know", unsure: true },
+            ],
+          },
+          {
+            id: 'sewer_distance',
+            text: 'How far is the sewer / septic connection from the pod location?',
+            options: [
+              { value: 'lt25',    label: 'Less than 25 feet' },
+              { value: '25to50',  label: '25 to 50 feet' },
+              { value: '50to100', label: '50 to 100 feet' },
+              { value: 'gt100',   label: 'More than 100 feet' },
+              { value: 'unsure',  label: "I don't know", unsure: true },
+            ],
+            guides: {
+              unsure: "If you have a septic system, the tank is usually in the yard (look for a slightly raised or different-colored patch of grass). For sewer, the cleanout is typically a white or black pipe sticking out of the ground near the house.",
+            },
+          },
+        ],
+      },
+      {
+        label: 'Internet',
+        id: 'internet',
+        always: true,
+        questions: [
+          {
+            id: 'internet_plan',
+            text: 'How do you plan to get internet to your pod?',
+            options: [
+              { value: 'wifi',     label: 'Wi-Fi from my house (router close enough)' },
+              { value: 'ethernet', label: "I'll run an ethernet cable" },
+              { value: 'later',    label: "I'll figure it out later" },
+              { value: 'unsure',   label: "I'm not sure", unsure: true },
+            ],
+            guides: {
+              unsure: "Most homeowners use their home Wi-Fi. If your router is within 50 to 75 feet of the pod and there aren't too many walls in between, Wi-Fi usually works fine. For more reliable connections, you can run a Cat6 ethernet cable from your router to the pod.",
+            },
+          },
+        ],
+      },
+    ],
+  },
+
+  4: {
+    intro: {
+      title: 'Permitting and HOA',
+      text: "Permit requirements depend on where you live, the size of the pod, and how it will be used. Most of our customers don't need to worry about this because we help you navigate it. But it's good to know where you stand.",
+    },
+    questions: [
+      {
+        id: 'permit_checked',
+        text: 'Have you checked whether your city or county requires a building permit for an accessory structure?',
+        options: [
+          { value: 'required',     label: 'Yes, and a permit is required' },
+          { value: 'not_required', label: 'Yes, and a permit is NOT required' },
+          { value: 'not_checked',  label: "No, I haven't checked" },
+          { value: 'unsure',       label: "I'm not sure", unsure: true },
+        ],
+        guides: {
+          not_checked: "Call your city's building department and ask: \"Do I need a permit for a prefabricated accessory structure under 120 square feet in my backyard?\" In many areas, structures under 120 square feet don't need a building permit, but this varies by city and state. Don't worry if this feels complicated. Mini O has experience with permits across the country.",
+          unsure: "Call your city's building department and ask: \"Do I need a permit for a prefabricated accessory structure under 120 square feet in my backyard?\" In many areas, structures under 120 square feet don't need a building permit, but this varies by city and state. Don't worry if this feels complicated. Mini O has experience with permits across the country.",
+          required: "Mini O handles permitting for many of our customers. We'll research what's needed for your specific location and walk you through the process. Permits typically add 1 to 5 months to the timeline.",
+        },
+      },
+      {
+        id: 'hoa_status',
+        text: 'Is your property part of a Homeowners Association (HOA)?',
+        options: [
+          { value: 'yes',    label: 'Yes' },
+          { value: 'no',     label: 'No' },
+          { value: 'unsure', label: "I'm not sure", unsure: true },
+        ],
+        guides: {
+          yes: "Check your HOA's CC&Rs (Covenants, Conditions and Restrictions) for rules about outbuildings, accessory structures, or sheds. Some HOAs require approval before installation, and may have rules about placement, size, or materials. Share the relevant section with us and we'll review it.",
+        },
+      },
+      {
+        id: 'setback_awareness',
+        text: 'Are you aware of any setback requirements for your property? (minimum distance structures must be from property lines)',
+        options: [
+          { value: 'yes',    label: 'Yes, I know my setbacks' },
+          { value: 'no',     label: 'No' },
+          { value: 'unsure', label: "I'm not sure", unsure: true },
+        ],
+        guides: {
+          no: "Setback requirements are usually available from your city's building or planning department. Common setbacks are 5 to 10 feet from rear and side property lines. Your property's plat map (available from the county assessor) shows your lot boundaries.",
+          unsure: "Setback requirements are usually available from your city's building or planning department. Common setbacks are 5 to 10 feet from rear and side property lines. Your property's plat map (available from the county assessor) shows your lot boundaries.",
+        },
+      },
+    ],
+  },
+
+};
+
+function getRequiredQuestionIds(stepIndex) {
+  const def = STEP_DEFS[stepIndex];
+  if (!def) return [];
+  const ids = [];
+  if (def.questions) {
+    def.questions.forEach(q => ids.push(q.id));
+  }
+  if (def.sections) {
+    const showPlumbing = planner && planner.podUse === 'guest_suite';
+    def.sections.forEach(sec => {
+      if (sec.always || (sec.guestSuiteOnly && showPlumbing)) {
+        sec.questions.forEach(q => ids.push(q.id));
+      }
+    });
+  }
+  return ids;
+}
+
+function isStepAnswered(stepIndex) {
+  const ids = getRequiredQuestionIds(stepIndex);
+  if (!ids.length) return true;
+  return ids.every(id => state.answers && state.answers[id] != null);
+}
+
+function buildOptionHTML(q, opt) {
+  const val = (state.answers && state.answers[q.id]) || null;
+  const isSelected = val === opt.value;
+  const unsureClass = opt.unsure ? ' opt-unsure' : '';
+  const selectedClass = isSelected ? ' selected' : '';
+  const textVal = (state.answersText && state.answersText[q.id]) || '';
+  let html = `<button class="option-btn${unsureClass}${selectedClass}" data-qid="${q.id}" data-val="${opt.value}" type="button"><span class="option-radio"></span><span>${opt.label}</span></button>`;
+  if (opt.extraText) {
+    const extraVisible = isSelected ? ' visible' : '';
+    const extraPlaceholder = opt.extraPlaceholder || 'Please describe...';
+    html += `<textarea class="option-extra-input${extraVisible}" data-qid="${q.id}" data-for-val="${opt.value}" placeholder="${escapeAttr(extraPlaceholder)}" rows="2">${isSelected ? escapeHtml(textVal) : ''}</textarea>`;
+  }
+  return html;
+}
+
+function escapeHtml(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+function escapeAttr(s) {
+  return String(s).replace(/"/g,'&quot;');
+}
+
+function buildGuideHTML(q) {
+  if (!q.guides) return '';
+  const val = (state.answers && state.answers[q.id]) || null;
+  return Object.entries(q.guides).map(([triggerVal, guideText]) => {
+    const isVisible = val === triggerVal;
+    return `<div class="micro-guide${isVisible ? ' visible' : ''}" data-qid="${q.id}" data-guide-trigger="${triggerVal}">${MICRO_ICON}<div><div class="micro-guide-label">What to do</div><div class="micro-guide-text">${escapeHtml(guideText)}</div></div></div>`;
+  }).join('');
+}
+
+function buildCardHTML(q) {
+  const optionsHtml = q.options.map(opt => buildOptionHTML(q, opt)).join('');
+  return `<div class="question-card" data-qid="${q.id}"><div class="question-text">${escapeHtml(q.text)}</div><div class="option-list">${optionsHtml}</div>${buildGuideHTML(q)}</div>`;
+}
+
+function buildSimplePanelHTML(stepIndex) {
+  const def = STEP_DEFS[stepIndex];
+  return `<div class="step-intro"><div class="step-intro-text">${escapeHtml(def.intro.text)}</div></div><div class="question-list">${def.questions.map(buildCardHTML).join('')}</div>`;
+}
+
+function buildSectionedPanelHTML(stepIndex) {
+  const def = STEP_DEFS[stepIndex];
+  const showPlumbing = planner && planner.podUse === 'guest_suite';
+  let html = `<div class="step-intro"><div class="step-intro-text">${escapeHtml(def.intro.text)}</div></div><div class="question-list">`;
+  def.sections.forEach(sec => {
+    const visible = sec.always || (sec.guestSuiteOnly && showPlumbing);
+    html += `<div class="cond-section${visible ? '' : ' hidden'}" data-section="${sec.id}"><div class="section-divider"><div class="section-divider-line"></div><div class="section-divider-label">${escapeHtml(sec.label)}</div><div class="section-divider-line"></div></div>${sec.questions.map(buildCardHTML).join('')}</div>`;
+  });
+  html += '</div>';
+  return html;
+}
+
+function renderQuestionStep(stepIndex) {
+  const panel = document.getElementById('panel-' + stepIndex);
+  if (!panel) return;
+  const def = STEP_DEFS[stepIndex];
+  if (!def) return;
+  const headingEl = panel.querySelector('h2');
+  const headingHTML = headingEl ? headingEl.outerHTML : '';
+  panel.innerHTML = headingHTML + (def.sections ? buildSectionedPanelHTML(stepIndex) : buildSimplePanelHTML(stepIndex));
+  panel.addEventListener('click', handleQuestionClick);
+  panel.addEventListener('input', handleQuestionInput);
+}
+
+function handleQuestionClick(e) {
+  const btn = e.target.closest('.option-btn');
+  if (!btn) return;
+  const qid = btn.dataset.qid;
+  const val = btn.dataset.val;
+  if (!state.answers) state.answers = {};
+  state.answers[qid] = val;
+
+  const card = btn.closest('.question-card');
+  if (card) {
+    // Toggle button selected states
+    card.querySelectorAll('.option-btn').forEach(b => b.classList.toggle('selected', b.dataset.val === val));
+    // Toggle extra text inputs
+    card.querySelectorAll('.option-extra-input').forEach(inp => {
+      const show = inp.dataset.forVal === val;
+      inp.classList.toggle('visible', show);
+      if (!show) { inp.value = ''; if (state.answersText) delete state.answersText[qid]; }
+    });
+    // Toggle micro-guides
+    card.querySelectorAll('.micro-guide').forEach(g => g.classList.toggle('visible', g.dataset.guideTrigger === val));
+  }
+
+  saveState();
+  updateNavButtons();
+}
+
+function handleQuestionInput(e) {
+  const inp = e.target;
+  if (!inp.classList.contains('option-extra-input')) return;
+  const qid = inp.dataset.qid;
+  if (!state.answersText) state.answersText = {};
+  state.answersText[qid] = inp.value;
+  saveState();
+}
+
+function initQuestionSteps() {
+  [1, 2, 3, 4].forEach(i => renderQuestionStep(i));
+}
+
+init();
+</script>
+
+</body>
+</html>
