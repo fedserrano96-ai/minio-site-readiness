@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mini·O Permitting Triage — Internal</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="topbar">
+    <div class="topbar-title">Mini·O Permitting Triage <span class="badge-internal">Internal</span></div>
+    <div class="topbar-sub">Guidance, not a verdict. Triage only — every result needs office confirmation.</div>
+  </header>
+
+  <main class="layout">
+    <section class="panel" aria-labelledby="config-heading">
+      <h2 id="config-heading">Pod configuration</h2>
+
+      <label class="field">
+        <span class="field-label">Model</span>
+        <select id="model">
+          <option value="twelve">The Twelve — 12×8 (96 sqft)</option>
+          <option value="sixteen">The Sixteen — 16×10 (160 sqft)</option>
+          <option value="station">The Station — 30×10 (300 sqft)</option>
+          <option value="custom">Custom</option>
+        </select>
+      </label>
+
+      <label class="field">
+        <span class="field-label">Footprint (sqft)</span>
+        <input type="number" id="footprint" min="1" step="1" value="96" disabled>
+      </label>
+
+      <label class="field">
+        <span class="field-label">Plumbing</span>
+        <select id="plumbing">
+          <option value="none">None</option>
+          <option value="half_bath">Half bath</option>
+          <option value="kitchenette">Kitchenette</option>
+          <option value="full_bath">Full bath</option>
+        </select>
+      </label>
+
+      <label class="field field-check">
+        <input type="checkbox" id="sleeping">
+        <span>Sleeping intended</span>
+      </label>
+
+      <label class="field field-check">
+        <input type="checkbox" id="trailer">
+        <span>Trailer-mounted</span>
+      </label>
+
+      <label class="field">
+        <span class="field-label">Jurisdiction</span>
+        <select id="jurisdiction"></select>
+      </label>
+
+      <button id="evaluate" class="btn-evaluate" type="button">Evaluate</button>
+    </section>
+
+    <section class="panel panel-output" aria-labelledby="output-heading">
+      <h2 id="output-heading">Result</h2>
+      <div id="output" class="output">
+        <p class="output-empty">Pick a configuration and jurisdiction, then Evaluate.</p>
+      </div>
+    </section>
+  </main>
+
+  <script src="engine.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

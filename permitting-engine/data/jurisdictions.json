@@ -1,0 +1,214 @@
+{
+  "version": "0.2",
+  "comment": "Jurisdiction knowledge base. status is one of: verified | draft | not_researched. Only Fred flips an entry to verified, after review with Urbatec. Citations containing <<verify>> cause the engine to downgrade that rule's determinations to 'depends' at render time.",
+
+  "product_default": {
+    "id": "_product_default",
+    "name": "Product default (jurisdiction not researched)",
+    "comment": "Generic product logic used when a jurisdiction is unknown or not_researched. Makes no jurisdiction-specific claims and never outputs likely_exempt (bias to the safe error).",
+    "rules": [
+      {
+        "id": "default-under-120-no-plumbing",
+        "when": {
+          "footprint": { "max": 120 },
+          "plumbing": ["none"],
+          "on_trailer": "any",
+          "sleeping": "any"
+        },
+        "result": {
+          "building_permit": "depends",
+          "electrical_permit": "likely_required",
+          "plumbing_permit": "not_applicable",
+          "zoning_review": "depends"
+        },
+        "confidence": "low",
+        "rationale": "Structures at or under the common 120 sqft line are often exempt from a building permit, but this varies by city — we'll confirm yours. The dedicated 50A circuit typically needs an electrical permit."
+      },
+      {
+        "id": "default-over-120",
+        "when": {
+          "footprint": { "min": 121 },
+          "plumbing": "any",
+          "on_trailer": "any",
+          "sleeping": "any"
+        },
+        "result": {
+          "building_permit": "likely_required",
+          "electrical_permit": "likely_required",
+          "plumbing_permit": "depends",
+          "zoning_review": "depends"
+        },
+        "confidence": "low",
+        "rationale": "Most jurisdictions require a building permit above the common 120 sqft accessory-structure exemption line."
+      },
+      {
+        "id": "default-any-plumbing",
+        "when": {
+          "footprint": "any",
+          "plumbing": ["half_bath", "kitchenette", "full_bath"],
+          "on_trailer": "any",
+          "sleeping": "any"
+        },
+        "result": {
+          "building_permit": "likely_required",
+          "electrical_permit": "likely_required",
+          "plumbing_permit": "likely_required",
+          "zoning_review": "depends"
+        },
+        "confidence": "medium",
+        "rationale": "Any water/sewer connection tends to reclassify the pod toward a dwelling unit (DADU), which triggers full residential code."
+      },
+      {
+        "id": "default-sleeping",
+        "when": {
+          "footprint": "any",
+          "plumbing": "any",
+          "on_trailer": "any",
+          "sleeping": true
+        },
+        "result": {
+          "building_permit": "likely_required",
+          "electrical_permit": "likely_required",
+          "plumbing_permit": "depends",
+          "zoning_review": "depends"
+        },
+        "confidence": "low",
+        "rationale": "Sleeping use pushes toward habitable-space / dwelling-unit classification in some jurisdictions."
+      }
+    ]
+  },
+
+  "jurisdictions": [
+    {
+      "id": "wa-king-seattle",
+      "name": "Seattle",
+      "level": "city",
+      "county": "King",
+      "state": "WA",
+      "status": "draft",
+      "last_verified": "",
+      "verified_by": "",
+      "authority": {
+        "dept": "Seattle Department of Construction & Inspections (SDCI)",
+        "url": "<<verify>>",
+        "phone": "",
+        "email": ""
+      },
+      "adopted_codes": "<<verify>>",
+      "rules": [
+        {
+          "id": "seattle-accessory-under-120-no-plumbing",
+          "when": {
+            "footprint": { "max": 120 },
+            "plumbing": ["none"],
+            "on_trailer": "any",
+            "sleeping": false
+          },
+          "result": {
+            "building_permit": "likely_exempt",
+            "electrical_permit": "depends",
+            "plumbing_permit": "not_applicable",
+            "zoning_review": "depends"
+          },
+          "citation": {
+            "code_section": "<<verify>>",
+            "title": "<<verify>>",
+            "url": "<<verify>>",
+            "snippet": "<<verify>>"
+          },
+          "confidence": "low",
+          "rationale": "Draft: small accessory structures without plumbing are commonly exempt, pending verification against SDCI sources."
+        },
+        {
+          "id": "seattle-accessory-over-120",
+          "when": {
+            "footprint": { "min": 121 },
+            "plumbing": "any",
+            "on_trailer": "any",
+            "sleeping": "any"
+          },
+          "result": {
+            "building_permit": "likely_required",
+            "electrical_permit": "likely_required",
+            "plumbing_permit": "depends",
+            "zoning_review": "depends"
+          },
+          "citation": {
+            "code_section": "<<verify>>",
+            "title": "<<verify>>",
+            "url": "<<verify>>",
+            "snippet": "<<verify>>"
+          },
+          "confidence": "low",
+          "rationale": "Draft: above the exemption line a building permit is expected, pending verification against SDCI sources."
+        },
+        {
+          "id": "seattle-any-plumbing",
+          "when": {
+            "footprint": "any",
+            "plumbing": ["half_bath", "kitchenette", "full_bath"],
+            "on_trailer": "any",
+            "sleeping": "any"
+          },
+          "result": {
+            "building_permit": "likely_required",
+            "electrical_permit": "likely_required",
+            "plumbing_permit": "likely_required",
+            "zoning_review": "depends"
+          },
+          "citation": {
+            "code_section": "<<verify>>",
+            "title": "<<verify>>",
+            "url": "<<verify>>",
+            "snippet": "<<verify>>"
+          },
+          "confidence": "medium",
+          "rationale": "Draft: plumbing tends to reclassify the pod toward a DADU under Seattle rules, pending verification."
+        },
+        {
+          "id": "seattle-on-trailer",
+          "when": {
+            "footprint": "any",
+            "plumbing": "any",
+            "on_trailer": true,
+            "sleeping": "any"
+          },
+          "result": {
+            "building_permit": "depends",
+            "electrical_permit": "likely_required",
+            "plumbing_permit": "depends",
+            "zoning_review": "depends"
+          },
+          "citation": {
+            "code_section": "<<verify>>",
+            "title": "<<verify>>",
+            "url": "<<verify>>",
+            "snippet": "<<verify>>"
+          },
+          "confidence": "low",
+          "rationale": "Draft: trailer-mounted units may fall outside structure rules; classification to be confirmed with SDCI."
+        }
+      ],
+      "zoning_note": "<<verify>> Setbacks, lot coverage, and DADU rules to be confirmed with SDCI.",
+      "hoa_note": "An HOA may impose separate requirements regardless of city rules.",
+      "notes": "DRAFT — outcomes unverified; citations pending Phase 2 research. Anchored to a live permit (Anna Chen) for validation. Tests the WA / WSEC path."
+    }
+  ],
+
+  "template": {
+    "id": "",
+    "name": "",
+    "level": "city",
+    "county": "",
+    "state": "",
+    "status": "draft",
+    "last_verified": "",
+    "verified_by": "Fred",
+    "authority": { "dept": "", "url": "", "phone": "", "email": "" },
+    "adopted_codes": "",
+    "rules": [],
+    "zoning_note": "",
+    "hoa_note": "An HOA may impose separate requirements regardless of city rules.",
+    "notes": ""
+  }
+}
