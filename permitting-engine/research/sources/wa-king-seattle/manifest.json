@@ -1,0 +1,82 @@
+[
+  {
+    "url": "https://www.seattle.gov/sdci/permits",
+    "fetched_at": "2026-06-09T22:56:54.273Z",
+    "http_status": 200,
+    "file": "001-www-seattle-gov-sdci-permits.html",
+    "bytes": 133907,
+    "error": null
+  },
+  {
+    "url": "https://www.seattle.gov/sdci/permits/common-projects/sheds",
+    "fetched_at": "2026-06-09T22:56:54.273Z",
+    "http_status": 200,
+    "file": "002-www-seattle-gov-sdci-permits-common-projects-sheds.html",
+    "bytes": 130417,
+    "error": null
+  },
+  {
+    "url": "https://kingcounty.gov/en/dept/dph/health-safety/environmental-health/plumbing-gas-piping/applications-and-permits",
+    "fetched_at": "2026-06-09T22:56:54.273Z",
+    "http_status": 200,
+    "file": "003-kingcounty-gov-en-dept-dph-health-safety-environmental-health-plumbing-gas-pipin.html",
+    "bytes": 54151,
+    "error": null
+  },
+  {
+    "url": "https://www.seattle.gov/sdci/permits/common-projects/accessory-dwelling-units",
+    "fetched_at": "2026-06-09T22:56:54.273Z",
+    "http_status": 200,
+    "file": "004-www-seattle-gov-sdci-permits-common-projects-accessory-dwelling-units.html",
+    "bytes": 132890,
+    "error": null
+  },
+  {
+    "url": "https://www.seattle.gov/sdci/permits/do-you-need-a-permit",
+    "fetched_at": "2026-06-09T22:58:31.953Z",
+    "http_status": 200,
+    "file": "005-www-seattle-gov-sdci-permits-do-you-need-a-permit.html",
+    "bytes": 131390,
+    "error": null
+  },
+  {
+    "url": "https://www.seattle.gov/sdci/permits/permits-we-issue-(a-z)/electrical-permit",
+    "fetched_at": "2026-06-09T22:58:31.953Z",
+    "http_status": 200,
+    "file": "006-www-seattle-gov-sdci-permits-permits-we-issue-a-z-electrical-permit.html",
+    "bytes": 139937,
+    "error": null
+  },
+  {
+    "url": "https://www.seattle.gov/sdci/codes/codes-we-enforce-(a-z)/plumbing-code",
+    "fetched_at": "2026-06-09T22:58:31.953Z",
+    "http_status": 200,
+    "file": "007-www-seattle-gov-sdci-codes-codes-we-enforce-a-z-plumbing-code.html",
+    "bytes": 130285,
+    "error": null
+  },
+  {
+    "url": "https://www.seattle.gov/sdci/codes/codes-we-enforce-(a-z)/building-code",
+    "fetched_at": "2026-06-09T22:58:31.953Z",
+    "http_status": 200,
+    "file": "008-www-seattle-gov-sdci-codes-codes-we-enforce-a-z-building-code.html",
+    "bytes": 167208,
+    "error": null
+  },
+  {
+    "url": "https://www.seattle.gov/sdci/codes/codes-we-enforce-(a-z)/residential-code",
+    "fetched_at": "2026-06-09T22:58:31.953Z",
+    "http_status": 200,
+    "file": "009-www-seattle-gov-sdci-codes-codes-we-enforce-a-z-residential-code.html",
+    "bytes": 166351,
+    "error": null
+  },
+  {
+    "url": "https://www.seattle.gov/sdci/codes/codes-we-enforce-(a-z)/energy-code",
+    "fetched_at": "2026-06-09T22:58:31.953Z",
+    "http_status": 200,
+    "file": "010-www-seattle-gov-sdci-codes-codes-we-enforce-a-z-energy-code.html",
+    "bytes": 158008,
+    "error": null
+  }
+]

@@ -16,6 +16,9 @@ This README documents what the scaffold adds on top of the v0.1 spec.
 | `data/jurisdictions.json` | The knowledge base: Seattle draft entry (`<<verify>>` citations), the product-default rule set, and the blank template from the spec. |
 | `index.html` / `styles.css` / `app.js` | Minimal internal UI: config selector + jurisdiction picker → rendered result. |
 | `tests/engine.test.js` | Plain-Node assertion suite (no framework). Run: `node tests/engine.test.js`. |
+| `research/fetch-sources.js` | Fetches and archives official source pages per jurisdiction (no rule interpretation). `node fetch-sources.js <id> --from-data` re-fetches every URL cited in the data file — used for quarterly re-verification diffs. |
+| `research/sources/<id>/` | Raw snapshots of every cited official page, with a manifest (URL, fetch date, HTTP status). Every citation in the data file traces to a snapshot here. |
+| `research/REVIEW.md` | The Tier 1 review sheet for Fred + Urbatec: per-jurisdiction findings, editorial downgrades, open `<<verify>>` items, and live-permit validation anchors. |
 
 ## Running it
 
@@ -66,4 +69,12 @@ specific city."
 
 Every entry produced by research stays `status: "draft"`. Only Fred flips an entry to
 `verified`, after review with Urbatec. The test suite asserts that no jurisdiction in the
-data file ships as `verified`.
+data file ships as `verified` (update that assertion when Fred verifies the first entry —
+it exists to stop research from shipping verified status, not Fred).
+
+## Jurisdiction entries also carry a `research` block
+
+Phase 2 added a non-schema `research` object to each jurisdiction (date, method, source
+URLs, caveats). The engine ignores it; it exists for provenance and quarterly
+re-verification. Entries researched 2026-06-09 cover the five Tier 1 jurisdictions:
+Seattle, San Jose, Del Mar, unincorporated King County, unincorporated LA County.

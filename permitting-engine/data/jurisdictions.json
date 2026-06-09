@@ -1,6 +1,6 @@
 {
   "version": "0.2",
-  "comment": "Jurisdiction knowledge base. status is one of: verified | draft | not_researched. Only Fred flips an entry to verified, after review with Urbatec. Citations containing <<verify>> cause the engine to downgrade that rule's determinations to 'depends' at render time.",
+  "comment": "Jurisdiction knowledge base. status is one of: verified | draft | not_researched. Only Fred flips an entry to verified, after review with Urbatec. Citations containing <<verify>> cause the engine to downgrade that rule's determinations to 'depends' at render time. The non-schema 'research' block records provenance for quarterly re-verification; see research/REVIEW.md for the full review sheet.",
 
   "product_default": {
     "id": "_product_default",
@@ -90,60 +90,219 @@
       "verified_by": "",
       "authority": {
         "dept": "Seattle Department of Construction & Inspections (SDCI)",
-        "url": "<<verify>>",
-        "phone": "",
+        "url": "https://www.seattle.gov/sdci/permits",
+        "phone": "(206) 684-8600",
         "email": ""
       },
-      "adopted_codes": "<<verify>>",
+      "adopted_codes": "2021 Seattle Building Code (2021 IBC + Seattle amendments); 2021 Seattle Residential Code (2021 IRC + amendments); 2021 Seattle Energy Code (largely matches 2021 WSEC); 2021 WA State Plumbing Code w/ Seattle amendments (enforced by Public Health — Seattle & King County). Seattle Electrical Code edition <<verify>>.",
       "rules": [
         {
-          "id": "seattle-accessory-under-120-no-plumbing",
+          "id": "seattle-under-120-no-plumbing-no-sleeping",
           "when": {
             "footprint": { "max": 120 },
             "plumbing": ["none"],
-            "on_trailer": "any",
+            "on_trailer": false,
             "sleeping": false
           },
           "result": {
-            "building_permit": "likely_exempt",
-            "electrical_permit": "depends",
+            "building_permit": "depends",
+            "electrical_permit": "likely_required",
             "plumbing_permit": "not_applicable",
             "zoning_review": "depends"
           },
           "citation": {
-            "code_section": "<<verify>>",
-            "title": "<<verify>>",
-            "url": "<<verify>>",
-            "snippet": "<<verify>>"
+            "code_section": "SDCI guidance — 'Sheds' common projects page (underlying SBC/SRC exemption section pending verification)",
+            "title": "Sheds — SDCI",
+            "url": "https://www.seattle.gov/sdci/permits/common-projects/sheds",
+            "snippet": "Only used for storage, growing plants, or similar generally unoccupied uses"
           },
-          "confidence": "low",
-          "rationale": "Draft: small accessory structures without plumbing are commonly exempt, pending verification against SDCI sources."
+          "confidence": "high",
+          "rationale": "SDCI's shed exemption (single story, roof footprint 120 sqft or less, simple foundation, not in an ECA) is limited to generally unoccupied uses like storage. A conditioned, occupied office pod may not qualify even at 96 sqft — confirm with SDCI before skipping a permit. SDCI requires an electrical permit any time wiring is installed, altered, extended, or connected, so the 50A feeder needs one regardless. Zoning standards still apply even without a permit."
         },
         {
-          "id": "seattle-accessory-over-120",
+          "id": "seattle-over-120",
           "when": {
             "footprint": { "min": 121 },
-            "plumbing": "any",
-            "on_trailer": "any",
+            "plumbing": ["none"],
+            "on_trailer": false,
+            "sleeping": false
+          },
+          "result": {
+            "building_permit": "likely_required",
+            "electrical_permit": "likely_required",
+            "plumbing_permit": "not_applicable",
+            "zoning_review": "likely_required"
+          },
+          "citation": {
+            "code_section": "SDCI guidance — 'Sheds' common projects page (underlying SBC/SRC exemption section pending verification)",
+            "title": "Sheds — SDCI",
+            "url": "https://www.seattle.gov/sdci/permits/common-projects/sheds",
+            "snippet": "the shed's roof is 120 square feet or less"
+          },
+          "confidence": "high",
+          "rationale": "Above 120 sqft the exemption is unavailable; structures typically need at least a subject-to-field-inspection construction permit (full permit if in/near an ECA, over 750 sqft, or beams spanning over 14 ft). Applies to the Sixteen and the Station. Zoning is reviewed as part of the permit."
+        },
+        {
+          "id": "seattle-any-plumbing",
+          "when": {
+            "footprint": "any",
+            "plumbing": ["half_bath", "kitchenette", "full_bath"],
+            "on_trailer": false,
             "sleeping": "any"
           },
           "result": {
             "building_permit": "likely_required",
             "electrical_permit": "likely_required",
+            "plumbing_permit": "likely_required",
+            "zoning_review": "likely_required"
+          },
+          "citation": {
+            "code_section": "Seattle Plumbing Code (2021 WA State Plumbing Code with Seattle amendments)",
+            "title": "Plumbing and gas piping applications and permits — Public Health, Seattle & King County",
+            "url": "https://kingcounty.gov/en/dept/dph/health-safety/environmental-health/plumbing-gas-piping/applications-and-permits",
+            "snippet": "install, relocate, or change a plumbing or gas piping system"
+          },
+          "confidence": "high",
+          "rationale": "Plumbing disqualifies the shed exemption, so a building permit applies at any footprint. Plumbing permits are issued by Public Health — Seattle & King County (206-263-9566), not SDCI. With sleeping plus kitchen/bath the pod crosses into DADU territory (see sleeping rule)."
+        },
+        {
+          "id": "seattle-sleeping-dadu",
+          "when": {
+            "footprint": "any",
+            "plumbing": "any",
+            "on_trailer": false,
+            "sleeping": true
+          },
+          "result": {
+            "building_permit": "likely_required",
+            "electrical_permit": "likely_required",
+            "plumbing_permit": "likely_required",
+            "zoning_review": "likely_required"
+          },
+          "citation": {
+            "code_section": "SMC 23.42.022 (referenced by SDCI ADU page; full code text not yet archived)",
+            "title": "Accessory Dwelling Unit — SDCI",
+            "url": "https://www.seattle.gov/sdci/permits/common-projects/accessory-dwelling-units",
+            "snippet": "a legally permitted unit on the property (but not within the home)"
+          },
+          "confidence": "high",
+          "rationale": "A pod used for sleeping is a separate living space under Seattle's DADU framework: full construction permit plus current residential, building, electrical, energy, and land use codes. Tiny houses on foundations are explicitly classified as DADUs. Pre-approved DADU plans (ADUniverse) can shorten approval."
+        },
+        {
+          "id": "seattle-trailer-mounted",
+          "when": {
+            "footprint": "any",
+            "plumbing": "any",
+            "on_trailer": true,
+            "sleeping": "any"
+          },
+          "result": {
+            "building_permit": "depends",
+            "electrical_permit": "depends",
             "plumbing_permit": "depends",
             "zoning_review": "depends"
           },
           "citation": {
             "code_section": "<<verify>>",
-            "title": "<<verify>>",
-            "url": "<<verify>>",
-            "snippet": "<<verify>>"
+            "title": "Accessory Dwelling Unit — SDCI",
+            "url": "https://www.seattle.gov/sdci/permits/common-projects/accessory-dwelling-units",
+            "snippet": "Tiny houses on wheels are treated like camper trailers."
           },
-          "confidence": "low",
-          "rationale": "Draft: above the exemption line a building permit is expected, pending verification against SDCI sources."
+          "confidence": "medium",
+          "rationale": "Seattle treats tiny houses on wheels like camper trailers and prohibits living in them on city lots — so a trailer-mounted pod used for sleeping is effectively prohibited as a dwelling. Treatment of a trailer-mounted, non-sleeping office pod was not found on any official page; a hard-wired 50A feeder still implicates SDCI's electrical permit rule. Confirm with SDCI before relying on vehicle treatment."
+        }
+      ],
+      "zoning_note": "Per the SDCI sheds page (NR1–NR3 zones): exempt sheds limited to 12 ft tall; keep structures out of the front setback (typically the first 10–15 ft) and at least 5 ft from side property lines; combined structure coverage roughly 50–60% of lot (verify exact formula in SMC 23.44 <<verify>> — Municode blocked archiving). DADUs governed by SMC 23.42.022 and zone height/location standards.",
+      "hoa_note": "An HOA may impose separate requirements regardless of city rules.",
+      "notes": "DRAFT (researched 2026-06-09, official SDCI/King County pages). Key escalators: (1) the 120 sqft exemption requires 'generally unoccupied uses' — a conditioned office may not qualify at any size, confirm with SDCI; SDCI pages phrase the line as both 'less than 120' and '120 or less' — exact boundary <<verify>>. (2) Seattle runs its OWN electrical permitting through SDCI (not WA L&I) — every pod's 50A inlet triggers it. (3) Plumbing permits go through Public Health — Seattle & King County, not SDCI. (4) Sleeping = DADU = full permit. (5) ECA proximity voids the exemption. Validation anchor: live permit (Anna Chen). Electrical inspections: (206) 684-8950.",
+      "research": {
+        "date": "2026-06-09",
+        "method": "Official sources fetched and read during a supervised research session; see research/REVIEW.md and research/sources/wa-king-seattle/.",
+        "sources": [
+          "https://www.seattle.gov/sdci/permits/do-you-need-a-permit",
+          "https://www.seattle.gov/sdci/permits/common-projects/sheds",
+          "https://www.seattle.gov/sdci/permits/permits-we-issue-(a-z)/electrical-permit",
+          "https://www.seattle.gov/sdci/codes/codes-we-enforce-(a-z)/plumbing-code",
+          "https://kingcounty.gov/en/dept/dph/health-safety/environmental-health/plumbing-gas-piping/applications-and-permits",
+          "https://www.seattle.gov/sdci/permits/common-projects/accessory-dwelling-units",
+          "https://www.seattle.gov/sdci/codes/codes-we-enforce-(a-z)/building-code",
+          "https://www.seattle.gov/sdci/codes/codes-we-enforce-(a-z)/residential-code",
+          "https://www.seattle.gov/sdci/codes/codes-we-enforce-(a-z)/energy-code",
+          "https://www.seattle.gov/sdci/permits"
+        ],
+        "caveats": [
+          "SMC Ch. 23.44 dimensional tables unfetchable (Municode 403) — setback/coverage details from SDCI summary pages only.",
+          "SDCI Tip 312 returned 404 and is NOT cited.",
+          "Seattle Electrical Code adopted edition not verified."
+        ]
+      }
+    },
+
+    {
+      "id": "ca-santa-clara-san-jose",
+      "name": "San Jose",
+      "level": "city",
+      "county": "Santa Clara",
+      "state": "CA",
+      "status": "draft",
+      "last_verified": "",
+      "verified_by": "",
+      "authority": {
+        "dept": "Building Division, Dept. of Planning, Building and Code Enforcement (Permit Center, 200 E. Santa Clara St.)",
+        "url": "https://www.sanjoseca.gov/your-government/departments-offices/planning-building-code-enforcement/building-division",
+        "phone": "408-535-3555",
+        "email": "BuildingPermits@sanjoseca.gov"
+      },
+      "adopted_codes": "2025 California Building Standards Code (CCR Title 24) effective Jan 1, 2026, incl. 2025 CA Residential Code (Part 2.5), Electrical (Part 3), Plumbing (Part 5), Energy (Part 6); adopted with local amendments in SJMC Title 24.",
+      "rules": [
+        {
+          "id": "san-jose-under-120-no-plumbing-no-sleeping",
+          "when": {
+            "footprint": { "max": 120 },
+            "plumbing": ["none"],
+            "on_trailer": false,
+            "sleeping": false
+          },
+          "result": {
+            "building_permit": "likely_required",
+            "electrical_permit": "likely_required",
+            "plumbing_permit": "not_applicable",
+            "zoning_review": "depends"
+          },
+          "citation": {
+            "code_section": "SJMC 24.02.110 (as summarized in City Bulletin #201, 06/12/2025)",
+            "title": "Bulletin #201 — When Is a Building Permit Required?",
+            "url": "https://www.sanjoseca.gov/home/showdocument?id=25897",
+            "snippet": "120 square feet or less and that will not be electrically wired"
+          },
+          "confidence": "high",
+          "rationale": "San Jose's 120 sqft exemption applies only if the structure will NOT be electrically wired. Every Mini·O pod ships with the standardized 50A inlet, so the exemption cannot apply at any size — Bulletin #250 states that with electrical or plumbing improvements 'a permit is required regardless of the size.' Zoning is 'depends' because Bulletin #250 says accessory buildings 'Cannot be air conditioned' — a conditioned pod may need planner review (free consults: ZoningQuestions@sanjoseca.gov)."
         },
         {
-          "id": "seattle-any-plumbing",
+          "id": "san-jose-over-120",
+          "when": {
+            "footprint": { "min": 121 },
+            "plumbing": ["none"],
+            "on_trailer": false,
+            "sleeping": "any"
+          },
+          "result": {
+            "building_permit": "likely_required",
+            "electrical_permit": "likely_required",
+            "plumbing_permit": "not_applicable",
+            "zoning_review": "depends"
+          },
+          "citation": {
+            "code_section": "SJMC 24.02.110; SJMC 20.30.500 (zoning)",
+            "title": "Bulletin #250 — Accessory Buildings and Structures (04/26/2024)",
+            "url": "https://www.sanjoseca.gov/home/showpublisheddocument/15445/638682236750270000",
+            "snippet": "If the planned size is greater than 120 square feet, a building permit is required."
+          },
+          "confidence": "high",
+          "rationale": "A building permit is directly required above 120 sqft. The 160 and 300 sqft pods fit under the 650 sqft Special Use Permit trigger, but the accessory-building limits (one story, no sleeping space, no air conditioning) may push a conditioned pod toward ADU classification or planner review."
+        },
+        {
+          "id": "san-jose-any-plumbing",
           "when": {
             "footprint": "any",
             "plumbing": ["half_bath", "kitchenette", "full_bath"],
@@ -157,16 +316,356 @@
             "zoning_review": "depends"
           },
           "citation": {
-            "code_section": "<<verify>>",
-            "title": "<<verify>>",
-            "url": "<<verify>>",
-            "snippet": "<<verify>>"
+            "code_section": "SJMC 24.02.110 (permit exemptions); SJMC 20.30.500 (accessory building standards)",
+            "title": "Bulletin #250 — Accessory Buildings and Structures (04/26/2024)",
+            "url": "https://www.sanjoseca.gov/home/showpublisheddocument/15445/638682236750270000",
+            "snippet": "a permit is required regardless of the size of the structure"
           },
-          "confidence": "medium",
-          "rationale": "Draft: plumbing tends to reclassify the pod toward a DADU under Seattle rules, pending verification."
+          "confidence": "high",
+          "rationale": "Any plumbing improvement requires permits regardless of size. Accessory buildings are 'Limited to two plumbing fixtures' — a full bath (3 fixtures) or kitchenette-plus-bath exceeds that, pointing toward ADU classification under Bulletin #210 (SJMC 20.80.175/176)."
         },
         {
-          "id": "seattle-on-trailer",
+          "id": "san-jose-sleeping-adu",
+          "when": {
+            "footprint": "any",
+            "plumbing": "any",
+            "on_trailer": "any",
+            "sleeping": true
+          },
+          "result": {
+            "building_permit": "likely_required",
+            "electrical_permit": "likely_required",
+            "plumbing_permit": "depends",
+            "zoning_review": "likely_required"
+          },
+          "citation": {
+            "code_section": "SJMC 20.30.500 (accessory buildings); SJMC 20.80.175/20.80.176 (ADU standards per Bulletin #210)",
+            "title": "Bulletin #250 — Accessory Buildings and Structures (04/26/2024)",
+            "url": "https://www.sanjoseca.gov/home/showpublisheddocument/15445/638682236750270000",
+            "snippet": "May not contain any living or sleeping spaces"
+          },
+          "confidence": "high",
+          "rationale": "Ordinary accessory buildings may not contain sleeping spaces, so a sleeping pod must go through the ADU process. Caution: San Jose's ADU minimum is 150 sqft — the 96 sqft Twelve is below it and also disqualified as a sleeping accessory building; there may be no lawful sleeping configuration for the Twelve. The Sixteen and Station clear the minimum."
+        },
+        {
+          "id": "san-jose-trailer-mounted",
+          "when": {
+            "footprint": "any",
+            "plumbing": "any",
+            "on_trailer": true,
+            "sleeping": "any"
+          },
+          "result": {
+            "building_permit": "depends",
+            "electrical_permit": "depends",
+            "plumbing_permit": "depends",
+            "zoning_review": "likely_required"
+          },
+          "citation": {
+            "code_section": "City Bulletin #210 (ADU Universal Checklist, 10/10/2025); references Bulletin #291 (THOW)",
+            "title": "Bulletin #210 — ADU Universal Checklist",
+            "url": "https://www.sanjoseca.gov/home/showdocument?id=39038",
+            "snippet": "This is a prefabricated ADU mounted on a trailer chassis"
+          },
+          "confidence": "medium",
+          "rationale": "San Jose regulates tiny homes on wheels as ADUs with a dedicated permit checklist (Bulletin #291) — not as unregulated vehicles. That regime covers dwelling units; treatment of a non-habitable trailer-mounted office pod is unverified. Confirm with the Permit Center before relying on trailer mounting to avoid permits."
+        }
+      ],
+      "zoning_note": "Non-ADU accessory buildings (Bulletin #250, SJMC 20.30.500/510/530): one story; max 12 ft height (16 ft roof peak); 60 ft front setback; no side/rear setback on interior lots (4 ft key lots, 10 ft street-side corners); 6 ft from other buildings; max 650 sqft total without Special Use Permit; rear-yard coverage max 40% all structures / 30% accessory buildings; 1-hr fire-rated walls if over 120 sqft within 5 ft of property line; max two plumbing fixtures; NO sleeping spaces; 'Cannot be air conditioned' — major flag for conditioned pods. ADUs (Bulletin #210): min 150 sqft; detached max 1,000–1,200 sqft (city) / 800 sqft (state); 4 ft side/rear setbacks (state standards); max 18 ft one story; no parking required.",
+      "hoa_note": "An HOA may impose separate requirements regardless of city rules.",
+      "notes": "DRAFT (researched 2026-06-09). VERIFICATION CAVEAT: live sanjoseca.gov pages block automated fetching; all cited content was read from Internet Archive captures of the same official URLs (captures 2025-03 to 2026-03) — re-confirm against live pages during verification. Key escalators: (1) the exemption requires NO electrical wiring — every pod needs permits at any size; (2) accessory buildings may not be air conditioned — conditioned pods likely need planner consultation even without plumbing; (3) the Twelve (96 sqft) is below the 150 sqft ADU minimum — no clear lawful sleeping configuration; (4) THOWs are regulated as ADUs. Bulletins predate the Jan 2026 switch to 2025 codes — re-confirm thresholds (408-535-3555). Bulletin #250 is ambiguous at exactly 120 sqft ('greater than 120' vs '120 or greater') — treat exactly-120 as permit-required. Validation anchor: live permit (Gary Deng), record 2026-121660-RS, plumbing A/B (one pod no plumbing, one 3/4 bath).",
+      "research": {
+        "date": "2026-06-09",
+        "method": "Official city bulletins and pages read via Internet Archive captures of official sanjoseca.gov URLs (live site blocks automation); see research/REVIEW.md.",
+        "sources": [
+          "https://www.sanjoseca.gov/home/showdocument?id=25897",
+          "https://www.sanjoseca.gov/home/showpublisheddocument/15445/638682236750270000",
+          "https://www.sanjoseca.gov/home/showdocument?id=39038",
+          "https://www.sanjoseca.gov/your-government/departments-offices/planning-building-code-enforcement/building-division/adopted-building-codes",
+          "https://www.sanjoseca.gov/your-government/departments-offices/planning-building-code-enforcement/building-division",
+          "https://www.sanjoseca.gov/business/development-services-permit-center/accessory-dwelling-units-adus/adu-faqs"
+        ],
+        "caveats": [
+          "All citations verified via Internet Archive captures, not live pages (WAF blocks bots).",
+          "SJMC code text itself unfetchable (Municode 403) — sections cited as referenced by city bulletins.",
+          "Bulletin #291 (Tiny Home on Wheels checklist) referenced but not locatable.",
+          "Original research posture for the under-120 rule was building_permit: depends; upgraded to likely_required during assembly because the no-wiring condition is directly cited and every pod is wired."
+        ]
+      }
+    },
+
+    {
+      "id": "ca-san-diego-del-mar",
+      "name": "Del Mar",
+      "level": "city",
+      "county": "San Diego",
+      "state": "CA",
+      "status": "draft",
+      "last_verified": "",
+      "verified_by": "",
+      "authority": {
+        "dept": "City of Del Mar Planning & Community Development — Building Services Division",
+        "url": "https://www.delmar.ca.us/133/Building-Services",
+        "phone": "858-375-9514 (Building); 858-755-9313 (Planning); 858-375-9528 (Inspections)",
+        "email": "Building@delmar.ca.us"
+      },
+      "adopted_codes": "Per DMMC Ch. 23.12 (Ord. 1022, eff. Oct 22, 2025): 2025 California Building, Electrical, Plumbing, Mechanical, Energy, Residential, and Green codes.",
+      "rules": [
+        {
+          "id": "del-mar-under-120-no-plumbing",
+          "when": {
+            "footprint": { "max": 120 },
+            "plumbing": ["none"],
+            "on_trailer": false,
+            "sleeping": false
+          },
+          "result": {
+            "building_permit": "depends",
+            "electrical_permit": "likely_required",
+            "plumbing_permit": "not_applicable",
+            "zoning_review": "likely_required"
+          },
+          "citation": {
+            "code_section": "DMMC 23.05.030.A.1; CRC R105.2",
+            "title": "Del Mar Municipal Code Ch. 23.05 Construction Permits (defers to state code exemptions)",
+            "url": "https://api.municode.com/codesContent?jobId=490350&nodeId=TIT23BUCO_CH23.05COPE&productId=15557",
+            "snippet": "meets an exemption per the California Building Code or Title 23"
+          },
+          "confidence": "medium",
+          "rationale": "DMMC defers to the state CRC R105.2 exemption (one-story detached accessory structures up to 120 sqft), but that exemption is written for 'tool and storage sheds, playhouses and similar uses' — a conditioned, occupied office may not qualify, so confirm with Building. Even if the shell is exempt: the 50A circuit needs an Electrical Permit (DMMC 23.05.040.A.1), Design Review applies to exterior structures (Ch. 23.08), and a coastal exemption determination is needed (Ch. 30.75). Shipped as 'depends' per the safe-error guardrail."
+        },
+        {
+          "id": "del-mar-over-120",
+          "when": {
+            "footprint": { "min": 121 },
+            "plumbing": ["none"],
+            "on_trailer": false,
+            "sleeping": false
+          },
+          "result": {
+            "building_permit": "likely_required",
+            "electrical_permit": "likely_required",
+            "plumbing_permit": "not_applicable",
+            "zoning_review": "likely_required"
+          },
+          "citation": {
+            "code_section": "DMMC 23.05.030.A.1",
+            "title": "Del Mar Municipal Code Ch. 23.05 Construction Permits",
+            "url": "https://api.municode.com/codesContent?jobId=490350&nodeId=TIT23BUCO_CH23.05COPE&productId=15557",
+            "snippet": "No structure shall be erected, constructed, enlarged, altered"
+          },
+          "confidence": "high",
+          "rationale": "The Sixteen and Station exceed the 120 sqft state exemption, so a Building Permit is required, plus Electrical Permit for the circuit and a Mechanical Permit for heating/cooling equipment (23.05.040.A.3). Design Review (Ch. 23.08) and coastal review (Ch. 30.75) apply on top."
+        },
+        {
+          "id": "del-mar-any-plumbing",
+          "when": {
+            "footprint": "any",
+            "plumbing": ["half_bath", "kitchenette", "full_bath"],
+            "on_trailer": "any",
+            "sleeping": "any"
+          },
+          "result": {
+            "building_permit": "likely_required",
+            "electrical_permit": "likely_required",
+            "plumbing_permit": "likely_required",
+            "zoning_review": "likely_required"
+          },
+          "citation": {
+            "code_section": "DMMC 23.05.040.A.2",
+            "title": "Del Mar Municipal Code Ch. 23.05 Construction Permits (Plumbing Permits)",
+            "url": "https://api.municode.com/codesContent?jobId=490350&nodeId=TIT23BUCO_CH23.05COPE&productId=15557",
+            "snippet": "unless a Plumbing Permit has been obtained"
+          },
+          "confidence": "high",
+          "rationale": "A Plumbing Permit is required for any plumbing system installed within or on any structure or premises. Plumbing also defeats the state shed exemption, so a Building Permit applies at any footprint. A pod with kitchenette/bath plus sleeping risks ADU classification (DMMC Ch. 30.91), which triggers an Administrative Coastal Development Permit."
+        },
+        {
+          "id": "del-mar-sleeping-adu",
+          "when": {
+            "footprint": "any",
+            "plumbing": "any",
+            "on_trailer": "any",
+            "sleeping": true
+          },
+          "result": {
+            "building_permit": "likely_required",
+            "electrical_permit": "likely_required",
+            "plumbing_permit": "depends",
+            "zoning_review": "likely_required"
+          },
+          "citation": {
+            "code_section": "DMMC 30.91.030(E)",
+            "title": "Del Mar Municipal Code Ch. 30.91 (June 2025) — ADU Regulations",
+            "url": "https://www.delmar.ca.us/DocumentCenter/View/9896/June-2025-Chapter-3091-ADU-Regulations",
+            "snippet": "requires issuance of an Administrative Coastal Development permit"
+          },
+          "confidence": "medium",
+          "rationale": "A detached unit used for sleeping points toward ADU treatment: all construction permits per Ch. 23.04/23.05, and ADU approval requires an Administrative Coastal Development Permit — new detached units do not meet the conversion/attached CDP exemptions. Del Mar permits 'tiny homes' on any lot that allows an ADU. Confirm classification with Planning."
+        },
+        {
+          "id": "del-mar-trailer-mounted",
+          "when": {
+            "footprint": "any",
+            "plumbing": "any",
+            "on_trailer": true,
+            "sleeping": "any"
+          },
+          "result": {
+            "building_permit": "depends",
+            "electrical_permit": "depends",
+            "plumbing_permit": "depends",
+            "zoning_review": "depends"
+          },
+          "citation": {
+            "code_section": "DMMC 30.86.200(K); DMMC 23.15.040; DMMC 30.75.030.I",
+            "title": "Del Mar Municipal Code — Supplemental Regulations / Manufactured Homes / CDP definitions",
+            "url": "https://api.municode.com/codesContent?jobId=490350&nodeId=TIT30ZO_CH30.86SURE&productId=15557",
+            "snippet": "boats, trailers, trucks, campers or the like be stored or parked"
+          },
+          "confidence": "low",
+          "rationale": "No DMMC provision squarely addresses occupied trailer-mounted office units. Trailers/campers are barred from required front/side yards; manufactured homes need permanent foundations; and the CDP 'development' definition is broad enough to cover a parked, occupied pod. Get a written determination from Planning before relying on wheels to avoid permits."
+        }
+      ],
+      "zoning_note": "COASTAL: Del Mar implements a certified Local Coastal Program citywide — DMMC 30.75.040.A requires a Coastal Development Permit for all 'development' (broadly defined). Key exemption: improvements to existing single-family residences incl. 'storage sheds' (30.75.200.C) — a backyard pod plausibly fits, BUT the exemption is lost on beaches/wetlands, within 50 ft of coastal bluffs, in the Lagoon Overlay, near steep slopes, or in the CDP Appeals Area. Every pod placement needs at minimum a city coastal exemption determination; lot location decides whether a full CDP is required. ADUs always need an Administrative CDP. SETBACKS (example, R1-10 zone): front 20 ft, rear 25 ft, interior side 7.5 ft; max height 26 ft (14 ft in Bluff/Slope/Canyon Overlay). The 500-sqft accessory-building rear-yard encroachment allowance (30.86.200(C)) EXCLUDES the R1-40/R1-14/R1-10 zones. DESIGN REVIEW: DMMC 23.08.030 requires a Design Review Permit for exterior construction of all structures; the administrative shortcut caps at 48 sqft and 6 ft height — every Mini·O pod exceeds it.",
+      "hoa_note": "An HOA may impose separate requirements regardless of city rules.",
+      "notes": "DRAFT (researched 2026-06-09, DMMC read via Municode's public content API — human-readable equivalents at library.municode.com/ca/del_mar, Supp. 11 Update 1, codified through Ord. 1027, Feb 17, 2026). Del Mar layers FOUR gates on a backyard pod: building/trade permits, Design Review, coastal exemption-or-CDP, and (if sleeping) ADU + Administrative CDP. Separate Electrical, Plumbing, and Mechanical permits are required for any new wiring, plumbing, or HVAC even on an exempt shell. The 'entirely within the Coastal Zone' claim could not be verified on a fetched page <<verify>> — but the citywide CDP chapter makes coastal review the operative assumption. Original research posture for the under-120 rule was building_permit: likely_exempt (medium); shipped as 'depends' per the safe-error guardrail. Validation anchor: live permit (Htut Zaw).",
+      "research": {
+        "date": "2026-06-09",
+        "method": "DMMC chapters fetched via api.municode.com (library.municode.com blocks automation); city pages from delmar.ca.us; CRC R105.2 text verified via a fetched ca.gov county handout quoting it. See research/REVIEW.md.",
+        "sources": [
+          "https://www.delmar.ca.us/133/Building-Services",
+          "https://www.delmar.ca.us/730/Planning-Community-Development",
+          "https://www.delmar.ca.us/DocumentCenter/View/9896/June-2025-Chapter-3091-ADU-Regulations",
+          "https://api.municode.com/codesContent?jobId=490350&nodeId=TIT23BUCO_CH23.05COPE&productId=15557",
+          "https://api.municode.com/codesContent?jobId=490350&nodeId=TIT23BUCO_CH23.12CACOCO&productId=15557",
+          "https://api.municode.com/codesContent?jobId=490350&nodeId=TIT30ZO_CH30.75CODEPECD&productId=15557",
+          "https://api.municode.com/codesContent?jobId=490350&nodeId=TIT30ZO_CH30.12LODERER1&productId=15557",
+          "https://api.municode.com/codesContent?jobId=490350&nodeId=TIT30ZO_CH30.86SURE&productId=15557",
+          "https://api.municode.com/codesContent?jobId=490350&nodeId=TIT23BUCO_CH23.08DERE&productId=15557",
+          "https://api.municode.com/codesContent?jobId=490350&nodeId=TIT23BUCO_CH23.15MAHO&productId=15557",
+          "https://www.contracosta.ca.gov/DocumentCenter/View/45841/WORK-NOT-REQUIRING-A-BUILDING-PERMIT"
+        ],
+        "caveats": [
+          "Citation URLs are Municode content-API URLs (the pages actually fetched); human-readable pages at library.municode.com use the same nodeIds.",
+          "Del Mar's 2019 construction-permit guidelines PDF is 404 and not cited.",
+          "Coastal Zone full-coverage claim unverified on a fetched page.",
+          "Original research posture for under-120 was likely_exempt (medium); shipped as depends per safe-error guardrail."
+        ]
+      }
+    },
+
+    {
+      "id": "wa-king-unincorporated",
+      "name": "Unincorporated King County",
+      "level": "unincorporated_county",
+      "county": "King",
+      "state": "WA",
+      "status": "draft",
+      "last_verified": "",
+      "verified_by": "",
+      "authority": {
+        "dept": "King County Dept. of Local Services, Permitting Division (plumbing via Public Health — Seattle & King County; electrical via WA State L&I)",
+        "url": "https://kingcounty.gov/en/dept/local-services/certificates-permits-licenses/permits/permits-inspections-codes-buildings-land-use/do-you-need-a-permit",
+        "phone": "206-296-6600",
+        "email": "PermitQuestions@kingcounty.gov"
+      },
+      "adopted_codes": "Per KCC 16.02.110: 2018 IBC/IRC effective Feb 1, 2021, plus IECC/IMC/UPC. A March 2025 county ordinance summary updates references to the 2021 editions (WA state codes effective March 15, 2024) — enacted status <<verify>>.",
+      "rules": [
+        {
+          "id": "king-county-under-200-conditioned-no-plumbing",
+          "when": {
+            "footprint": { "max": 200 },
+            "plumbing": ["none"],
+            "on_trailer": false,
+            "sleeping": false
+          },
+          "result": {
+            "building_permit": "likely_required",
+            "electrical_permit": "likely_required",
+            "plumbing_permit": "not_applicable",
+            "zoning_review": "depends"
+          },
+          "citation": {
+            "code_section": "KCC 16.02.240 (amending the IRC/IBC work-exempt-from-permit list)",
+            "title": "Residential Accessory Building or Miscellaneous Structures Permit (DLS Permitting, July 2020)",
+            "url": "https://cdn.kingcounty.gov/-/media/king-county/depts/local-services/permits/building-land-use-permits/r/residential-accessory-building-permits.pdf?rev=9223ccccc74b4672ae1e85d3e9d4b41b&hash=CB2707363E1B3D722B7CA9A026937544",
+            "snippet": "less than 200 square feet and unconditioned space"
+          },
+          "confidence": "medium",
+          "rationale": "King County's shed exemption is two-pronged: under 200 sqft AND unconditioned. The county's 2025 code-update summary is explicit: 'Detached accessory structures must be unconditioned to be exempt.' Mini·O pods are insulated and heated/cooled, so even the Twelve and Sixteen likely need a building permit. Electrical permit for the 50A circuit comes from WA L&I regardless. Exempt structures must still meet KCC 21A.12 setbacks."
+        },
+        {
+          "id": "king-county-over-200",
+          "when": {
+            "footprint": { "min": 201 },
+            "plumbing": ["none"],
+            "on_trailer": false,
+            "sleeping": "any"
+          },
+          "result": {
+            "building_permit": "likely_required",
+            "electrical_permit": "likely_required",
+            "plumbing_permit": "not_applicable",
+            "zoning_review": "likely_required"
+          },
+          "citation": {
+            "code_section": "KCC 16.02.240",
+            "title": "King County Code Title 16 / Do you need a permit?",
+            "url": "https://kingcounty.gov/en/dept/local-services/certificates-permits-licenses/permits/permits-inspections-codes-buildings-land-use/do-you-need-a-permit",
+            "snippet": "A storage shed with a floor area of 200 square feet or less"
+          },
+          "confidence": "high",
+          "rationale": "The exemption caps at 200 sqft, so the Station (300 sqft) always needs a Residential Accessory Building permit (apply via MyBuildingPermit.com). Factory-built structures also need WA L&I Factory Built Structures approval — and a county building permit is still required to site the unit."
+        },
+        {
+          "id": "king-county-any-plumbing",
+          "when": {
+            "footprint": "any",
+            "plumbing": ["half_bath", "kitchenette", "full_bath"],
+            "on_trailer": false,
+            "sleeping": "any"
+          },
+          "result": {
+            "building_permit": "likely_required",
+            "electrical_permit": "likely_required",
+            "plumbing_permit": "likely_required",
+            "zoning_review": "likely_required"
+          },
+          "citation": {
+            "code_section": "KCC Title 16 (UPC as adopted, KCC 16.32) — permits issued by Public Health — Seattle & King County",
+            "title": "Plumbing and gas piping applications and permits — Public Health, Seattle & King County",
+            "url": "https://kingcounty.gov/en/dept/dph/health-safety/environmental-health/plumbing-gas-piping/applications-and-permits",
+            "snippet": "Seattle and King County codes require that you obtain a permit"
+          },
+          "confidence": "high",
+          "rationale": "Public Health — Seattle & King County issues plumbing permits in unincorporated King County (206-477-8050 Eastgate office). Adding a bath/kitchenette also triggers water supply / sewage review — on septic, expect On-Site Sewage System review and possibly a sewer certificate."
+        },
+        {
+          "id": "king-county-sleeping-adu",
+          "when": {
+            "footprint": "any",
+            "plumbing": "any",
+            "on_trailer": false,
+            "sleeping": true
+          },
+          "result": {
+            "building_permit": "likely_required",
+            "electrical_permit": "likely_required",
+            "plumbing_permit": "likely_required",
+            "zoning_review": "likely_required"
+          },
+          "citation": {
+            "code_section": "KCC 21A.08.030 B.7.a",
+            "title": "Residential Accessory Dwelling Units (ADUs) — DLS Permits (March 2026)",
+            "url": "https://cdn.kingcounty.gov/-/media/king-county/depts/local-services/permits/building-land-use-permits/r/residential-accessory-dwelling-units-information.pdf?rev=adf307cc4014415886da43c8353626ad&hash=FA6B15604E52DD22FB7063F5EF3DF3F3",
+            "snippet": "shall not exceed one thousand square feet of heated floor area"
+          },
+          "confidence": "medium",
+          "rationale": "A sleeping pod with sanitation/kitchen functions as an ADU: full building permit as a dwelling, notice on title recorded before approval, max 1,000 sqft heated, one ADU per rural lot (two in the urban growth area), prohibited in Forest zones, public health/sewer or septic review. Any residence regardless of size must be anchored to a permanent foundation and meet energy code."
+        },
+        {
+          "id": "king-county-trailer-mounted",
           "when": {
             "footprint": "any",
             "plumbing": "any",
@@ -180,18 +679,199 @@
             "zoning_review": "depends"
           },
           "citation": {
-            "code_section": "<<verify>>",
-            "title": "<<verify>>",
-            "url": "<<verify>>",
-            "snippet": "<<verify>>"
+            "code_section": "King County zoning code RV definition (per DLS tiny-homes bulletin)",
+            "title": "Residential Tiny Homes (DLS Permitting Division, March 2020)",
+            "url": "https://cdn.kingcounty.gov/-/media/king-county/depts/local-services/permits/building-land-use-permits/r/residential-tiny-homes.pdf?rev=f09ff6bfb1fd4479bcae22a05e32bb74&hash=BC782DC522F260B43B70D373A63EE310",
+            "snippet": "Tiny homes on wheels are treated like recreational vehicles"
           },
-          "confidence": "low",
-          "rationale": "Draft: trailer-mounted units may fall outside structure rules; classification to be confirmed with SDCI."
+          "confidence": "medium",
+          "rationale": "Wheeled units are treated like RVs: not dwelling units, no full-time residence, camping capped at 60 days per rolling 365. A trailer-mounted OFFICE pod is not directly addressed — the county could treat a permanently sited, utility-connected wheeled pod as a structure. The premises wiring for the 50A circuit still needs an L&I electrical permit. Confirm with the Permitting Division."
         }
       ],
-      "zoning_note": "<<verify>> Setbacks, lot coverage, and DADU rules to be confirmed with SDCI.",
+      "zoning_note": "All structures, including permit-exempt ones, must meet KCC Title 21A dimensional standards (setbacks in KCC 21A.12; exact numeric setbacks per zone in the 21A.12.030 tables <<verify>> — table text not directly archived). Critical areas (wetlands, steep slopes, streams) void the shed exemption entirely. ADUs: KCC 21A.08.030 B.7.a — 1,000 sqft heated cap, notice on title, one per rural lot / two in urban area, prohibited in Forest zones.",
       "hoa_note": "An HOA may impose separate requirements regardless of city rules.",
-      "notes": "DRAFT — outcomes unverified; citations pending Phase 2 research. Anchored to a live permit (Anna Chen) for validation. Tests the WA / WSEC path."
+      "notes": "DRAFT (researched 2026-06-09, official kingcounty.gov / lni.wa.gov / sbcc.wa.gov pages). Three different authorities: building permits — King County DLS Permitting (206-296-6600, MyBuildingPermit.com); electrical — WA State Labor & Industries; plumbing — Public Health Seattle & King County. THE HEADLINE: the 200 sqft exemption requires UNCONDITIONED space, so every conditioned Mini·O pod should be assumed to need a county building permit at any size, an L&I electrical permit, and a PHSKC plumbing permit if wet. Factory-built units need L&I Factory Built Structures approval plus the county siting permit. Septic (OSS) capacity and critical-areas review are common complications in rural zones.",
+      "research": {
+        "date": "2026-06-09",
+        "method": "Official county/state pages and DLS bulletins fetched and read; see research/REVIEW.md.",
+        "sources": [
+          "https://kingcounty.gov/en/dept/local-services/certificates-permits-licenses/permits/permits-inspections-codes-buildings-land-use/do-you-need-a-permit",
+          "https://cdn.kingcounty.gov/-/media/king-county/depts/local-services/permits/building-land-use-permits/r/residential-accessory-building-permits.pdf?rev=9223ccccc74b4672ae1e85d3e9d4b41b&hash=CB2707363E1B3D722B7CA9A026937544",
+          "https://aqua.kingcounty.gov/council/clerk/code/19_Title_16.htm",
+          "https://cdn.kingcounty.gov/-/media/king-county/depts/local-services/permits/public-notices/building-code-update-plain-language-summary.pdf?rev=401ed8ff094348f385b60502480c3f28&hash=F9605C11B3E796AC9B7AB9514B84A1AD",
+          "https://lni.wa.gov/licensing-permits/electrical/electrical-permits-fees-and-inspections/",
+          "https://kingcounty.gov/en/dept/dph/health-safety/environmental-health/plumbing-gas-piping/applications-and-permits",
+          "https://cdn.kingcounty.gov/-/media/king-county/depts/local-services/permits/building-land-use-permits/r/residential-tiny-homes.pdf?rev=f09ff6bfb1fd4479bcae22a05e32bb74&hash=BC782DC522F260B43B70D373A63EE310",
+          "https://cdn.kingcounty.gov/-/media/king-county/depts/local-services/permits/building-land-use-permits/r/residential-accessory-dwelling-units-information.pdf?rev=adf307cc4014415886da43c8353626ad&hash=FA6B15604E52DD22FB7063F5EF3DF3F3",
+          "https://kingcounty.gov/en/dept/local-services/buildings-property/local-services-permit-guide/permit-guide/faq",
+          "https://sbcc.wa.gov/state-codes-regulations-guidelines/state-building-code/energy-code"
+        ],
+        "caveats": [
+          "KCC Title 21A setback tables too large to extract — exact numeric setbacks not verified.",
+          "2021-code-edition update ordinance: only the March 2025 plain-language summary fetched; enacted status unverified.",
+          "Full KCC 16.02.240 exemption text summarized via Title 16 page and ordinance summary, not independently read."
+        ]
+      }
+    },
+
+    {
+      "id": "ca-los-angeles-unincorporated",
+      "name": "Unincorporated Los Angeles County",
+      "level": "unincorporated_county",
+      "county": "Los Angeles",
+      "state": "CA",
+      "status": "draft",
+      "last_verified": "",
+      "verified_by": "",
+      "authority": {
+        "dept": "LA County Public Works, Building and Safety Division (permits via EPIC-LA and district offices)",
+        "url": "https://pw.lacounty.gov/building-and-safety/",
+        "phone": "(626) 458-5100",
+        "email": ""
+      },
+      "adopted_codes": "2026 County of LA Building Code (Title 26), effective Jan 1, 2026, adopting the 2025 California Building Code with county amendments; companion Titles 27 (Electrical), 28 (Plumbing), 29 (Mechanical), 30 (Residential). Note: the permit-exemption provision is numbered Title 26 Sec. 106.3, not model-code 105.2.",
+      "rules": [
+        {
+          "id": "la-county-under-120-no-plumbing-no-sleeping",
+          "when": {
+            "footprint": { "max": 120 },
+            "plumbing": ["none"],
+            "on_trailer": false,
+            "sleeping": false
+          },
+          "result": {
+            "building_permit": "depends",
+            "electrical_permit": "likely_required",
+            "plumbing_permit": "not_applicable",
+            "zoning_review": "likely_required"
+          },
+          "citation": {
+            "code_section": "LA County Building Code (Title 26) Sec. 106.3, item 1",
+            "title": "Work Exempt from Building Permits — LA County Building and Safety",
+            "url": "https://pw.lacounty.gov/building-and-safety/permits/workexempt.shtml",
+            "snippet": "gross floor area does not exceed 120 square feet"
+          },
+          "confidence": "medium",
+          "rationale": "One-story detached accessory buildings are exempt only if gross floor area is 120 sqft or less, height 12 ft or less, and roof projection 24 in or less — and the exemption is written for tool/storage sheds, playhouses, and 'similar uses.' A conditioned office may be questioned, so confirm use with the district office; shipped as 'depends' per the safe-error guardrail. The exemption does NOT waive the electrical permit for the 50A circuit or zoning compliance (Title 22 applies to all structures)."
+        },
+        {
+          "id": "la-county-over-120",
+          "when": {
+            "footprint": { "min": 121 },
+            "plumbing": ["none"],
+            "on_trailer": false,
+            "sleeping": "any"
+          },
+          "result": {
+            "building_permit": "likely_required",
+            "electrical_permit": "likely_required",
+            "plumbing_permit": "not_applicable",
+            "zoning_review": "likely_required"
+          },
+          "citation": {
+            "code_section": "LA County Building Code (Title 26) Sec. 106.3 (exemption inapplicable over 120 sqft)",
+            "title": "Work Exempt from Building Permits — LA County Building and Safety",
+            "url": "https://pw.lacounty.gov/building-and-safety/permits/workexempt.shtml",
+            "snippet": "does not exceed 120 square feet, the height does not exceed 12 feet"
+          },
+          "confidence": "high",
+          "rationale": "Over 120 sqft the exemption cannot apply — building permit from Building and Safety required (the Sixteen and Station). Regional Planning approval is needed before the building permit issues for accessory structures over 120 sqft. Applications on/after Jan 1, 2026 are reviewed under the 2025-cycle county codes."
+        },
+        {
+          "id": "la-county-any-plumbing",
+          "when": {
+            "footprint": "any",
+            "plumbing": ["half_bath", "kitchenette", "full_bath"],
+            "on_trailer": false,
+            "sleeping": "any"
+          },
+          "result": {
+            "building_permit": "likely_required",
+            "electrical_permit": "likely_required",
+            "plumbing_permit": "likely_required",
+            "zoning_review": "likely_required"
+          },
+          "citation": {
+            "code_section": "LA County Public Works construction permits page; Title 26 Sec. 106.3 exemption limited to shed-type uses",
+            "title": "Construction Permits — LA County Building and Safety",
+            "url": "https://pw.lacounty.gov/building-and-safety/permits/",
+            "snippet": "New, expanded, or replaced plumbing items"
+          },
+          "confidence": "medium",
+          "rationale": "A plumbing permit is required for new plumbing regardless of structure size — separate trade permits apply even in exempt sheds. A bathroom/kitchenette also moves the structure outside the shed-type exemption toward habitable-space review. With sleeping + kitchen + bath, the unit meets the county ADU definition and must be permitted as an ADU."
+        },
+        {
+          "id": "la-county-sleeping-adu",
+          "when": {
+            "footprint": "any",
+            "plumbing": "any",
+            "on_trailer": false,
+            "sleeping": true
+          },
+          "result": {
+            "building_permit": "likely_required",
+            "electrical_permit": "likely_required",
+            "plumbing_permit": "depends",
+            "zoning_review": "likely_required"
+          },
+          "citation": {
+            "code_section": "LA County Code Title 22, Sec. 22.140.640 (ADU development standards)",
+            "title": "Accessory Dwelling Unit (ADU) Summary — LA County Planning",
+            "url": "https://planning.lacounty.gov/wp-content/uploads/2023/03/adu_ordinance-summary.pdf",
+            "snippet": "a sleeping area, kitchen, and bathroom"
+          },
+          "confidence": "medium",
+          "rationale": "Sleeping use makes the pod habitable space — never within the shed exemption. With sleeping area + kitchen + bathroom it is an ADU under the county ordinance (ministerial approval per state ADU law). Sleeping without kitchen/bath still requires habitable-space review — confirm classification with Building and Safety and Regional Planning ((213) 974-6411)."
+        },
+        {
+          "id": "la-county-trailer-mounted",
+          "when": {
+            "footprint": "any",
+            "plumbing": "any",
+            "on_trailer": true,
+            "sleeping": "any"
+          },
+          "result": {
+            "building_permit": "depends",
+            "electrical_permit": "depends",
+            "plumbing_permit": "depends",
+            "zoning_review": "likely_required"
+          },
+          "citation": {
+            "code_section": "LA County Planning zoning enforcement guidance (Title 22)",
+            "title": "Common Zoning Violations — LA County Planning",
+            "url": "https://planning.lacounty.gov/enforcement/common-zoning-violations/",
+            "snippet": "Living in a recreational vehicle or trailer for any length of time"
+          },
+          "confidence": "medium",
+          "rationale": "No county page exempts trailer-mounted units as vehicles, and unincorporated LA County has no published movable-tiny-home provision (unlike the City of LA). Enforcement flags occupied trailers as violations — an occupied trailer-mounted pod risks being treated as illegal trailer occupancy rather than escaping permits. Confirm with Regional Planning and Building and Safety."
+        }
+      ],
+      "zoning_note": "Title 22 (Planning and Zoning) applies regardless of building-permit exemption. County enforcement examples show 5-ft side / 15-ft rear residential setbacks (exact values vary by zone and community standards district). ADU standards: Title 22 Sec. 22.140.640 (the 4-ft side/rear ADU setback appears only in search snippets, not a fetched page <<verify>>). Regional Planning approval precedes the building permit for accessory structures over 120 sqft. Regional Planning: (213) 974-6411, info@planning.lacounty.gov.",
+      "hoa_note": "An HOA may impose separate requirements regardless of city rules.",
+      "notes": "DRAFT (researched 2026-06-09, official pw.lacounty.gov / planning.lacounty.gov / energy.ca.gov pages). The 96 sqft Twelve with no plumbing/sleeping is the only configuration plausibly exempt from a building permit (height limit 12 ft, roof projection limit 24 in) — but the 50A feed always triggers an electrical permit, and the conditioned-office use question led us to ship the building outcome as 'depends' (original research posture: likely_exempt, high). Permits issue via EPIC-LA (epicla.lacounty.gov). Factory-built/state-insignia treatment not researched on a fetched page <<verify>>. The exemption lives at Title 26 Sec. 106.3 (county renumbering of model-code 105.2).",
+      "research": {
+        "date": "2026-06-09",
+        "method": "Official county pages and the Title 26 adopting-ordinance PDF fetched and read; see research/REVIEW.md.",
+        "sources": [
+          "https://pw.lacounty.gov/building-and-safety/permits/workexempt.shtml",
+          "https://pw.lacounty.gov/building-and-safety/general",
+          "https://pw.lacounty.gov/bsd/lib/fp/Stakeholder%20Outreach%20Meeting%20on%20September%2011,%202025/Title%2026%20-%20Building%20Code%20Ordinance%2008192025.pdf",
+          "https://pw.lacounty.gov/building-and-safety/permits/",
+          "https://permits.lacounty.gov/permits/electrical/",
+          "https://permits.lacounty.gov/permits/building-and-safety/",
+          "https://planning.lacounty.gov/planning-permits/accessory-dwelling-units/",
+          "https://planning.lacounty.gov/wp-content/uploads/2023/03/adu_ordinance-summary.pdf",
+          "https://planning.lacounty.gov/enforcement/common-zoning-violations/",
+          "https://www.energy.ca.gov/programs-and-topics/programs/building-energy-efficiency-standards/2025-building-energy-efficiency"
+        ],
+        "caveats": [
+          "Codified Title 26 Sec. 106.3 text unfetchable on Municode (403) — corroborated via county workexempt page and adopting-ordinance PDF.",
+          "ADU 4-ft setback figure from search snippets only.",
+          "Factory-built/state-insignia rules not researched.",
+          "Original research posture for under-120 was likely_exempt (high); shipped as depends per safe-error guardrail."
+        ]
+      }
     }
   ],
 

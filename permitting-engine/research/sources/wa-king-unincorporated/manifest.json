@@ -1,0 +1,82 @@
+[
+  {
+    "url": "https://kingcounty.gov/en/dept/local-services/certificates-permits-licenses/permits/permits-inspections-codes-buildings-land-use/do-you-need-a-permit",
+    "fetched_at": "2026-06-09T22:56:55.587Z",
+    "http_status": 200,
+    "file": "001-kingcounty-gov-en-dept-local-services-certificates-permits-licenses-permits-perm.html",
+    "bytes": 61441,
+    "error": null
+  },
+  {
+    "url": "https://cdn.kingcounty.gov/-/media/king-county/depts/local-services/permits/building-land-use-permits/r/residential-accessory-building-permits.pdf?rev=9223ccccc74b4672ae1e85d3e9d4b41b&hash=CB2707363E1B3D722B7CA9A026937544",
+    "fetched_at": "2026-06-09T22:56:55.587Z",
+    "http_status": 200,
+    "file": "002-cdn-kingcounty-gov-media-king-county-depts-local-services-permits-building-land-.html",
+    "bytes": 259760,
+    "error": null
+  },
+  {
+    "url": "https://kingcounty.gov/en/dept/dph/health-safety/environmental-health/plumbing-gas-piping/applications-and-permits",
+    "fetched_at": "2026-06-09T22:56:55.587Z",
+    "http_status": 200,
+    "file": "003-kingcounty-gov-en-dept-dph-health-safety-environmental-health-plumbing-gas-pipin.html",
+    "bytes": 54151,
+    "error": null
+  },
+  {
+    "url": "https://cdn.kingcounty.gov/-/media/king-county/depts/local-services/permits/building-land-use-permits/r/residential-accessory-dwelling-units-information.pdf?rev=adf307cc4014415886da43c8353626ad&hash=FA6B15604E52DD22FB7063F5EF3DF3F3",
+    "fetched_at": "2026-06-09T22:56:55.587Z",
+    "http_status": 200,
+    "file": "004-cdn-kingcounty-gov-media-king-county-depts-local-services-permits-building-land-.html",
+    "bytes": 340259,
+    "error": null
+  },
+  {
+    "url": "https://cdn.kingcounty.gov/-/media/king-county/depts/local-services/permits/building-land-use-permits/r/residential-tiny-homes.pdf?rev=f09ff6bfb1fd4479bcae22a05e32bb74&hash=BC782DC522F260B43B70D373A63EE310",
+    "fetched_at": "2026-06-09T22:56:55.587Z",
+    "http_status": 200,
+    "file": "005-cdn-kingcounty-gov-media-king-county-depts-local-services-permits-building-land-.html",
+    "bytes": 255858,
+    "error": null
+  },
+  {
+    "url": "https://aqua.kingcounty.gov/council/clerk/code/19_Title_16.htm",
+    "fetched_at": "2026-06-09T22:58:33.939Z",
+    "http_status": 200,
+    "file": "006-aqua-kingcounty-gov-council-clerk-code-19-title-16-htm.html",
+    "bytes": 1213134,
+    "error": null
+  },
+  {
+    "url": "https://cdn.kingcounty.gov/-/media/king-county/depts/local-services/permits/public-notices/building-code-update-plain-language-summary.pdf?rev=401ed8ff094348f385b60502480c3f28&hash=F9605C11B3E796AC9B7AB9514B84A1AD",
+    "fetched_at": "2026-06-09T22:58:33.939Z",
+    "http_status": 200,
+    "file": "007-cdn-kingcounty-gov-media-king-county-depts-local-services-permits-public-notices.html",
+    "bytes": 306201,
+    "error": null
+  },
+  {
+    "url": "https://lni.wa.gov/licensing-permits/electrical/electrical-permits-fees-and-inspections/",
+    "fetched_at": "2026-06-09T22:58:33.939Z",
+    "http_status": 200,
+    "file": "008-lni-wa-gov-licensing-permits-electrical-electrical-permits-fees-and-inspections.html",
+    "bytes": 11071,
+    "error": null
+  },
+  {
+    "url": "https://kingcounty.gov/en/dept/local-services/buildings-property/local-services-permit-guide/permit-guide/faq",
+    "fetched_at": "2026-06-09T22:58:33.939Z",
+    "http_status": 200,
+    "file": "009-kingcounty-gov-en-dept-local-services-buildings-property-local-services-permit-g.html",
+    "bytes": 62807,
+    "error": null
+  },
+  {
+    "url": "https://sbcc.wa.gov/state-codes-regulations-guidelines/state-building-code/energy-code",
+    "fetched_at": "2026-06-09T22:58:33.939Z",
+    "http_status": 200,
+    "file": "010-sbcc-wa-gov-state-codes-regulations-guidelines-state-building-code-energy-code.html",
+    "bytes": 111357,
+    "error": null
+  }
+]

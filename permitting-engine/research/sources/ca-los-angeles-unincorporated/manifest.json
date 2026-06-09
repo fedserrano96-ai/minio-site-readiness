@@ -1,0 +1,90 @@
+[
+  {
+    "url": "https://pw.lacounty.gov/building-and-safety/",
+    "fetched_at": "2026-06-09T22:57:26.778Z",
+    "http_status": 200,
+    "file": "001-pw-lacounty-gov-building-and-safety.html",
+    "bytes": 72596,
+    "error": null
+  },
+  {
+    "url": "https://pw.lacounty.gov/building-and-safety/permits/workexempt.shtml",
+    "fetched_at": "2026-06-09T22:57:26.778Z",
+    "http_status": 200,
+    "file": "002-pw-lacounty-gov-building-and-safety-permits-workexempt-shtml.html",
+    "bytes": 63964,
+    "error": null
+  },
+  {
+    "url": "https://pw.lacounty.gov/building-and-safety/permits/",
+    "fetched_at": "2026-06-09T22:57:26.778Z",
+    "http_status": 200,
+    "file": "003-pw-lacounty-gov-building-and-safety-permits.html",
+    "bytes": 60735,
+    "error": null
+  },
+  {
+    "url": "https://planning.lacounty.gov/wp-content/uploads/2023/03/adu_ordinance-summary.pdf",
+    "fetched_at": "2026-06-09T22:57:26.778Z",
+    "http_status": 200,
+    "file": "004-planning-lacounty-gov-wp-content-uploads-2023-03-adu-ordinance-summary-pdf.html",
+    "bytes": 119072,
+    "error": null
+  },
+  {
+    "url": "https://planning.lacounty.gov/enforcement/common-zoning-violations/",
+    "fetched_at": "2026-06-09T22:57:26.778Z",
+    "http_status": 200,
+    "file": "005-planning-lacounty-gov-enforcement-common-zoning-violations.html",
+    "bytes": 556747,
+    "error": null
+  },
+  {
+    "url": "https://pw.lacounty.gov/building-and-safety/general",
+    "fetched_at": "2026-06-09T22:58:58.228Z",
+    "http_status": 200,
+    "file": "006-pw-lacounty-gov-building-and-safety-general.html",
+    "bytes": 68548,
+    "error": null
+  },
+  {
+    "url": "https://pw.lacounty.gov/bsd/lib/fp/Stakeholder%20Outreach%20Meeting%20on%20September%2011,%202025/Title%2026%20-%20Building%20Code%20Ordinance%2008192025.pdf",
+    "fetched_at": "2026-06-09T22:58:58.228Z",
+    "http_status": 200,
+    "file": "007-pw-lacounty-gov-bsd-lib-fp-stakeholder-20outreach-20meeting-20on-20september-201.html",
+    "bytes": 1085394,
+    "error": null
+  },
+  {
+    "url": "https://permits.lacounty.gov/permits/electrical/",
+    "fetched_at": "2026-06-09T22:58:58.228Z",
+    "http_status": 200,
+    "file": "008-permits-lacounty-gov-permits-electrical.html",
+    "bytes": 587584,
+    "error": null
+  },
+  {
+    "url": "https://permits.lacounty.gov/permits/building-and-safety/",
+    "fetched_at": "2026-06-09T22:58:58.228Z",
+    "http_status": 200,
+    "file": "009-permits-lacounty-gov-permits-building-and-safety.html",
+    "bytes": 600932,
+    "error": null
+  },
+  {
+    "url": "https://planning.lacounty.gov/planning-permits/accessory-dwelling-units/",
+    "fetched_at": "2026-06-09T22:58:58.228Z",
+    "http_status": 200,
+    "file": "010-planning-lacounty-gov-planning-permits-accessory-dwelling-units.html",
+    "bytes": 364015,
+    "error": null
+  },
+  {
+    "url": "https://www.energy.ca.gov/programs-and-topics/programs/building-energy-efficiency-standards/2025-building-energy-efficiency",
+    "fetched_at": "2026-06-09T22:58:58.228Z",
+    "http_status": 200,
+    "file": "011-www-energy-ca-gov-programs-and-topics-programs-building-energy-efficiency-standa.html",
+    "bytes": 85567,
+    "error": null
+  }
+]
