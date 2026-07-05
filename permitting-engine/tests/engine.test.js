@@ -286,6 +286,20 @@ assert(
   'no Tier 1 draft currently renders likely_exempt for any config (safe-error posture until verified)'
 );
 
+/* geo blocks: every researched entry must be resolvable from a Census result */
+data.jurisdictions.forEach((j) => {
+  const geo = j.geo || {};
+  const isPlace = typeof geo.place_geoid === 'string' && /^\d{7}$/.test(geo.place_geoid);
+  const isCounty =
+    typeof geo.county_geoid === 'string' &&
+    /^\d{5}$/.test(geo.county_geoid) &&
+    geo.unincorporated === true;
+  assert(isPlace || isCounty, j.id + ': geo block has a 7-digit place_geoid or a 5-digit unincorporated county_geoid');
+  assert(!(isPlace && geo.unincorporated), j.id + ': place entries must not claim unincorporated');
+});
+const geoKeys = data.jurisdictions.map((j) => ((j.geo || {}).place_geoid || (j.geo || {}).county_geoid || j.id));
+assert(new Set(geoKeys).size === geoKeys.length, 'geo GEOIDs are unique across jurisdictions');
+
 /* ════ 3. PER-JURISDICTION BEHAVIOR (Tier 1 drafts) ════════════════ */
 
 /* Seattle — WSEC path; conditioned-office ambiguity; DADU escalation. */
