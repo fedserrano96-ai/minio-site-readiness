@@ -210,7 +210,8 @@
     if (coverage === 'product_default') {
       return { status: 'product_default', verified: [], unverified: [], note: REQUIREMENTS_PRODUCT_DEFAULT_NOTE };
     }
-    var list = (jurisdiction && jurisdiction.construction_requirements) || [];
+    var raw = jurisdiction && jurisdiction.construction_requirements;
+    var list = Array.isArray(raw) ? raw : [];
     if (!list.length) {
       return { status: 'not_researched', verified: [], unverified: [], note: REQUIREMENTS_NOT_RESEARCHED_NOTE };
     }
@@ -222,7 +223,12 @@
           id: req.id,
           category: req.category,
           requirement: req.requirement,
-          citation: req.citation,
+          citation: {
+            code_section: req.citation.code_section,
+            title: req.citation.title,
+            url: req.citation.url,
+            snippet: req.citation.snippet || '',
+          },
           confidence: req.confidence || 'low',
         });
       } else {

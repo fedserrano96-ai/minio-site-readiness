@@ -274,6 +274,12 @@ assert(
   'requirements: absent field → not_researched'
 );
 
+const malformedCrJur = Object.assign({}, REQ_JUR, { construction_requirements: 'TBD' });
+assert(
+  engine.evaluate(pod(), malformedCrJur, opts).construction_requirements.status === 'not_researched',
+  'requirements: non-array value → not_researched'
+);
+
 const pdReqOut = engine.evaluate(pod(), null, opts);
 assert(pdReqOut.construction_requirements.status === 'product_default', 'requirements: product default status');
 assert(/vary by climate/i.test(pdReqOut.construction_requirements.note), 'requirements: product-default generic note');
