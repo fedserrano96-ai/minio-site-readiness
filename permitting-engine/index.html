@@ -51,10 +51,22 @@
         <span>Trailer-mounted</span>
       </label>
 
-      <label class="field">
-        <span class="field-label">Jurisdiction</span>
-        <select id="jurisdiction"></select>
-      </label>
+      <div class="field">
+        <span class="field-label">Property address</span>
+        <div class="address-row">
+          <input type="text" id="address" placeholder="600 4th Ave, Seattle, WA" autocomplete="street-address">
+          <button id="address-search" class="btn-search" type="button">Find</button>
+        </div>
+        <div id="address-status" class="address-status" hidden></div>
+      </div>
+
+      <details id="manual-pick" class="manual-pick">
+        <summary>or pick the jurisdiction manually</summary>
+        <label class="field">
+          <span class="field-label">Jurisdiction</span>
+          <select id="jurisdiction"></select>
+        </label>
+      </details>
 
       <button id="evaluate" class="btn-evaluate" type="button">Evaluate</button>
     </section>
@@ -68,6 +80,7 @@
   </main>
 
   <script src="engine.js"></script>
+  <script src="resolver.js"></script>
   <script src="app.js"></script>
 </body>
 </html>

@@ -15,6 +15,10 @@
     jurisdiction: document.getElementById('jurisdiction'),
     evaluate: document.getElementById('evaluate'),
     output: document.getElementById('output'),
+    address: document.getElementById('address'),
+    addressSearch: document.getElementById('address-search'),
+    addressStatus: document.getElementById('address-status'),
+    manualPick: document.getElementById('manual-pick'),
   };
 
   var POSTURE_LABELS = {
@@ -31,6 +35,16 @@
     electrical_permit: 'Electrical permit',
     plumbing_permit: 'Plumbing permit',
     zoning_review: 'Zoning review',
+  };
+
+  var CATEGORY_LABELS = {
+    insulation: 'Insulation',
+    foundation: 'Foundation',
+    snow_load: 'Snow load',
+    wind: 'Wind',
+    seismic: 'Seismic',
+    energy: 'Energy',
+    other: 'Other',
   };
 
   var COVERAGE_LABELS = {
@@ -93,6 +107,55 @@
     return data.jurisdictions.find(function (j) { return j.id === id; }) || null;
   }
 
+  function setAddressStatus(message, kind) {
+    el.addressStatus.hidden = false;
+    el.addressStatus.className = 'address-status address-status-' + kind;
+    el.addressStatus.textContent = message;
+  }
+
+  function jurisdictionLabel(j) {
+    return j.name + ', ' + (j.county ? j.county + ' County, ' : '') + j.state + ' [' + j.status + ']';
+  }
+
+  function onAddressSearch() {
+    if (!data) return;
+    var address = el.address.value.trim();
+    if (!address) {
+      setAddressStatus('Type an address first.', 'error');
+      return;
+    }
+    setAddressStatus('Looking up address…', 'pending');
+    fetch('/.netlify/functions/geocode?address=' + encodeURIComponent(address))
+      .then(function (res) {
+        if (!res.ok) throw new Error('geocode ' + res.status);
+        return res.json();
+      })
+      .then(function (json) {
+        if (!json.result) {
+          setAddressStatus('No match for that address — check it or pick the jurisdiction manually below.', 'error');
+          el.manualPick.open = true;
+          return;
+        }
+        var resolved = window.PermittingResolver.resolve(json.result, data.jurisdictions);
+        if (resolved.jurisdictionId) {
+          el.jurisdiction.value = resolved.jurisdictionId;
+          var j = data.jurisdictions.find(function (x) { return x.id === resolved.jurisdictionId; });
+          setAddressStatus('Matched: ' + resolved.matchedAddress + ' → ' + jurisdictionLabel(j), 'ok');
+        } else {
+          el.jurisdiction.value = '__other';
+          setAddressStatus(
+            'Matched: ' + resolved.matchedAddress + ' → not yet researched. Using generic product guidance — we’ll confirm this city.',
+            'warn'
+          );
+        }
+        onEvaluate();
+      })
+      .catch(function () {
+        setAddressStatus('Couldn’t look up that address — pick the jurisdiction manually below.', 'error');
+        el.manualPick.open = true;
+      });
+  }
+
   function onModelChange() {
     var model = el.model.value;
     if (model === 'custom') {
@@ -128,6 +191,32 @@
     out.notes.forEach(function (n) { html += '<li>' + esc(n) + '</li>'; });
     if (out.config_lock_note) html += '<li>' + esc(out.config_lock_note) + '</li>';
     html += '</ul></div>';
+
+    var reqs = out.construction_requirements;
+    html += '<div class="section-block"><h3>Building requirements</h3>';
+    if (reqs.status === 'listed') {
+      if (reqs.verified.length) {
+        html += '<ul>';
+        reqs.verified.forEach(function (r) {
+          html += '<li><strong>' + esc(CATEGORY_LABELS[r.category] || r.category) + ':</strong> ' +
+            esc(r.requirement) +
+            ' <span class="req-cite">(' + esc(r.citation.code_section) +
+            ', confidence: ' + esc(r.confidence) + ')</span></li>';
+        });
+        html += '</ul>';
+      }
+      if (reqs.unverified.length) {
+        html += '<p class="req-unverified-head">Unverified — confirm with the office:</p><ul class="req-unverified">';
+        reqs.unverified.forEach(function (r) {
+          html += '<li><strong>' + esc(CATEGORY_LABELS[r.category] || r.category) + ':</strong> ' +
+            esc(r.requirement) + '</li>';
+        });
+        html += '</ul>';
+      }
+    } else {
+      html += '<p>' + esc(reqs.note) + '</p>';
+    }
+    html += '</div>';
 
     if (out.citations.length) {
       html += '<div class="section-block"><h3>Citations</h3>';
@@ -170,6 +259,10 @@
 
   el.model.addEventListener('change', onModelChange);
   el.evaluate.addEventListener('click', onEvaluate);
+  el.addressSearch.addEventListener('click', onAddressSearch);
+  el.address.addEventListener('keydown', function (e) {
+    if (e.key === 'Enter') onAddressSearch();
+  });
 
   onModelChange();
   loadData();
