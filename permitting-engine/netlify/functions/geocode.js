@@ -36,7 +36,12 @@ exports.handler = async function (event) {
     if (!res.ok) {
       return json(502, { error: 'Census geocoder returned ' + res.status + '.' });
     }
-    const raw = await res.json();
+    let raw;
+    try {
+      raw = await res.json();
+    } catch (_) {
+      return json(502, { error: 'Census geocoder returned an unparseable response.' });
+    }
     return json(200, { result: resolver.parseCensusResponse(raw) });
   } catch (err) {
     return json(502, { error: 'Census geocoder unreachable or timed out.' });
