@@ -286,7 +286,7 @@ assert(
   'no Tier 1 draft currently renders likely_exempt for any config (safe-error posture until verified)'
 );
 
-/* geo blocks: every researched entry must be resolvable from a Census result */
+/* geo blocks: every jurisdiction entry must be resolvable from a Census result */
 data.jurisdictions.forEach((j) => {
   const geo = j.geo || {};
   const isPlace = typeof geo.place_geoid === 'string' && /^\d{7}$/.test(geo.place_geoid);
@@ -296,8 +296,14 @@ data.jurisdictions.forEach((j) => {
     geo.unincorporated === true;
   assert(isPlace || isCounty, j.id + ': geo block has a 7-digit place_geoid or a 5-digit unincorporated county_geoid');
   assert(!(isPlace && geo.unincorporated), j.id + ': place entries must not claim unincorporated');
+  if (j.level === 'city') {
+    assert(isPlace && !geo.county_geoid, j.id + ': city entries carry place_geoid only');
+  }
+  if (j.level === 'unincorporated_county') {
+    assert(isCounty && !geo.place_geoid, j.id + ': county entries carry county_geoid + unincorporated only');
+  }
 });
-const geoKeys = data.jurisdictions.map((j) => ((j.geo || {}).place_geoid || (j.geo || {}).county_geoid || j.id));
+const geoKeys = data.jurisdictions.map((j) => ((j.geo || {}).place_geoid || (j.geo || {}).county_geoid || ('__missing__' + j.id)));
 assert(new Set(geoKeys).size === geoKeys.length, 'geo GEOIDs are unique across jurisdictions');
 
 /* ════ 3. PER-JURISDICTION BEHAVIOR (Tier 1 drafts) ════════════════ */
