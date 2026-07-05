@@ -218,6 +218,67 @@ engine.evaluate(p, jur('wa-king-seattle'), opts);
 assert(JSON.stringify(p) === pBefore, 'evaluate does not mutate the pod config');
 assert(JSON.stringify(jur('wa-king-seattle')) === sBefore, 'evaluate does not mutate the jurisdiction');
 
+/* Construction requirements */
+const REQ_JUR = {
+  id: 'test-req',
+  name: 'Testville',
+  county: 'Test',
+  state: 'CA',
+  status: 'draft',
+  last_verified: '2026-01-01',
+  rules: [
+    {
+      id: 'req-broad',
+      when: { footprint: 'any', plumbing: 'any', on_trailer: 'any', sleeping: 'any' },
+      result: { building_permit: 'depends', electrical_permit: 'depends', plumbing_permit: 'depends', zoning_review: 'depends' },
+      citation: { code_section: 'T 1.1', title: 'Test', url: 'https://example.gov/t', snippet: 't' },
+      confidence: 'low',
+    },
+  ],
+  construction_requirements: [
+    {
+      id: 'req-cited',
+      category: 'insulation',
+      requirement: 'R-49 ceiling insulation.',
+      citation: { code_section: 'EC R402', title: 'Energy Code', url: 'https://example.gov/ec', snippet: 'R-49 ceilings' },
+      confidence: 'high',
+    },
+    {
+      id: 'req-uncited',
+      category: 'foundation',
+      requirement: 'Footings below frost line.',
+      citation: { code_section: '<<verify>>', title: '', url: '', snippet: '' },
+      confidence: 'medium',
+    },
+  ],
+};
+
+const reqOut = engine.evaluate(pod(), REQ_JUR, opts);
+assert(reqOut.construction_requirements.status === 'listed', 'requirements: non-empty list → status listed');
+assert(reqOut.construction_requirements.verified.length === 1, 'requirements: one verified (complete citation)');
+assert(reqOut.construction_requirements.verified[0].id === 'req-cited', 'requirements: cited item is the verified one');
+assert(reqOut.construction_requirements.verified[0].citation.code_section === 'EC R402', 'requirements: verified keeps citation');
+assert(reqOut.construction_requirements.unverified.length === 1, 'requirements: one unverified (incomplete citation)');
+assert(reqOut.construction_requirements.unverified[0].citation === undefined, 'requirements: unverified never carries a citation');
+assert(reqOut.construction_requirements.note === null, 'requirements: listed → no fallback note');
+
+const noReqJur = Object.assign({}, REQ_JUR, { construction_requirements: [] });
+const noReqOut = engine.evaluate(pod(), noReqJur, opts);
+assert(noReqOut.construction_requirements.status === 'not_researched', 'requirements: empty list → not_researched');
+assert(/not yet researched/i.test(noReqOut.construction_requirements.note), 'requirements: not-researched note');
+
+const absentReqJur = Object.assign({}, REQ_JUR);
+delete absentReqJur.construction_requirements;
+assert(
+  engine.evaluate(pod(), absentReqJur, opts).construction_requirements.status === 'not_researched',
+  'requirements: absent field → not_researched'
+);
+
+const pdReqOut = engine.evaluate(pod(), null, opts);
+assert(pdReqOut.construction_requirements.status === 'product_default', 'requirements: product default status');
+assert(/vary by climate/i.test(pdReqOut.construction_requirements.note), 'requirements: product-default generic note');
+assert(pdReqOut.construction_requirements.verified.length === 0, 'requirements: product default lists nothing');
+
 /* ════ 2. DATA-FILE INVARIANTS ═════════════════════════════════════ */
 
 const TIER1_IDS = [

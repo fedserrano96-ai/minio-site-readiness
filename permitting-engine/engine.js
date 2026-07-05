@@ -54,6 +54,13 @@
     'Trailer-mounted units may be treated as a vehicle/RV rather than a structure in some ' +
     'jurisdictions — confirm how your local office classifies them.';
 
+  var REQUIREMENTS_NOT_RESEARCHED_NOTE =
+    'Construction requirements not yet researched for this jurisdiction.';
+
+  var REQUIREMENTS_PRODUCT_DEFAULT_NOTE =
+    'Requirements like insulation depth, footing depth, and snow load vary by climate and ' +
+    'city — we’ll confirm what applies to your specific location.';
+
   /* ── Config helpers ────────────────────────────────────────────── */
 
   function resolveFootprint(podConfig) {
@@ -191,6 +198,38 @@
       posture: 'standard_ok',
       note: 'Exempt path: a standard slab or pier foundation per Mini·O spec is typically fine. Re-check if your config changes.',
     };
+  }
+
+  /*
+   * Construction requirements (data model v0.3): cited plain-English guidance
+   * notes per jurisdiction. Same guardrail as permits: an incomplete citation
+   * moves the item to the "unverified" bucket (and its citation is never
+   * rendered); it can never appear as a clean claim.
+   */
+  function buildConstructionRequirements(jurisdiction, coverage) {
+    if (coverage === 'product_default') {
+      return { status: 'product_default', verified: [], unverified: [], note: REQUIREMENTS_PRODUCT_DEFAULT_NOTE };
+    }
+    var list = (jurisdiction && jurisdiction.construction_requirements) || [];
+    if (!list.length) {
+      return { status: 'not_researched', verified: [], unverified: [], note: REQUIREMENTS_NOT_RESEARCHED_NOTE };
+    }
+    var verified = [];
+    var unverified = [];
+    list.forEach(function (req) {
+      if (citationComplete(req.citation)) {
+        verified.push({
+          id: req.id,
+          category: req.category,
+          requirement: req.requirement,
+          citation: req.citation,
+          confidence: req.confidence || 'low',
+        });
+      } else {
+        unverified.push({ id: req.id, category: req.category, requirement: req.requirement });
+      }
+    });
+    return { status: 'listed', verified: verified, unverified: unverified, note: null };
   }
 
   function buildNextStep(jurisdiction, coverage) {
@@ -333,6 +372,10 @@
         podConfig,
         permits.building_permit,
         coverage === 'product_default' ? null : jurisdiction
+      ),
+      construction_requirements: buildConstructionRequirements(
+        coverage === 'product_default' ? null : jurisdiction,
+        coverage
       ),
       notes: notes,
       next_step: buildNextStep(jurisdiction, coverage),
