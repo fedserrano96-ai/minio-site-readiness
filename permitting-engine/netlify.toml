@@ -1,0 +1,12 @@
+# Netlify config for the permitting-engine module.
+# Local dev: npx netlify-cli@latest dev   (serves static files + functions)
+# NOTE: if this module deploys as part of a Netlify site rooted at the parent
+# Readiness Assessment repo, set that site's base to permitting-engine/ (or
+# replicate these paths in the root config) — deploy wiring is decided at
+# integration time, not in Phase A.
+
+[build]
+  publish = "."
+
+[functions]
+  directory = "netlify/functions"
