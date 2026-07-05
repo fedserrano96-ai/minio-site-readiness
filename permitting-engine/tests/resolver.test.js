@@ -52,6 +52,12 @@ assert(resolver.parseCensusResponse(fixture('census-no-match.json')) === null, '
 assert(resolver.parseCensusResponse(fixture('census-malformed.json')) === null, 'malformed response → null');
 assert(resolver.parseCensusResponse(null) === null, 'null input → null');
 assert(resolver.parseCensusResponse({}) === null, 'empty object → null');
+const noGeos = resolver.parseCensusResponse({
+  result: { addressMatches: [{ matchedAddress: 'A ST', coordinates: { x: 1, y: 2 } }] },
+});
+assert(noGeos !== null, 'no geographies block → returns struct, not null');
+assert(noGeos.county_geoid === null && noGeos.place_geoid === null, 'no geographies → both GEOIDs null');
+assert(resolver.resolve(noGeos, data.jurisdictions).jurisdictionId === null, 'no geographies → resolves to product-default');
 
 /* ════ resolve ═════════════════════════════════════════════════════ */
 

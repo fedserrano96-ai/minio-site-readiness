@@ -24,6 +24,8 @@
   function parseCensusResponse(raw) {
     var matches = raw && raw.result && raw.result.addressMatches;
     if (!Array.isArray(matches) || matches.length === 0) return null;
+    /* Census lists candidate matches best-first; take the first and let the UI
+       render the matched address so a wrong match is visible, not silent. */
     var m = matches[0] || {};
     var geos = m.geographies || {};
     var county = (geos['Counties'] || [])[0] || null;
@@ -31,10 +33,10 @@
     return {
       matched_address: m.matchedAddress || '',
       coords: m.coordinates ? { lat: m.coordinates.y, lon: m.coordinates.x } : null,
-      state_fips: county ? county.STATE || null : null,
-      county_geoid: county ? county.GEOID || null : null,
+      state_fips: (county ? county.STATE : null) || (place ? place.STATE : null) || null,
+      county_geoid: county && county.GEOID != null ? String(county.GEOID) : null,
       county_name: county ? county.BASENAME || null : null,
-      place_geoid: place ? place.GEOID || null : null,
+      place_geoid: place && place.GEOID != null ? String(place.GEOID) : null,
       place_name: place ? place.BASENAME || null : null,
     };
   }
