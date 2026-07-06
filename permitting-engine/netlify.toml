@@ -1,0 +1,13 @@
+# Netlify config for the permitting-engine module.
+# Local dev (from the repo root, because the parent site has its own netlify.toml):
+#   npx netlify-cli@latest dev -d permitting-engine -f permitting-engine/netlify/functions
+# NOTE: if this module deploys as part of a Netlify site rooted at the parent
+# Readiness Assessment repo, set that site's base to permitting-engine/ (or
+# replicate these paths in the root config) — deploy wiring is decided at
+# integration time, not in Phase A.
+
+[build]
+  publish = "."
+
+[functions]
+  directory = "netlify/functions"

@@ -1,0 +1,50 @@
+[
+  {
+    "url": "https://www.sanjoseca.gov/your-government/departments-offices/planning-building-code-enforcement/building-division",
+    "fetched_at": "2026-06-09T22:57:22.163Z",
+    "http_status": 200,
+    "file": "001-www-sanjoseca-gov-your-government-departments-offices-planning-building-code-enf.html",
+    "bytes": 116173,
+    "error": null
+  },
+  {
+    "url": "https://www.sanjoseca.gov/home/showdocument?id=25897",
+    "fetched_at": "2026-06-09T22:57:22.163Z",
+    "http_status": 200,
+    "file": "002-www-sanjoseca-gov-home-showdocument.html",
+    "bytes": 244196,
+    "error": null
+  },
+  {
+    "url": "https://www.sanjoseca.gov/home/showpublisheddocument/15445/638682236750270000",
+    "fetched_at": "2026-06-09T22:57:22.163Z",
+    "http_status": 200,
+    "file": "003-www-sanjoseca-gov-home-showpublisheddocument-15445-638682236750270000.html",
+    "bytes": 289631,
+    "error": null
+  },
+  {
+    "url": "https://www.sanjoseca.gov/home/showdocument?id=39038",
+    "fetched_at": "2026-06-09T22:57:22.163Z",
+    "http_status": 200,
+    "file": "004-www-sanjoseca-gov-home-showdocument.html",
+    "bytes": 559637,
+    "error": null
+  },
+  {
+    "url": "https://www.sanjoseca.gov/your-government/departments-offices/planning-building-code-enforcement/building-division/adopted-building-codes",
+    "fetched_at": "2026-06-09T22:58:55.370Z",
+    "http_status": 200,
+    "file": "005-www-sanjoseca-gov-your-government-departments-offices-planning-building-code-enf.html",
+    "bytes": 119733,
+    "error": null
+  },
+  {
+    "url": "https://www.sanjoseca.gov/business/development-services-permit-center/accessory-dwelling-units-adus/adu-faqs",
+    "fetched_at": "2026-06-09T22:58:55.370Z",
+    "http_status": 200,
+    "file": "006-www-sanjoseca-gov-business-development-services-permit-center-accessory-dwelling.html",
+    "bytes": 104278,
+    "error": null
+  }
+]

@@ -1,0 +1,18 @@
+{
+  "result": {
+    "addressMatches": [
+      {
+        "matchedAddress": "600 4TH AVE, SEATTLE, WA, 98104",
+        "coordinates": { "x": -122.330270920928, "y": 47.603314311191 },
+        "geographies": {
+          "Incorporated Places": [
+            { "GEOID": "5363000", "BASENAME": "Seattle", "NAME": "Seattle city", "STATE": "53" }
+          ],
+          "Counties": [
+            { "GEOID": "53033", "BASENAME": "King", "NAME": "King County", "STATE": "53" }
+          ]
+        }
+      }
+    ]
+  }
+}

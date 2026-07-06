@@ -62,7 +62,8 @@ body {
 .field { display: block; margin-bottom: 12px; font-size: 14px; }
 .field-label { display: block; font-weight: 600; margin-bottom: 4px; font-size: 13px; }
 .field select,
-.field input[type="number"] {
+.field input[type="number"],
+.address-row input {
   width: 100%;
   padding: 7px 8px;
   border: 1px solid #ccc;
@@ -151,3 +152,33 @@ body {
   padding-top: 10px;
   margin-top: 14px;
 }
+
+/* Address search (Phase A) */
+.address-row { display: flex; gap: 8px; }
+.address-row input { flex: 1; }
+
+.btn-search {
+  background: var(--dark);
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 7px 14px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: inherit;
+  white-space: nowrap;
+}
+.btn-search:hover { filter: brightness(0.95); }
+
+.address-status { margin-top: 6px; font-size: 0.85rem; padding: 6px 8px; border-radius: 4px; }
+.address-status-pending { background: #f0f0f0; color: #555; }
+.address-status-ok { background: #e6f4ea; color: #1e6b34; }
+.address-status-warn { background: #fdf3dc; color: #8a6100; }
+.address-status-error { background: #fdecea; color: #a4272c; }
+
+.manual-pick summary { cursor: pointer; font-size: 0.85rem; color: #666; margin: 8px 0; }
+
+.req-cite { color: #666; font-size: 0.85em; }
+.req-unverified-head { font-weight: 600; margin-bottom: 4px; }
+.req-unverified { opacity: 0.85; }

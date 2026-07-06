@@ -1,0 +1,18 @@
+{
+  "result": {
+    "addressMatches": [
+      {
+        "matchedAddress": "450 110TH AVE NE, BELLEVUE, WA, 98004",
+        "coordinates": { "x": -122.191667, "y": 47.615278 },
+        "geographies": {
+          "Incorporated Places": [
+            { "GEOID": "5305210", "BASENAME": "Bellevue", "NAME": "Bellevue city", "STATE": "53" }
+          ],
+          "Counties": [
+            { "GEOID": "53033", "BASENAME": "King", "NAME": "King County", "STATE": "53" }
+          ]
+        }
+      }
+    ]
+  }
+}

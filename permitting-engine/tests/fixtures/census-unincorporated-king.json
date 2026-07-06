@@ -1,0 +1,15 @@
+{
+  "result": {
+    "addressMatches": [
+      {
+        "matchedAddress": "17705 VASHON HWY SW, VASHON, WA, 98070",
+        "coordinates": { "x": -122.459815, "y": 47.447212 },
+        "geographies": {
+          "Counties": [
+            { "GEOID": "53033", "BASENAME": "King", "NAME": "King County", "STATE": "53" }
+          ]
+        }
+      }
+    ]
+  }
+}

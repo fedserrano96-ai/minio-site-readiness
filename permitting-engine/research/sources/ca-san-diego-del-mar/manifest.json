@@ -1,0 +1,90 @@
+[
+  {
+    "url": "https://www.delmar.ca.us/133/Building-Services",
+    "fetched_at": "2026-06-09T22:57:23.835Z",
+    "http_status": 200,
+    "file": "001-www-delmar-ca-us-133-building-services.html",
+    "bytes": 105923,
+    "error": null
+  },
+  {
+    "url": "https://api.municode.com/codesContent?jobId=490350&nodeId=TIT23BUCO_CH23.05COPE&productId=15557",
+    "fetched_at": "2026-06-09T22:57:23.835Z",
+    "http_status": 200,
+    "file": "002-api-municode-com-codescontent.html",
+    "bytes": 21176,
+    "error": null
+  },
+  {
+    "url": "https://www.delmar.ca.us/DocumentCenter/View/9896/June-2025-Chapter-3091-ADU-Regulations",
+    "fetched_at": "2026-06-09T22:57:23.835Z",
+    "http_status": 200,
+    "file": "003-www-delmar-ca-us-documentcenter-view-9896-june-2025-chapter-3091-adu-regulations.html",
+    "bytes": 238747,
+    "error": null
+  },
+  {
+    "url": "https://api.municode.com/codesContent?jobId=490350&nodeId=TIT30ZO_CH30.86SURE&productId=15557",
+    "fetched_at": "2026-06-09T22:57:23.835Z",
+    "http_status": 200,
+    "file": "004-api-municode-com-codescontent.html",
+    "bytes": 93691,
+    "error": null
+  },
+  {
+    "url": "https://www.delmar.ca.us/730/Planning-Community-Development",
+    "fetched_at": "2026-06-09T22:58:56.191Z",
+    "http_status": 200,
+    "file": "005-www-delmar-ca-us-730-planning-community-development.html",
+    "bytes": 96858,
+    "error": null
+  },
+  {
+    "url": "https://api.municode.com/codesContent?jobId=490350&nodeId=TIT23BUCO_CH23.12CACOCO&productId=15557",
+    "fetched_at": "2026-06-09T22:58:56.191Z",
+    "http_status": 200,
+    "file": "006-api-municode-com-codescontent.html",
+    "bytes": 67023,
+    "error": null
+  },
+  {
+    "url": "https://api.municode.com/codesContent?jobId=490350&nodeId=TIT30ZO_CH30.75CODEPECD&productId=15557",
+    "fetched_at": "2026-06-09T22:58:56.191Z",
+    "http_status": 200,
+    "file": "007-api-municode-com-codescontent.html",
+    "bytes": 103298,
+    "error": null
+  },
+  {
+    "url": "https://api.municode.com/codesContent?jobId=490350&nodeId=TIT30ZO_CH30.12LODERER1&productId=15557",
+    "fetched_at": "2026-06-09T22:58:56.191Z",
+    "http_status": 200,
+    "file": "008-api-municode-com-codescontent.html",
+    "bytes": 19608,
+    "error": null
+  },
+  {
+    "url": "https://api.municode.com/codesContent?jobId=490350&nodeId=TIT23BUCO_CH23.08DERE&productId=15557",
+    "fetched_at": "2026-06-09T22:58:56.191Z",
+    "http_status": 200,
+    "file": "009-api-municode-com-codescontent.html",
+    "bytes": 87632,
+    "error": null
+  },
+  {
+    "url": "https://api.municode.com/codesContent?jobId=490350&nodeId=TIT23BUCO_CH23.15MAHO&productId=15557",
+    "fetched_at": "2026-06-09T22:58:56.191Z",
+    "http_status": 200,
+    "file": "010-api-municode-com-codescontent.html",
+    "bytes": 15031,
+    "error": null
+  },
+  {
+    "url": "https://www.contracosta.ca.gov/DocumentCenter/View/45841/WORK-NOT-REQUIRING-A-BUILDING-PERMIT",
+    "fetched_at": "2026-06-09T22:58:56.191Z",
+    "http_status": 200,
+    "file": "011-www-contracosta-ca-gov-documentcenter-view-45841-work-not-requiring-a-building-p.html",
+    "bytes": 71083,
+    "error": null
+  }
+]

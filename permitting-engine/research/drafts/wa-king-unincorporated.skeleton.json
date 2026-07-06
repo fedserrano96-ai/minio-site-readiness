@@ -1,0 +1,21 @@
+{
+  "id": "wa-king-unincorporated",
+  "name": "",
+  "level": "city",
+  "county": "",
+  "state": "",
+  "status": "draft",
+  "last_verified": "",
+  "verified_by": "Fred",
+  "authority": {
+    "dept": "",
+    "url": "",
+    "phone": "",
+    "email": ""
+  },
+  "adopted_codes": "",
+  "rules": [],
+  "zoning_note": "",
+  "hoa_note": "An HOA may impose separate requirements regardless of city rules.",
+  "notes": ""
+}

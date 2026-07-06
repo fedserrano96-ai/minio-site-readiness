@@ -2,6 +2,11 @@
  * Unit tests for the Mini·O Permitting Triage Engine.
  * Run: node permitting-engine/tests/engine.test.js
  * No test framework — plain assertions with a pass/fail counter.
+ *
+ * Sections:
+ *   1. Engine unit tests (synthetic fixtures — stable against data changes)
+ *   2. Data-file invariants (every jurisdiction, every rule)
+ *   3. Per-jurisdiction behavior (Tier 1 drafts, incl. live-permit A/B cases)
  */
 
 'use strict';
@@ -14,7 +19,6 @@ const data = JSON.parse(
   fs.readFileSync(path.join(__dirname, '..', 'data', 'jurisdictions.json'), 'utf8')
 );
 
-const seattle = data.jurisdictions.find((j) => j.id === 'wa-king-seattle');
 const opts = { productDefault: data.product_default, today: '2026-06-09' };
 
 let passed = 0;
@@ -43,7 +47,13 @@ function pod(overrides) {
   );
 }
 
-/* ── Footprint resolution ─────────────────────────────────────────── */
+function jur(id) {
+  return data.jurisdictions.find((j) => j.id === id);
+}
+
+/* ════ 1. ENGINE UNIT TESTS (synthetic fixtures) ═══════════════════ */
+
+/* Footprint resolution */
 assert(engine.resolveFootprint({ model: 'twelve' }) === 96, 'twelve resolves to 96 sqft');
 assert(engine.resolveFootprint({ model: 'sixteen' }) === 160, 'sixteen resolves to 160 sqft');
 assert(engine.resolveFootprint({ model: 'station' }) === 300, 'station resolves to 300 sqft');
@@ -56,239 +66,391 @@ assert(
   'explicit footprint overrides model default'
 );
 
-/* ── Rule matching ────────────────────────────────────────────────── */
-const underRule = seattle.rules.find((r) => r.id === 'seattle-accessory-under-120-no-plumbing');
-const overRule = seattle.rules.find((r) => r.id === 'seattle-accessory-over-120');
-const plumbingRule = seattle.rules.find((r) => r.id === 'seattle-any-plumbing');
-const trailerRule = seattle.rules.find((r) => r.id === 'seattle-on-trailer');
+/* Matching + specificity */
+const FIX_RULES = [
+  {
+    id: 'fix-specific',
+    when: { footprint: { max: 120 }, plumbing: ['none'], on_trailer: false, sleeping: false },
+    result: { building_permit: 'likely_exempt', electrical_permit: 'depends', plumbing_permit: 'not_applicable', zoning_review: 'depends' },
+    citation: { code_section: 'TEST 1.2.3', title: 'Test', url: 'https://example.gov/a', snippet: 'test' },
+    confidence: 'low',
+  },
+  {
+    id: 'fix-broad-low',
+    when: { footprint: { min: 121 } },
+    result: { building_permit: 'likely_required', electrical_permit: 'likely_required', plumbing_permit: 'depends', zoning_review: 'depends' },
+    citation: { code_section: 'TEST 4.5.6', title: 'Test', url: 'https://example.gov/b', snippet: 'test' },
+    confidence: 'low',
+  },
+  {
+    id: 'fix-broad-high',
+    when: { plumbing: ['half_bath', 'kitchenette', 'full_bath'] },
+    result: { building_permit: 'likely_required', electrical_permit: 'likely_required', plumbing_permit: 'likely_required', zoning_review: 'depends' },
+    citation: { code_section: 'TEST 7.8.9', title: 'Test', url: 'https://example.gov/c', snippet: 'test' },
+    confidence: 'high',
+  },
+];
+const FIX_JUR = {
+  id: 'xx-fixture', name: 'Fixture City', county: 'Test', state: 'WA',
+  status: 'verified', last_verified: '2026-06-01', rules: FIX_RULES,
+};
 
-assert(engine.ruleMatches(underRule, pod()), 'under-120 rule matches a Twelve, no plumbing');
-assert(
-  !engine.ruleMatches(underRule, pod({ model: 'sixteen', footprint_sqft: 160 })),
-  'under-120 rule rejects a Sixteen'
-);
-assert(
-  !engine.ruleMatches(underRule, pod({ plumbing: 'half_bath' })),
-  'under-120 rule rejects plumbing'
-);
-assert(
-  !engine.ruleMatches(underRule, pod({ sleeping_intended: true })),
-  'under-120 rule rejects sleeping (sleeping: false is a condition)'
-);
-assert(
-  engine.ruleMatches(overRule, pod({ model: 'sixteen', footprint_sqft: 160 })),
-  'over-120 rule matches a Sixteen'
-);
-assert(
-  engine.ruleMatches(plumbingRule, pod({ plumbing: 'full_bath' })),
-  'plumbing rule matches full bath'
-);
-assert(engine.ruleMatches(trailerRule, pod({ on_trailer: true })), 'trailer rule matches on_trailer');
-assert(!engine.ruleMatches(trailerRule, pod()), 'trailer rule rejects ground-mounted');
+assert(engine.ruleMatches(FIX_RULES[0], pod()), 'specific rule matches small bare pod');
+assert(!engine.ruleMatches(FIX_RULES[0], pod({ footprint_sqft: 160 })), 'max footprint condition rejects larger pod');
+assert(!engine.ruleMatches(FIX_RULES[0], pod({ plumbing: 'half_bath' })), 'plumbing list condition rejects plumbing');
+assert(!engine.ruleMatches(FIX_RULES[0], pod({ sleeping_intended: true })), 'sleeping:false condition rejects sleeping');
+assert(!engine.ruleMatches(FIX_RULES[0], pod({ on_trailer: true })), 'on_trailer:false condition rejects trailer');
+assert(engine.ruleMatches(FIX_RULES[1], pod({ footprint_sqft: 160 })), 'min footprint condition matches larger pod');
+assert(engine.ruleSpecificity(FIX_RULES[0]) === 4, 'four explicit conditions → specificity 4');
+assert(engine.ruleSpecificity(FIX_RULES[1]) === 1, 'one explicit condition → specificity 1');
 
-/* ── Specificity and selection ────────────────────────────────────── */
-assert(engine.ruleSpecificity(underRule) === 3, 'under-120 rule specificity is 3');
-assert(engine.ruleSpecificity(overRule) === 1, 'over-120 rule specificity is 1');
-assert(engine.ruleSpecificity(plumbingRule) === 1, 'plumbing rule specificity is 1');
-
-const sel1 = engine.selectRule(seattle.rules, pod());
-assert(sel1 && sel1.id === 'seattle-accessory-under-120-no-plumbing', 'Twelve selects under-120 rule');
-
-/* Sixteen + half bath matches both over-120 (spec 1, low) and plumbing (spec 1, medium):
-   tie on specificity → higher confidence wins. */
-const sel2 = engine.selectRule(seattle.rules, pod({ model: 'sixteen', footprint_sqft: 160, plumbing: 'half_bath' }));
-assert(sel2 && sel2.id === 'seattle-any-plumbing', 'specificity tie broken by higher confidence');
-
-const sel3 = engine.selectRule(seattle.rules, pod({ on_trailer: true }));
+assert(engine.selectRule(FIX_RULES, pod()).id === 'fix-specific', 'most specific rule wins');
+/* 160 sqft + half bath matches both broad rules (spec 1 each); high confidence wins the tie. */
 assert(
-  sel3 && sel3.id === 'seattle-accessory-under-120-no-plumbing',
-  'most specific rule wins over trailer rule for small no-plumbing pod'
+  engine.selectRule(FIX_RULES, pod({ footprint_sqft: 160, plumbing: 'half_bath' })).id === 'fix-broad-high',
+  'specificity tie broken by higher confidence'
 );
-
 assert(engine.selectRule([], pod()) === null, 'no rules → null selection');
 
-/* ── Citation completeness ────────────────────────────────────────── */
-assert(!engine.citationComplete(underRule.citation), '<<verify>> citation is incomplete');
+/* Citation completeness */
+assert(
+  !engine.citationComplete({ code_section: '<<verify>>', title: 'x', url: 'https://x', snippet: 'x' }),
+  '<<verify>> citation is incomplete'
+);
 assert(!engine.citationComplete(null), 'missing citation is incomplete');
-assert(
-  engine.citationComplete({
-    code_section: 'SMC 22.x',
-    title: 'Tip sheet',
-    url: 'https://example.gov',
-    snippet: 'short paraphrase',
-  }),
-  'fully filled citation is complete'
-);
+assert(engine.citationComplete(FIX_RULES[0].citation), 'fully filled citation is complete');
 
-/* ── Citation downgrade behavior ──────────────────────────────────── */
-const out1 = engine.evaluate(pod(), seattle, opts);
+/* Citation downgrade behavior (synthetic draft with <<verify>> citation) */
+const DOWNGRADE_JUR = JSON.parse(JSON.stringify(FIX_JUR));
+DOWNGRADE_JUR.status = 'draft';
+DOWNGRADE_JUR.last_verified = '';
+DOWNGRADE_JUR.rules[0].citation.code_section = '<<verify>>';
+const dOut = engine.evaluate(pod(), DOWNGRADE_JUR, opts);
+assert(dOut.permits.building_permit === 'depends', 'uncited likely_exempt downgrades to depends');
+assert(dOut.permits.plumbing_permit === 'not_applicable', 'not_applicable survives downgrade');
 assert(
-  out1.permits.building_permit === 'depends',
-  'uncited likely_exempt downgrades to depends (never render uncited exemption)'
-);
-assert(out1.permits.plumbing_permit === 'not_applicable', 'not_applicable survives downgrade');
-assert(out1.downgraded.length > 0, 'downgrade is reported in output');
-assert(
-  out1.downgraded.some((d) => d.permit === 'building_permit' && d.from === 'likely_exempt'),
+  dOut.downgraded.some((d) => d.permit === 'building_permit' && d.from === 'likely_exempt'),
   'downgrade records original posture'
 );
 assert(
-  out1.notes.some((n) => n.indexOf('confirm with the office') !== -1),
+  dOut.notes.some((n) => n.indexOf('confirm with the office') !== -1),
   'downgrade adds confirm-with-the-office note'
 );
-assert(out1.citations.length === 0, 'incomplete citations are not rendered as citations');
+assert(dOut.citations.length === 0, 'incomplete citations are not rendered');
 
-/* Verified citation renders without downgrade. */
-const verifiedSeattle = JSON.parse(JSON.stringify(seattle));
-verifiedSeattle.status = 'verified';
-verifiedSeattle.last_verified = '2026-06-01';
-verifiedSeattle.rules.forEach((r) => {
-  r.citation = {
-    code_section: 'SMC test',
-    title: 'Test title',
-    url: 'https://example.gov/test',
-    snippet: 'test snippet',
-  };
-});
-const out2 = engine.evaluate(pod(), verifiedSeattle, opts);
-assert(out2.permits.building_permit === 'likely_exempt', 'cited likely_exempt renders as-is');
-assert(out2.downgraded.length === 0, 'no downgrades when citation is complete');
-assert(out2.citations.length === 1, 'complete citation is rendered');
-assert(out2.coverage === 'verified', 'verified status → verified coverage');
-assert(out2.verified_as_of === '2026-06-01', 'verified_as_of comes from last_verified');
+/* Cited rule renders as-is */
+const vOut = engine.evaluate(pod(), FIX_JUR, opts);
+assert(vOut.permits.building_permit === 'likely_exempt', 'cited likely_exempt renders as-is');
+assert(vOut.downgraded.length === 0, 'no downgrades when citation is complete');
+assert(vOut.citations.length === 1, 'complete citation is rendered');
+assert(vOut.coverage === 'verified', 'verified status → verified coverage');
+assert(vOut.verified_as_of === '2026-06-01', 'verified_as_of comes from last_verified');
+assert(vOut.disclaimer.indexOf('2026-06-01') !== -1, 'disclaimer dated with last_verified');
+assert(dOut.coverage === 'draft', 'draft status → draft coverage');
+assert(dOut.disclaimer.indexOf('2026-06-09') !== -1, 'draft disclaimer falls back to today');
+
+/* Product default path */
+const pdOut = engine.evaluate(pod(), null, opts);
+assert(pdOut.coverage === 'product_default', 'unknown jurisdiction → product_default coverage');
+assert(pdOut.package_cta === true, 'product default still shows the package CTA');
+assert(pdOut.permits.building_permit === 'depends', 'product default never says likely_exempt');
+assert(pdOut.jurisdiction.indexOf('not yet researched') !== -1, 'product default labels jurisdiction');
 assert(
-  out2.disclaimer.indexOf('2026-06-01') !== -1,
-  'disclaimer is dated with last_verified when available'
-);
-
-/* ── Draft coverage ───────────────────────────────────────────────── */
-assert(out1.coverage === 'draft', 'draft status → draft coverage');
-assert(out1.verified_as_of === null, 'draft with empty last_verified has no verified_as_of');
-assert(out1.disclaimer.indexOf('2026-06-09') !== -1, 'disclaimer falls back to today');
-
-/* ── Posture vocabulary invariant (guidance, never a verdict) ─────── */
-const configs = [
-  pod(),
-  pod({ model: 'sixteen', footprint_sqft: 160 }),
-  pod({ model: 'station', footprint_sqft: 300, plumbing: 'full_bath', sleeping_intended: true }),
-  pod({ on_trailer: true }),
-  pod({ plumbing: 'kitchenette' }),
-];
-let vocabOk = true;
-configs.forEach((c) => {
-  [engine.evaluate(c, seattle, opts), engine.evaluate(c, null, opts)].forEach((out) => {
-    Object.values(out.permits).forEach((v) => {
-      if (engine.POSTURES.indexOf(v) === -1) vocabOk = false;
-    });
-  });
-});
-assert(vocabOk, 'all outcomes use the allowed posture vocabulary — never yes/no');
-
-/* ── not_researched / product default path ────────────────────────── */
-const out3 = engine.evaluate(pod(), null, opts);
-assert(out3.coverage === 'product_default', 'unknown jurisdiction → product_default coverage');
-assert(out3.package_cta === true, 'product default still shows the package CTA');
-assert(
-  out3.permits.building_permit === 'depends',
-  'product default never says likely_exempt for building permit'
+  engine.evaluate(pod(), { id: 'xx', name: 'X', state: 'TX', status: 'not_researched', rules: [] }, opts).coverage === 'product_default',
+  'not_researched status → product_default coverage'
 );
 assert(
-  out3.jurisdiction.indexOf('not yet researched') !== -1,
-  'product default labels jurisdiction as not researched'
+  engine.evaluate(pod({ footprint_sqft: 160 }), null, opts).permits.building_permit === 'likely_required',
+  'product default: over 120 sqft → building likely_required'
 );
-
-const notResearched = { id: 'xx-test', name: 'Testville', state: 'TX', status: 'not_researched', rules: [] };
-const out4 = engine.evaluate(pod(), notResearched, opts);
-assert(out4.coverage === 'product_default', 'not_researched status → product_default coverage');
-
-/* Product default never outputs likely_exempt for any config. */
-let noExempt = true;
-configs.forEach((c) => {
-  const out = engine.evaluate(c, null, opts);
-  Object.values(out.permits).forEach((v) => {
-    if (v === 'likely_exempt') noExempt = false;
-  });
-});
-assert(noExempt, 'product default outputs contain no likely_exempt (bias to the safe error)');
-
-const out5 = engine.evaluate(pod({ model: 'sixteen', footprint_sqft: 160 }), null, opts);
 assert(
-  out5.permits.building_permit === 'likely_required',
-  'product default: over 120 sqft → building permit likely_required'
-);
-const out6 = engine.evaluate(pod({ plumbing: 'full_bath' }), null, opts);
-assert(
-  out6.permits.plumbing_permit === 'likely_required',
+  engine.evaluate(pod({ plumbing: 'full_bath' }), null, opts).permits.plumbing_permit === 'likely_required',
   'product default: plumbing → plumbing permit likely_required'
 );
 
-/* ── Energy compliance (v0.2) ─────────────────────────────────────── */
-const outWA = engine.evaluate(pod(), seattle, opts);
-assert(outWA.energy_compliance.code === 'WSEC', 'WA jurisdiction → WSEC energy line');
+/* Energy compliance (v0.2) */
+assert(engine.evaluate(pod(), FIX_JUR, opts).energy_compliance.code === 'WSEC', 'WA → WSEC energy line');
+const caFix = Object.assign({}, FIX_JUR, { state: 'CA' });
+assert(engine.evaluate(pod(), caFix, opts).energy_compliance.code === 'Title 24', 'CA → Title 24 energy line');
+assert(engine.evaluate(pod(), null, opts).energy_compliance.posture === 'depends', 'unknown state → energy depends');
 assert(
-  outWA.energy_compliance.posture === 'likely_required',
-  'WSEC report is likely_required for conditioned pods'
+  engine.evaluate(pod(), FIX_JUR, opts).energy_compliance.posture === 'likely_required',
+  'energy report likely_required for conditioned pods in mapped states'
 );
-const caJur = { id: 'ca-test', name: 'TestCity', county: 'Santa Clara', state: 'CA', status: 'draft', rules: seattle.rules };
-const outCA = engine.evaluate(pod(), caJur, opts);
-assert(outCA.energy_compliance.code === 'Title 24', 'CA jurisdiction → Title 24 energy line');
-const outUnknown = engine.evaluate(pod(), null, opts);
-assert(outUnknown.energy_compliance.posture === 'depends', 'unknown state → energy compliance depends');
 
-/* ── Foundation requirement (v0.2) ────────────────────────────────── */
-const outFoundCA = engine.evaluate(pod({ model: 'sixteen', footprint_sqft: 160 }), Object.assign({}, caJur, { status: 'verified', rules: verifiedSeattle.rules }), opts);
+/* Foundation requirement (v0.2) */
 assert(
-  outFoundCA.foundation_requirement.posture === 'footings_likely_required',
+  engine.evaluate(pod({ footprint_sqft: 160 }), caFix, opts).foundation_requirement.posture === 'footings_likely_required',
   'permitted build → footings likely required'
 );
 assert(
-  outFoundCA.foundation_requirement.note.indexOf('slab is not enough') !== -1,
+  engine.evaluate(pod({ footprint_sqft: 160 }), caFix, opts).foundation_requirement.note.indexOf('slab is not enough') !== -1,
   'CA permitted build warns a plain slab is not enough'
 );
-const outFoundTrailer = engine.evaluate(pod({ on_trailer: true }), seattle, opts);
 assert(
-  outFoundTrailer.foundation_requirement.posture === 'not_applicable',
+  engine.evaluate(pod({ on_trailer: true }), FIX_JUR, opts).foundation_requirement.posture === 'not_applicable',
   'trailer-mounted → foundation not applicable'
 );
-const outFoundExempt = engine.evaluate(pod(), verifiedSeattle, opts);
 assert(
-  outFoundExempt.foundation_requirement.posture === 'standard_ok',
+  engine.evaluate(pod(), FIX_JUR, opts).foundation_requirement.posture === 'standard_ok',
   'cited exempt path → standard slab ok'
 );
-const outFoundDepends = engine.evaluate(pod(), seattle, opts);
 assert(
-  outFoundDepends.foundation_requirement.posture === 'depends',
-  'building permit depends → foundation depends (no bare-slab promise)'
+  engine.evaluate(pod(), DOWNGRADE_JUR, opts).foundation_requirement.posture === 'depends',
+  'building permit depends → foundation depends'
 );
 
-/* ── CTA, config lock, trailer note, disclaimer ───────────────────── */
-assert(out1.package_cta === true, 'any depends/required outcome → package CTA shown');
-assert(out1.config_lock_note !== null, 'config lock reminder shown when permits in play');
-const outTrailer = engine.evaluate(pod({ on_trailer: true }), seattle, opts);
+/* CTA, config lock, trailer note */
+assert(dOut.package_cta === true, 'any depends/required outcome → package CTA');
+assert(dOut.config_lock_note !== null, 'config lock reminder shown when permits in play');
 assert(
-  outTrailer.notes.some((n) => n.indexOf('vehicle/RV') !== -1),
-  'trailer config adds the vehicle/RV classification note'
+  engine.evaluate(pod({ on_trailer: true }), FIX_JUR, opts).notes.some((n) => n.indexOf('vehicle/RV') !== -1),
+  'trailer config adds the vehicle/RV note'
 );
-assert(out1.disclaimer.indexOf('not a permitting determination') !== -1, 'disclaimer text present');
-assert(out1.hoa_note.indexOf('HOA') !== -1, 'HOA note present');
-assert(out3.next_step.questions.length >= 2, 'next_step includes questions to ask the office');
+assert(dOut.disclaimer.indexOf('not a permitting determination') !== -1, 'disclaimer text present');
+assert(pdOut.next_step.questions.length >= 2, 'next_step includes questions for the office');
 
-/* ── Purity: evaluate must not mutate its inputs ──────────────────── */
-const podBefore = JSON.stringify(pod());
-const jurBefore = JSON.stringify(seattle);
+/* Purity */
 const p = pod();
-engine.evaluate(p, seattle, opts);
-assert(JSON.stringify(p) === podBefore, 'evaluate does not mutate the pod config');
-assert(JSON.stringify(seattle) === jurBefore, 'evaluate does not mutate the jurisdiction');
+const pBefore = JSON.stringify(p);
+const sBefore = JSON.stringify(jur('wa-king-seattle'));
+engine.evaluate(p, jur('wa-king-seattle'), opts);
+assert(JSON.stringify(p) === pBefore, 'evaluate does not mutate the pod config');
+assert(JSON.stringify(jur('wa-king-seattle')) === sBefore, 'evaluate does not mutate the jurisdiction');
 
-/* ── Data file sanity ─────────────────────────────────────────────── */
+/* Construction requirements */
+const REQ_JUR = {
+  id: 'test-req',
+  name: 'Testville',
+  county: 'Test',
+  state: 'CA',
+  status: 'draft',
+  last_verified: '2026-01-01',
+  rules: [
+    {
+      id: 'req-broad',
+      when: { footprint: 'any', plumbing: 'any', on_trailer: 'any', sleeping: 'any' },
+      result: { building_permit: 'depends', electrical_permit: 'depends', plumbing_permit: 'depends', zoning_review: 'depends' },
+      citation: { code_section: 'T 1.1', title: 'Test', url: 'https://example.gov/t', snippet: 't' },
+      confidence: 'low',
+    },
+  ],
+  construction_requirements: [
+    {
+      id: 'req-cited',
+      category: 'insulation',
+      requirement: 'R-49 ceiling insulation.',
+      citation: { code_section: 'EC R402', title: 'Energy Code', url: 'https://example.gov/ec', snippet: 'R-49 ceilings' },
+      confidence: 'high',
+    },
+    {
+      id: 'req-uncited',
+      category: 'foundation',
+      requirement: 'Footings below frost line.',
+      citation: { code_section: '<<verify>>', title: '', url: '', snippet: '' },
+      confidence: 'medium',
+    },
+  ],
+};
+
+const reqOut = engine.evaluate(pod(), REQ_JUR, opts);
+assert(reqOut.construction_requirements.status === 'listed', 'requirements: non-empty list → status listed');
+assert(reqOut.construction_requirements.verified.length === 1, 'requirements: one verified (complete citation)');
+assert(reqOut.construction_requirements.verified[0].id === 'req-cited', 'requirements: cited item is the verified one');
+assert(reqOut.construction_requirements.verified[0].citation.code_section === 'EC R402', 'requirements: verified keeps citation');
+assert(reqOut.construction_requirements.unverified.length === 1, 'requirements: one unverified (incomplete citation)');
+assert(reqOut.construction_requirements.unverified[0].citation === undefined, 'requirements: unverified never carries a citation');
+assert(reqOut.construction_requirements.note === null, 'requirements: listed → no fallback note');
+
+const noReqJur = Object.assign({}, REQ_JUR, { construction_requirements: [] });
+const noReqOut = engine.evaluate(pod(), noReqJur, opts);
+assert(noReqOut.construction_requirements.status === 'not_researched', 'requirements: empty list → not_researched');
+assert(/not yet researched/i.test(noReqOut.construction_requirements.note), 'requirements: not-researched note');
+
+const absentReqJur = Object.assign({}, REQ_JUR);
+delete absentReqJur.construction_requirements;
 assert(
-  data.jurisdictions.every((j) => j.status !== 'verified'),
-  'no jurisdiction ships as verified without Fred'
+  engine.evaluate(pod(), absentReqJur, opts).construction_requirements.status === 'not_researched',
+  'requirements: absent field → not_researched'
+);
+
+const malformedCrJur = Object.assign({}, REQ_JUR, { construction_requirements: 'TBD' });
+assert(
+  engine.evaluate(pod(), malformedCrJur, opts).construction_requirements.status === 'not_researched',
+  'requirements: non-array value → not_researched'
+);
+
+const pdReqOut = engine.evaluate(pod(), null, opts);
+assert(pdReqOut.construction_requirements.status === 'product_default', 'requirements: product default status');
+assert(/vary by climate/i.test(pdReqOut.construction_requirements.note), 'requirements: product-default generic note');
+assert(pdReqOut.construction_requirements.verified.length === 0, 'requirements: product default lists nothing');
+
+/* ════ 2. DATA-FILE INVARIANTS ═════════════════════════════════════ */
+
+const TIER1_IDS = [
+  'wa-king-seattle',
+  'ca-santa-clara-san-jose',
+  'ca-san-diego-del-mar',
+  'wa-king-unincorporated',
+  'ca-los-angeles-unincorporated',
+];
+TIER1_IDS.forEach((id) => {
+  assert(Boolean(jur(id)), 'Tier 1 jurisdiction present: ' + id);
+});
+assert(
+  data.jurisdictions.every((j) => j.status === 'draft'),
+  'every jurisdiction ships as draft — only Fred flips to verified'
 );
 assert(data.template && data.template.status === 'draft', 'blank template present with draft status');
-assert(data.product_default.rules.length >= 3, 'product default rule set is populated');
+assert(data.product_default.rules.length >= 3, 'product default rule set populated');
 
-/* ── Summary ──────────────────────────────────────────────────────── */
+const ALLOWED = engine.POSTURES;
+data.jurisdictions.forEach((j) => {
+  assert(j.rules.length >= 4, j.id + ': at least 4 rules (size under/over, plumbing, trailer)');
+  j.rules.forEach((r) => {
+    assert(
+      engine.PERMIT_TYPES.every((p2) => ALLOWED.indexOf(r.result[p2]) !== -1),
+      j.id + '/' + r.id + ': outcomes use allowed vocabulary only'
+    );
+    assert(Boolean(r.citation && r.citation.url), j.id + '/' + r.id + ': citation object with url present');
+    assert(['high', 'medium', 'low'].indexOf(r.confidence) !== -1, j.id + '/' + r.id + ': confidence set');
+    assert(Boolean(r.rationale), j.id + '/' + r.id + ': rationale present');
+  });
+  assert(Boolean(j.authority && j.authority.dept), j.id + ': authority dept present');
+  assert(Boolean(j.hoa_note), j.id + ': HOA note present');
+  assert(Boolean(j.research && j.research.date && j.research.sources.length), j.id + ': research provenance recorded');
+});
+
+/* The full config matrix evaluates without throwing, in vocabulary, with CTA. */
+const MATRIX = [
+  pod(),
+  pod({ model: 'sixteen', footprint_sqft: 160 }),
+  pod({ model: 'station', footprint_sqft: 300 }),
+  pod({ plumbing: 'half_bath' }),
+  pod({ model: 'sixteen', footprint_sqft: 160, plumbing: 'full_bath' }),
+  pod({ model: 'station', footprint_sqft: 300, plumbing: 'kitchenette', sleeping_intended: true }),
+  pod({ sleeping_intended: true }),
+  pod({ on_trailer: true }),
+  pod({ model: 'sixteen', footprint_sqft: 160, on_trailer: true, plumbing: 'half_bath' }),
+];
+let matrixOk = true;
+let ctaOk = true;
+let noExemptInDrafts = true;
+data.jurisdictions.concat([null]).forEach((j) => {
+  MATRIX.forEach((c) => {
+    const out = engine.evaluate(c, j, opts);
+    Object.values(out.permits).forEach((v) => {
+      if (ALLOWED.indexOf(v) === -1) matrixOk = false;
+      if (v === 'likely_exempt') noExemptInDrafts = false;
+    });
+    if (!out.package_cta) ctaOk = false;
+  });
+});
+assert(matrixOk, 'full matrix × all jurisdictions: vocabulary holds');
+assert(ctaOk, 'full matrix × all jurisdictions: package CTA always shown');
+assert(
+  noExemptInDrafts,
+  'no Tier 1 draft currently renders likely_exempt for any config (safe-error posture until verified)'
+);
+
+/* geo blocks: every jurisdiction entry must be resolvable from a Census result */
+data.jurisdictions.forEach((j) => {
+  const geo = j.geo || {};
+  const isPlace = typeof geo.place_geoid === 'string' && /^\d{7}$/.test(geo.place_geoid);
+  const isCounty =
+    typeof geo.county_geoid === 'string' &&
+    /^\d{5}$/.test(geo.county_geoid) &&
+    geo.unincorporated === true;
+  assert(isPlace || isCounty, j.id + ': geo block has a 7-digit place_geoid or a 5-digit unincorporated county_geoid');
+  assert(!(isPlace && geo.unincorporated), j.id + ': place entries must not claim unincorporated');
+  if (j.level === 'city') {
+    assert(isPlace && !geo.county_geoid, j.id + ': city entries carry place_geoid only');
+  }
+  if (j.level === 'unincorporated_county') {
+    assert(isCounty && !geo.place_geoid, j.id + ': county entries carry county_geoid + unincorporated only');
+  }
+});
+const geoKeys = data.jurisdictions.map((j) => ((j.geo || {}).place_geoid || (j.geo || {}).county_geoid || ('__missing__' + j.id)));
+assert(new Set(geoKeys).size === geoKeys.length, 'geo GEOIDs are unique across jurisdictions');
+
+/* ════ 3. PER-JURISDICTION BEHAVIOR (Tier 1 drafts) ════════════════ */
+
+/* Seattle — WSEC path; conditioned-office ambiguity; DADU escalation. */
+const sea = jur('wa-king-seattle');
+const seaTwelve = engine.evaluate(pod(), sea, opts);
+assert(seaTwelve.permits.building_permit === 'depends', 'Seattle: Twelve (96) building → depends (occupied-use ambiguity)');
+assert(seaTwelve.permits.electrical_permit === 'likely_required', 'Seattle: 50A inlet → electrical likely_required');
+assert(seaTwelve.energy_compliance.code === 'WSEC', 'Seattle: WSEC energy line');
+assert(
+  engine.evaluate(pod({ model: 'sixteen', footprint_sqft: 160 }), sea, opts).permits.building_permit === 'likely_required',
+  'Seattle: Sixteen (160) building → likely_required'
+);
+const seaSleep = engine.evaluate(pod({ sleeping_intended: true }), sea, opts);
+assert(seaSleep.permits.building_permit === 'likely_required', 'Seattle: sleeping → DADU building likely_required');
+assert(seaSleep.permits.zoning_review === 'likely_required', 'Seattle: sleeping → zoning likely_required');
+const seaTrailer = engine.evaluate(pod({ on_trailer: true }), sea, opts);
+assert(seaTrailer.permits.building_permit === 'depends', 'Seattle: trailer → building depends');
+
+/* San Jose — Title 24; wired-voids-exemption; Gary Deng plumbing A/B (record 2026-121660-RS). */
+const sj = jur('ca-santa-clara-san-jose');
+const sjTwelve = engine.evaluate(pod(), sj, opts);
+assert(
+  sjTwelve.permits.building_permit === 'likely_required',
+  'San Jose: even the Twelve needs a permit (exemption requires no electrical wiring)'
+);
+assert(sjTwelve.energy_compliance.code === 'Title 24', 'San Jose: Title 24 energy line');
+const sjA = engine.evaluate(pod({ model: 'sixteen', footprint_sqft: 160 }), sj, opts);
+const sjB = engine.evaluate(pod({ model: 'sixteen', footprint_sqft: 160, plumbing: 'full_bath' }), sj, opts);
+assert(sjA.permits.plumbing_permit === 'not_applicable', 'San Jose A/B: no-plumbing pod → plumbing not_applicable');
+assert(sjB.permits.plumbing_permit === 'likely_required', 'San Jose A/B: 3/4-bath pod → plumbing likely_required');
+assert(
+  JSON.stringify(sjA.permits) !== JSON.stringify(sjB.permits),
+  'San Jose A/B: plumbing changes the output (Gary Deng validation case)'
+);
+assert(
+  engine.evaluate(pod({ model: 'sixteen', footprint_sqft: 160 }), sj, opts).foundation_requirement.note.indexOf('slab is not enough') !== -1,
+  'San Jose: permitted CA build warns slab is not enough'
+);
+
+/* Del Mar — coastal overlay; Title 24; design review means zoning always in play. */
+const dm = jur('ca-san-diego-del-mar');
+const dmTwelve = engine.evaluate(pod(), dm, opts);
+assert(dmTwelve.permits.building_permit === 'depends', 'Del Mar: Twelve building → depends (safe-error posture)');
+assert(dmTwelve.permits.zoning_review === 'likely_required', 'Del Mar: zoning review likely_required even under 120 (design review + coastal)');
+assert(
+  engine.evaluate(pod({ model: 'station', footprint_sqft: 300 }), dm, opts).permits.building_permit === 'likely_required',
+  'Del Mar: Station building → likely_required'
+);
+assert(dm.zoning_note.toLowerCase().indexOf('coastal') !== -1, 'Del Mar: coastal overlay documented in zoning note');
+assert(dmTwelve.energy_compliance.code === 'Title 24', 'Del Mar: Title 24 energy line');
+
+/* Unincorporated King County — conditioned pods are never exempt (the headline). */
+const kc = jur('wa-king-unincorporated');
+const kcTwelve = engine.evaluate(pod(), kc, opts);
+assert(
+  kcTwelve.permits.building_permit === 'likely_required',
+  'King County: conditioned Twelve → building likely_required (exemption requires unconditioned)'
+);
+assert(kcTwelve.energy_compliance.code === 'WSEC', 'King County: WSEC energy line');
+assert(
+  engine.evaluate(pod({ model: 'station', footprint_sqft: 300 }), kc, opts).permits.zoning_review === 'likely_required',
+  'King County: Station (over 200) → zoning review likely_required'
+);
+const kcTrailer = engine.evaluate(pod({ on_trailer: true }), kc, opts);
+assert(kcTrailer.permits.electrical_permit === 'likely_required', 'King County: trailer still needs L&I electrical permit');
+
+/* Unincorporated LA County — under-120 shipped as depends; over-120 required. */
+const la = jur('ca-los-angeles-unincorporated');
+const laTwelve = engine.evaluate(pod(), la, opts);
+assert(laTwelve.permits.building_permit === 'depends', 'LA County: Twelve building → depends (safe-error posture)');
+assert(laTwelve.permits.electrical_permit === 'likely_required', 'LA County: 50A inlet → electrical likely_required');
+assert(laTwelve.permits.zoning_review === 'likely_required', 'LA County: Title 22 zoning applies regardless of exemption');
+assert(
+  engine.evaluate(pod({ model: 'sixteen', footprint_sqft: 160 }), la, opts).permits.building_permit === 'likely_required',
+  'LA County: Sixteen building → likely_required'
+);
+assert(laTwelve.energy_compliance.code === 'Title 24', 'LA County: Title 24 energy line');
+
+/* ════ Summary ═════════════════════════════════════════════════════ */
 console.log('\n' + passed + ' passed, ' + failed + ' failed (' + (passed + failed) + ' assertions)');
 if (failed > 0) process.exit(1);
