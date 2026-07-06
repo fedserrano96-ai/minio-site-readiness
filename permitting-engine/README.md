@@ -16,15 +16,20 @@ This README documents what the scaffold adds on top of the v0.1 spec.
 | `data/jurisdictions.json` | The knowledge base: Seattle draft entry (`<<verify>>` citations), the product-default rule set, and the blank template from the spec. |
 | `index.html` / `styles.css` / `app.js` | Minimal internal UI: config selector + jurisdiction picker → rendered result. |
 | `tests/engine.test.js` | Plain-Node assertion suite (no framework). Run: `node tests/engine.test.js`. |
+| `resolver.js` | Pure `parseCensusResponse(raw)` + `resolve(parsed, jurisdictions)` — maps a Census geocoder result to a KB entry by GEOID. No DOM, no network. |
+| `netlify/functions/geocode.js` | Proxy for the free Census geocoder (it sends no CORS headers). No API key. |
+| `tests/resolver.test.js` | Resolver suite against fixture Census responses in `tests/fixtures/`. Run: `node tests/resolver.test.js`. |
 | `research/fetch-sources.js` | Fetches and archives official source pages per jurisdiction (no rule interpretation). `node fetch-sources.js <id> --from-data` re-fetches every URL cited in the data file — used for quarterly re-verification diffs. |
 | `research/sources/<id>/` | Raw snapshots of every cited official page, with a manifest (URL, fetch date, HTTP status). Every citation in the data file traces to a snapshot here. |
 | `research/REVIEW.md` | The Tier 1 review sheet for Fred + Urbatec: per-jurisdiction findings, editorial downgrades, open `<<verify>>` items, and live-permit validation anchors. |
 
 ## Running it
 
-- **Tests:** `node permitting-engine/tests/engine.test.js`
-- **UI:** serve the folder over HTTP (the data file is fetched, so `file://` won't work),
-  e.g. `npx serve permitting-engine` or any static server, then open `index.html`.
+- **Tests:** `node permitting-engine/tests/engine.test.js && node permitting-engine/tests/resolver.test.js`
+- **UI (full, with address search):** `npx netlify-cli@latest dev` from `permitting-engine/` — serves the
+  static app plus the geocode function at `http://localhost:8888`.
+- **UI (static only):** any static server still works (`npx serve permitting-engine`), but address
+  lookups will show the fallback error and the manual jurisdiction picker.
 
 ## v0.2 data model changes (added per CLAUDE.md)
 
@@ -44,6 +49,17 @@ Two output lines beyond the v0.1 spec, both assembled by the engine (not stored 
 The output also carries a `config_lock_note` (config changes after a permit set is underway
 force a restart) whenever any permit is in play, and a trailer classification note when
 `on_trailer` is set.
+
+## v0.3 data model changes (Phase A)
+
+1. **`geo` block per jurisdiction** — Census GEOIDs used for address resolution:
+   `{ "place_geoid": "5363000" }` for cities, `{ "county_geoid": "53033", "unincorporated": true }`
+   for unincorporated county entries. Matching is by GEOID, never by name. An address inside an
+   incorporated city with no KB entry resolves to product-default — never to the county entry.
+2. **`construction_requirements` per jurisdiction** — cited plain-English guidance notes
+   (insulation, foundation/frost depth, snow load, …). Same citation guardrail as permits:
+   incomplete citations render in an "unverified — confirm with the office" bucket. All five
+   Tier 1 entries currently ship empty lists ("not yet researched") pending a research pass.
 
 ## Citation-downgrade behavior
 
