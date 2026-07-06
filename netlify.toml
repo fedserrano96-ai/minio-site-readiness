@@ -6,6 +6,9 @@
 
 [build.environment]
   NODE_VERSION = "18"
+  # Archived third-party webpage snapshots (permitting research citations) contain
+  # public client-side Google Maps keys from the source sites; not our secrets.
+  SECRETS_SCAN_OMIT_PATHS = "permitting-engine/research/sources/**"
 
 [[headers]]
   for = "/*"
