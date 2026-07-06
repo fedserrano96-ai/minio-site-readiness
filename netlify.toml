@@ -1,5 +1,9 @@
 [build]
   publish = "."
+  # Strip internal material from the deployed copy (repo itself is untouched):
+  # research snapshot archives, specs/plans, tests, and internal docs are not
+  # part of the public site and were tripping Netlify's secrets scanner.
+  command = "rm -rf permitting-engine/research permitting-engine/docs permitting-engine/tests permitting-engine/CLAUDE.md permitting-engine/README.md permitting-engine/permitting_engine_data_model.md site-readiness-spec.md"
 
 [functions]
   directory = "netlify/functions"
