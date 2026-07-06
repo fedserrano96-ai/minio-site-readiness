@@ -26,8 +26,10 @@ This README documents what the scaffold adds on top of the v0.1 spec.
 ## Running it
 
 - **Tests:** `node permitting-engine/tests/engine.test.js && node permitting-engine/tests/resolver.test.js`
-- **UI (full, with address search):** `npx netlify-cli@latest dev` from `permitting-engine/` — serves the
-  static app plus the geocode function at `http://localhost:8888`.
+- **UI (full, with address search):** from the repo root run
+  `npx netlify-cli@latest dev -d permitting-engine -f permitting-engine/netlify/functions` — serves the
+  static app plus the geocode function at `http://localhost:8888`. (The `-d`/`-f` flags are needed because
+  the Netlify CLI resolves the git root, where the parent Readiness Assessment site has its own `netlify.toml`.)
 - **UI (static only):** any static server still works (`npx serve permitting-engine`), but address
   lookups will show the fallback error and the manual jurisdiction picker.
 
