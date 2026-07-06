@@ -62,7 +62,8 @@ body {
 .field { display: block; margin-bottom: 12px; font-size: 14px; }
 .field-label { display: block; font-weight: 600; margin-bottom: 4px; font-size: 13px; }
 .field select,
-.field input[type="number"] {
+.field input[type="number"],
+.address-row input {
   width: 100%;
   padding: 7px 8px;
   border: 1px solid #ccc;
@@ -155,7 +156,6 @@ body {
 /* Address search (Phase A) */
 .address-row { display: flex; gap: 8px; }
 .address-row input { flex: 1; }
-.btn-search { white-space: nowrap; }
 
 .btn-search {
   background: var(--dark);
@@ -167,8 +167,9 @@ body {
   font-weight: 600;
   cursor: pointer;
   font-family: inherit;
+  white-space: nowrap;
 }
-.btn-search:hover { filter: brightness(1.1); }
+.btn-search:hover { filter: brightness(0.95); }
 
 .address-status { margin-top: 6px; font-size: 0.85rem; padding: 6px 8px; border-radius: 4px; }
 .address-status-pending { background: #f0f0f0; color: #555; }

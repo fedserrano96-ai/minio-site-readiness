@@ -5,6 +5,7 @@
 
   var engine = window.PermittingEngine;
   var data = null;
+  var searchSeq = 0;
 
   var el = {
     model: document.getElementById('model'),
@@ -83,8 +84,7 @@
   function populateJurisdictions() {
     var html = '';
     data.jurisdictions.forEach(function (j) {
-      var label = j.name + ', ' + (j.county ? j.county + ' County, ' : '') + j.state + ' [' + j.status + ']';
-      html += '<option value="' + esc(j.id) + '">' + esc(label) + '</option>';
+      html += '<option value="' + esc(j.id) + '">' + esc(jurisdictionLabel(j)) + '</option>';
     });
     html += '<option value="__other">Other / not listed (not researched)</option>';
     el.jurisdiction.innerHTML = html;
@@ -124,6 +124,7 @@
       setAddressStatus('Type an address first.', 'error');
       return;
     }
+    var seq = ++searchSeq;
     setAddressStatus('Looking up address…', 'pending');
     fetch('/.netlify/functions/geocode?address=' + encodeURIComponent(address))
       .then(function (res) {
@@ -131,6 +132,7 @@
         return res.json();
       })
       .then(function (json) {
+        if (seq !== searchSeq) return;
         if (!json.result) {
           setAddressStatus('No match for that address — check it or pick the jurisdiction manually below.', 'error');
           el.manualPick.open = true;
@@ -151,6 +153,7 @@
         onEvaluate();
       })
       .catch(function () {
+        if (seq !== searchSeq) return;
         setAddressStatus('Couldn’t look up that address — pick the jurisdiction manually below.', 'error');
         el.manualPick.open = true;
       });
@@ -262,6 +265,9 @@
   el.addressSearch.addEventListener('click', onAddressSearch);
   el.address.addEventListener('keydown', function (e) {
     if (e.key === 'Enter') onAddressSearch();
+  });
+  el.jurisdiction.addEventListener('change', function () {
+    el.addressStatus.hidden = true;
   });
 
   onModelChange();
