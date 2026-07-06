@@ -9,6 +9,9 @@
   # Archived third-party webpage snapshots (permitting research citations) contain
   # public client-side Google Maps keys from the source sites; not our secrets.
   SECRETS_SCAN_OMIT_PATHS = "permitting-engine/research/sources/**"
+  # The City of Del Mar's own public client-side Google Maps key, embedded in
+  # their webpages and captured in our archived snapshots. Not our credential.
+  SECRETS_SCAN_SMART_DETECTION_OMIT_VALUES = "AIzaSyDWUuE-ifkbhxblF920N8MjpBdTg1Wt784"
 
 [[headers]]
   for = "/*"
