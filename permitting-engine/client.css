@@ -1,0 +1,209 @@
+/* Mini·O Permitting — client-facing "quick answer" page. */
+
+:root {
+  --red: #ED3648;
+  --ink: #535266;
+  --slate: #9398A5;
+  --sand: #E3CDBF;
+  --sand-soft: #F3E9E1;
+  --paper: #FBF9F6;
+  --card: #ffffff;
+  --ok: #2e7d32;
+  --ok-bg: #e8f2e9;
+  --amber: #9a6a1c;
+  --amber-bg: #f7ecd9;
+  --line: #e8e4de;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  font-family: Inter, system-ui, -apple-system, "Segoe UI", sans-serif;
+  background: var(--paper);
+  color: var(--ink);
+  line-height: 1.5;
+}
+
+.c-header { padding: 20px 24px; }
+.c-wordmark {
+  font-family: Fraunces, Georgia, serif;
+  font-size: 22px;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+}
+.c-wordmark::after { content: ""; display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: var(--red); margin-left: 6px; }
+
+.c-main { max-width: 620px; margin: 0 auto; padding: 8px 20px 80px; }
+
+/* Hero */
+.c-hero { padding: 24px 0 28px; }
+.c-hero h1 {
+  font-family: Fraunces, Georgia, serif;
+  font-weight: 600;
+  font-size: clamp(34px, 6vw, 48px);
+  line-height: 1.08;
+  margin: 0 0 12px;
+}
+.c-hero-sub { font-size: 17px; color: var(--ink); opacity: 0.75; margin: 0; max-width: 46ch; }
+
+/* Cards */
+.c-card {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  padding: 22px;
+  margin-bottom: 16px;
+}
+.c-card h2 { margin: 0 0 14px; }
+.c-step {
+  font-size: 13px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--slate);
+}
+
+/* Address */
+.c-address-row { display: flex; gap: 10px; }
+.c-address-row input { flex: 1; }
+input[type="text"], input[type="email"], select {
+  padding: 12px 14px;
+  border: 1px solid #d5d1ca;
+  border-radius: 10px;
+  font-size: 16px;
+  font-family: inherit;
+  color: var(--ink);
+  background: #fff;
+  width: 100%;
+}
+input:focus-visible, select:focus-visible, button:focus-visible {
+  outline: 3px solid rgba(237, 54, 72, 0.35);
+  outline-offset: 1px;
+}
+
+.c-address-status { margin-top: 10px; font-size: 14px; padding: 9px 12px; border-radius: 8px; }
+.c-address-status-pending { background: #f0efec; color: var(--ink); }
+.c-address-status-ok { background: var(--ok-bg); color: var(--ok); }
+.c-address-status-warn { background: var(--amber-bg); color: var(--amber); }
+.c-address-status-error { background: #fdecea; color: #a4272c; }
+
+.c-manual { margin-top: 12px; }
+
+/* Fields */
+.c-field { display: block; margin: 14px 0; }
+.c-field-label { display: block; font-weight: 600; font-size: 14px; margin-bottom: 6px; }
+.c-check { display: flex; align-items: center; gap: 10px; font-size: 15px; margin: 10px 0; cursor: pointer; }
+.c-check input { width: 18px; height: 18px; accent-color: var(--red); }
+
+/* Model picker */
+.c-models { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 6px; }
+@media (max-width: 520px) { .c-models { grid-template-columns: 1fr; } }
+.c-model input { position: absolute; opacity: 0; }
+.c-model-body {
+  display: block;
+  border: 1.5px solid var(--line);
+  border-radius: 10px;
+  padding: 12px;
+  cursor: pointer;
+  font-size: 13px;
+  color: var(--slate);
+  transition: border-color 120ms ease, background 120ms ease;
+}
+.c-model-body strong { display: block; color: var(--ink); font-size: 15px; margin-bottom: 2px; }
+.c-model input:checked + .c-model-body { border-color: var(--red); background: #fdf4f2; }
+.c-model input:focus-visible + .c-model-body { outline: 3px solid rgba(237, 54, 72, 0.35); }
+
+/* Buttons */
+.c-btn {
+  border: none;
+  border-radius: 10px;
+  padding: 12px 18px;
+  font-size: 15px;
+  font-weight: 700;
+  font-family: inherit;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.c-btn-dark { background: var(--ink); color: #fff; }
+.c-btn-red { background: var(--red); color: #fff; }
+.c-btn:hover { filter: brightness(0.95); }
+.c-btn-big { width: 100%; padding: 15px; font-size: 17px; margin-top: 12px; }
+
+/* Result */
+.c-result { margin-top: 28px; }
+.c-result-head h2 {
+  font-family: Fraunces, Georgia, serif;
+  font-weight: 600;
+  font-size: clamp(26px, 5vw, 34px);
+  line-height: 1.15;
+  margin: 0 0 8px;
+}
+.c-result-head p { margin: 0 0 18px; font-size: 16px; opacity: 0.75; }
+
+.c-rows { display: flex; flex-direction: column; gap: 10px; }
+.c-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 14px 16px;
+}
+.c-row-pill {
+  flex-shrink: 0;
+  font-size: 12px;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: 999px;
+  margin-top: 2px;
+}
+.c-pill-likely { background: #fdecee; color: var(--red); }
+.c-pill-check { background: var(--amber-bg); color: var(--amber); }
+.c-pill-clear { background: var(--ok-bg); color: var(--ok); }
+.c-row-text { font-size: 15px; }
+.c-row-text strong { display: block; font-size: 13px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--slate); margin-bottom: 2px; }
+
+.c-extras { margin: 16px 0 0; padding: 0 0 0 20px; }
+.c-extras li { font-size: 15px; margin: 6px 0; }
+
+.c-finalsay { font-size: 14px; font-style: italic; opacity: 0.75; margin: 16px 0; }
+
+.c-package {
+  background: var(--sand);
+  border-radius: 12px;
+  padding: 16px 18px;
+  font-size: 15px;
+  margin: 18px 0;
+}
+.c-package p { margin: 6px 0 0; }
+
+.c-email {
+  background: var(--sand-soft);
+  border-radius: 12px;
+  padding: 20px;
+  margin: 18px 0;
+}
+.c-email h3 { margin: 0 0 6px; font-family: Fraunces, Georgia, serif; font-weight: 600; font-size: 20px; }
+.c-email p { margin: 0 0 14px; font-size: 14px; }
+.c-email-row { display: flex; gap: 10px; }
+.c-email-row input { flex: 1; }
+@media (max-width: 520px) {
+  .c-email-row { flex-direction: column; }
+  .c-address-row { flex-direction: column; }
+}
+.c-email-status { margin-top: 10px; font-size: 14px; padding: 9px 12px; border-radius: 8px; }
+.c-email-status-ok { background: var(--ok-bg); color: var(--ok); }
+.c-email-status-error { background: #fdecea; color: #a4272c; }
+.c-email-status-pending { background: #f0efec; color: var(--ink); }
+
+.c-disclaimer { font-size: 12px; color: var(--slate); border-top: 1px solid var(--line); padding-top: 12px; margin-top: 8px; }
+
+@media (prefers-reduced-motion: no-preference) {
+  .c-result:not([hidden]) { animation: c-rise 320ms ease-out; }
+  @keyframes c-rise {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: none; }
+  }
+}

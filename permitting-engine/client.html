@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Will your backyard pod need a permit? — Mini·O</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="client.css">
+</head>
+<body>
+  <header class="c-header">
+    <div class="c-wordmark">Mini·O</div>
+  </header>
+
+  <main class="c-main">
+    <section class="c-hero">
+      <h1 id="hero-headline">Will your backyard pod<br>need a permit?</h1>
+      <p class="c-hero-sub">Type your address and we’ll give you the plain-English answer in seconds. No jargon, no homework.</p>
+    </section>
+
+    <section class="c-card" aria-labelledby="step-address">
+      <h2 id="step-address"><span class="c-step">Your address</span></h2>
+      <div class="c-address-row">
+        <input type="text" id="address" placeholder="123 Maple St, Seattle, WA" autocomplete="street-address" aria-label="Property address">
+        <button id="address-search" class="c-btn c-btn-dark" type="button">Find it</button>
+      </div>
+      <div id="address-status" class="c-address-status" hidden></div>
+      <div id="manual-pick" class="c-manual" hidden>
+        <label class="c-field">
+          <span class="c-field-label">Choose your area instead</span>
+          <select id="jurisdiction"></select>
+        </label>
+      </div>
+    </section>
+
+    <section class="c-card" aria-labelledby="step-pod">
+      <h2 id="step-pod"><span class="c-step">Your pod</span></h2>
+      <div class="c-models" role="radiogroup" aria-label="Pod model">
+        <label class="c-model">
+          <input type="radio" name="model" value="twelve" checked>
+          <span class="c-model-body"><strong>The Twelve</strong><span>12×8 · 96 sqft</span></span>
+        </label>
+        <label class="c-model">
+          <input type="radio" name="model" value="sixteen">
+          <span class="c-model-body"><strong>The Sixteen</strong><span>16×10 · 160 sqft</span></span>
+        </label>
+        <label class="c-model">
+          <input type="radio" name="model" value="station">
+          <span class="c-model-body"><strong>The Station</strong><span>30×10 · 300 sqft</span></span>
+        </label>
+      </div>
+
+      <label class="c-field">
+        <span class="c-field-label">Adding water?</span>
+        <select id="plumbing">
+          <option value="none">No plumbing</option>
+          <option value="half_bath">Half bath</option>
+          <option value="kitchenette">Kitchenette</option>
+          <option value="full_bath">Full bath</option>
+        </select>
+      </label>
+
+      <label class="c-check">
+        <input type="checkbox" id="sleeping">
+        <span>Someone will sleep in it</span>
+      </label>
+      <label class="c-check">
+        <input type="checkbox" id="trailer">
+        <span>It’ll sit on a trailer</span>
+      </label>
+
+      <button id="evaluate" class="c-btn c-btn-red c-btn-big" type="button">Get my quick answer</button>
+    </section>
+
+    <section id="result" class="c-result" hidden aria-live="polite">
+      <div class="c-result-head">
+        <h2 id="result-headline"></h2>
+        <p id="result-subline"></p>
+      </div>
+      <div id="result-rows" class="c-rows"></div>
+      <ul id="result-extras" class="c-extras"></ul>
+      <p id="result-finalsay" class="c-finalsay"></p>
+
+      <div id="result-cta" class="c-package" hidden>
+        <strong>Don’t want to deal with any of this?</strong>
+        <p>Mini·O’s permitting package handles the whole thing — research, drawings, submitting, and any back-and-forth with your city.</p>
+      </div>
+
+      <div class="c-email">
+        <h3>Want the full breakdown?</h3>
+        <p>We’ll email you the complete technical version — exact permits, building requirements, code citations, and who to call.</p>
+        <div class="c-email-row">
+          <input type="email" id="email" placeholder="you@example.com" autocomplete="email" aria-label="Email address">
+          <button id="email-send" class="c-btn c-btn-red" type="button">Send me the details</button>
+        </div>
+        <div id="email-status" class="c-email-status" hidden></div>
+      </div>
+
+      <p id="result-disclaimer" class="c-disclaimer"></p>
+    </section>
+  </main>
+
+  <script src="engine.js"></script>
+  <script src="resolver.js"></script>
+  <script src="summary.js"></script>
+  <script src="client.js"></script>
+</body>
+</html>

@@ -19,6 +19,10 @@ This README documents what the scaffold adds on top of the v0.1 spec.
 | `resolver.js` | Pure `parseCensusResponse(raw)` + `resolve(parsed, jurisdictions)` — maps a Census geocoder result to a KB entry by GEOID. No DOM, no network. |
 | `netlify/functions/geocode.js` | Proxy for the free Census geocoder (it sends no CORS headers). No API key. |
 | `tests/resolver.test.js` | Resolver suite against fixture Census responses in `tests/fixtures/`. Run: `node tests/resolver.test.js`. |
+| `summary.js` | Pure `summarize(evaluateOutput)` — translates an engine result into the plain-English client view (headline, status rows, extra lines). Enforces the safe-error tone: the green "likely no permits" headline only renders for a `verified` entry with nothing likely/depends. |
+| `client.html` / `client.css` / `client.js` | Client-facing "quick answer" page: address search → friendly pod picker → plain-English result + email CTA. No citations or code sections on screen — those go in the email. |
+| `netlify/functions/send-details.js` | POST endpoint behind the email CTA. Re-runs the engine server-side (never trusts client-rendered results) and emails the full technical breakdown via the Resend API. Requires `RESEND_API_KEY` (and optional `SEND_DETAILS_FROM`); returns a clear 503 until it's set. |
+| `tests/summary.test.js` | Summary-tone guardrail tests + send-details validation paths. Run: `node tests/summary.test.js`. |
 | `research/fetch-sources.js` | Fetches and archives official source pages per jurisdiction (no rule interpretation). `node fetch-sources.js <id> --from-data` re-fetches every URL cited in the data file — used for quarterly re-verification diffs. |
 | `research/sources/<id>/` | Raw snapshots of every cited official page, with a manifest (URL, fetch date, HTTP status). Every citation in the data file traces to a snapshot here. |
 | `research/REVIEW.md` | The Tier 1 review sheet for Fred + Urbatec: per-jurisdiction findings, editorial downgrades, open `<<verify>>` items, and live-permit validation anchors. |
