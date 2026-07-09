@@ -78,5 +78,85 @@
     "file": "010-www-seattle-gov-sdci-codes-codes-we-enforce-a-z-energy-code.html",
     "bytes": 158008,
     "error": null
+  },
+  {
+    "url": "https://www.seattle.gov/sdci/permits",
+    "fetched_at": "2026-07-08T20:19:07.472Z",
+    "http_status": 200,
+    "file": "011-www-seattle-gov-sdci-permits.html",
+    "bytes": 133636,
+    "error": null
+  },
+  {
+    "url": "https://www.seattle.gov/sdci/permits/common-projects/sheds",
+    "fetched_at": "2026-07-08T20:19:07.472Z",
+    "http_status": 200,
+    "file": "012-www-seattle-gov-sdci-permits-common-projects-sheds.html",
+    "bytes": 130055,
+    "error": null
+  },
+  {
+    "url": "https://kingcounty.gov/en/dept/dph/health-safety/environmental-health/plumbing-gas-piping/applications-and-permits",
+    "fetched_at": "2026-07-08T20:19:07.472Z",
+    "http_status": 200,
+    "file": "013-kingcounty-gov-en-dept-dph-health-safety-environmental-health-plumbing-gas-pipin.html",
+    "bytes": 56397,
+    "error": null
+  },
+  {
+    "url": "https://www.seattle.gov/sdci/permits/common-projects/accessory-dwelling-units",
+    "fetched_at": "2026-07-08T20:19:07.472Z",
+    "http_status": 200,
+    "file": "014-www-seattle-gov-sdci-permits-common-projects-accessory-dwelling-units.html",
+    "bytes": 132508,
+    "error": null
+  },
+  {
+    "url": "https://www.seattle.gov/documents/Departments/SDCI/Codes/SeattleEnergyCode/2021SECResChapter4.pdf",
+    "fetched_at": "2026-07-08T20:19:07.472Z",
+    "http_status": 200,
+    "file": "015-www-seattle-gov-documents-departments-sdci-codes-seattleenergycode-2021secrescha.html",
+    "bytes": 2090366,
+    "error": null
+  },
+  {
+    "url": "https://www.seattle.gov/sdci/codes/codes-we-enforce-(a-z)/energy-code/forms",
+    "fetched_at": "2026-07-08T20:19:07.472Z",
+    "http_status": 200,
+    "file": "016-www-seattle-gov-sdci-codes-codes-we-enforce-a-z-energy-code-forms.html",
+    "bytes": 133880,
+    "error": null
+  },
+  {
+    "url": "https://www.seattle.gov/documents/departments/sdci/codes/seattlebuildingcode/2021sbcchapter16.pdf",
+    "fetched_at": "2026-07-08T20:19:07.472Z",
+    "http_status": 200,
+    "file": "017-www-seattle-gov-documents-departments-sdci-codes-seattlebuildingcode-2021sbcchap.html",
+    "bytes": 37590881,
+    "error": null
+  },
+  {
+    "url": "https://www.seattle.gov/documents/Departments/SDCI/Codes/SeattleResidentialCode/2021SRCChapter3.pdf",
+    "fetched_at": "2026-07-08T20:19:07.472Z",
+    "http_status": 200,
+    "file": "018-www-seattle-gov-documents-departments-sdci-codes-seattleresidentialcode-2021srcc.html",
+    "bytes": 21883445,
+    "error": null
+  },
+  {
+    "url": "https://www.seattle.gov/documents/Departments/SDCI/Codes/SeattleResidentialCode/2021SRCChapter4.pdf",
+    "fetched_at": "2026-07-08T20:19:07.472Z",
+    "http_status": 200,
+    "file": "019-www-seattle-gov-documents-departments-sdci-codes-seattleresidentialcode-2021srcc.html",
+    "bytes": 7471983,
+    "error": null
+  },
+  {
+    "url": "https://www.seattle.gov/sdci/permits/do-you-need-a-permit",
+    "fetched_at": "2026-07-08T20:19:07.472Z",
+    "http_status": 200,
+    "file": "020-www-seattle-gov-sdci-permits-do-you-need-a-permit.html",
+    "bytes": 130978,
+    "error": null
   }
 ]

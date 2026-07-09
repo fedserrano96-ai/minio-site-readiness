@@ -55,6 +55,11 @@ function collectCitedUrls(jurisdictionId) {
       urls.add(r.citation.url);
     }
   });
+  (jur.construction_requirements || []).forEach((r) => {
+    if (r.citation && r.citation.url && r.citation.url.indexOf('<<') === -1) {
+      urls.add(r.citation.url);
+    }
+  });
   return Array.from(urls);
 }
 

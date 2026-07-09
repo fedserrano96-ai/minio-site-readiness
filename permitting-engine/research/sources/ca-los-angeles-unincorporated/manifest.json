@@ -86,5 +86,93 @@
     "file": "011-www-energy-ca-gov-programs-and-topics-programs-building-energy-efficiency-standa.html",
     "bytes": 85567,
     "error": null
+  },
+  {
+    "url": "https://pw.lacounty.gov/building-and-safety/",
+    "fetched_at": "2026-07-08T20:20:43.778Z",
+    "http_status": 200,
+    "file": "012-pw-lacounty-gov-building-and-safety.html",
+    "bytes": 73248,
+    "error": null
+  },
+  {
+    "url": "https://pw.lacounty.gov/building-and-safety/permits/workexempt.shtml",
+    "fetched_at": "2026-07-08T20:20:43.778Z",
+    "http_status": 200,
+    "file": "013-pw-lacounty-gov-building-and-safety-permits-workexempt-shtml.html",
+    "bytes": 63965,
+    "error": null
+  },
+  {
+    "url": "https://pw.lacounty.gov/building-and-safety/permits/",
+    "fetched_at": "2026-07-08T20:20:43.778Z",
+    "http_status": 200,
+    "file": "014-pw-lacounty-gov-building-and-safety-permits.html",
+    "bytes": 60735,
+    "error": null
+  },
+  {
+    "url": "https://planning.lacounty.gov/wp-content/uploads/2023/03/adu_ordinance-summary.pdf",
+    "fetched_at": "2026-07-08T20:20:43.778Z",
+    "http_status": 200,
+    "file": "015-planning-lacounty-gov-wp-content-uploads-2023-03-adu-ordinance-summary-pdf.html",
+    "bytes": 119072,
+    "error": null
+  },
+  {
+    "url": "https://planning.lacounty.gov/enforcement/common-zoning-violations/",
+    "fetched_at": "2026-07-08T20:20:43.778Z",
+    "http_status": 200,
+    "file": "016-planning-lacounty-gov-enforcement-common-zoning-violations.html",
+    "bytes": 556097,
+    "error": null
+  },
+  {
+    "url": "https://www.energy.ca.gov/sites/default/files/2025-03/Whats_New_for_2025_Single-Family_ada.pdf",
+    "fetched_at": "2026-07-08T20:20:43.778Z",
+    "http_status": 200,
+    "file": "017-www-energy-ca-gov-sites-default-files-2025-03-whats-new-for-2025-single-family-a.html",
+    "bytes": 148139,
+    "error": null
+  },
+  {
+    "url": "https://dpw.lacounty.gov/bsd/lib/fp/Building/Residential/2026%20Code%20Version/Residential%20Plan%20Review_2026.pdf",
+    "fetched_at": "2026-07-08T20:20:43.778Z",
+    "http_status": 200,
+    "file": "018-dpw-lacounty-gov-bsd-lib-fp-building-residential-2026-20code-20version-residenti.html",
+    "bytes": 343726,
+    "error": null
+  },
+  {
+    "url": "https://dpw.lacounty.gov/bsd/lib/fp/Building/Building%20Code%20Manuals/2011/BCM%201608%20A1%20-%20Snow%20Loads%2009-20-11.pdf",
+    "fetched_at": "2026-07-08T20:20:43.778Z",
+    "http_status": 200,
+    "file": "019-dpw-lacounty-gov-bsd-lib-fp-building-building-20code-20manuals-2011-bcm-201608-2.html",
+    "bytes": 211890,
+    "error": null
+  },
+  {
+    "url": "https://dpw.lacounty.gov/bsd/lib/fp/Building/Building%20Code%20Manuals/2011/BCM%201609.1.1%20A1%20-%20ASCE%207-05%20Special%20Wind%20Region%20Loads%2006-14-11.pdf",
+    "fetched_at": "2026-07-08T20:20:43.778Z",
+    "http_status": 200,
+    "file": "020-dpw-lacounty-gov-bsd-lib-fp-building-building-20code-20manuals-2011-bcm-201609-1.html",
+    "bytes": 213085,
+    "error": null
+  },
+  {
+    "url": "https://dpw.lacounty.gov/bsd/lib/fp/Building/Very%20High%20Fire%20Hazard%20Severity%20Zone/2026%20Code%20Version/Fire%20Hazard%20Notes%202026.pdf",
+    "fetched_at": "2026-07-08T20:20:43.778Z",
+    "http_status": 200,
+    "file": "021-dpw-lacounty-gov-bsd-lib-fp-building-very-20high-20fire-20hazard-20severity-20zo.html",
+    "bytes": 200945,
+    "error": null
+  },
+  {
+    "url": "https://pw.lacounty.gov/general/faq/index.cfm?37556=37556&Action=getAnswers&FaqID=JSMtIzFSXSQgCg%3D%3D&Keywords=1",
+    "fetched_at": "2026-07-08T20:20:43.778Z",
+    "http_status": 200,
+    "file": "022-pw-lacounty-gov-general-faq-index-cfm.html",
+    "bytes": 4740,
+    "error": null
   }
 ]

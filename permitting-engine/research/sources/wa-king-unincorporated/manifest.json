@@ -78,5 +78,125 @@
     "file": "010-sbcc-wa-gov-state-codes-regulations-guidelines-state-building-code-energy-code.html",
     "bytes": 111357,
     "error": null
+  },
+  {
+    "url": "https://kingcounty.gov/en/dept/local-services/certificates-permits-licenses/permits/permits-inspections-codes-buildings-land-use/do-you-need-a-permit",
+    "fetched_at": "2026-07-08T20:19:12.683Z",
+    "http_status": 200,
+    "file": "011-kingcounty-gov-en-dept-local-services-certificates-permits-licenses-permits-perm.html",
+    "bytes": 62215,
+    "error": null
+  },
+  {
+    "url": "https://cdn.kingcounty.gov/-/media/king-county/depts/local-services/permits/building-land-use-permits/r/residential-accessory-building-permits.pdf?rev=9223ccccc74b4672ae1e85d3e9d4b41b&hash=CB2707363E1B3D722B7CA9A026937544",
+    "fetched_at": "2026-07-08T20:19:12.683Z",
+    "http_status": 200,
+    "file": "012-cdn-kingcounty-gov-media-king-county-depts-local-services-permits-building-land-.html",
+    "bytes": 259760,
+    "error": null
+  },
+  {
+    "url": "https://kingcounty.gov/en/dept/dph/health-safety/environmental-health/plumbing-gas-piping/applications-and-permits",
+    "fetched_at": "2026-07-08T20:19:12.683Z",
+    "http_status": 200,
+    "file": "013-kingcounty-gov-en-dept-dph-health-safety-environmental-health-plumbing-gas-pipin.html",
+    "bytes": 56394,
+    "error": null
+  },
+  {
+    "url": "https://cdn.kingcounty.gov/-/media/king-county/depts/local-services/permits/building-land-use-permits/r/residential-accessory-dwelling-units-information.pdf?rev=adf307cc4014415886da43c8353626ad&hash=FA6B15604E52DD22FB7063F5EF3DF3F3",
+    "fetched_at": "2026-07-08T20:19:12.683Z",
+    "http_status": 200,
+    "file": "014-cdn-kingcounty-gov-media-king-county-depts-local-services-permits-building-land-.html",
+    "bytes": 340259,
+    "error": null
+  },
+  {
+    "url": "https://cdn.kingcounty.gov/-/media/king-county/depts/local-services/permits/building-land-use-permits/r/residential-tiny-homes.pdf?rev=f09ff6bfb1fd4479bcae22a05e32bb74&hash=BC782DC522F260B43B70D373A63EE310",
+    "fetched_at": "2026-07-08T20:19:12.683Z",
+    "http_status": 200,
+    "file": "015-cdn-kingcounty-gov-media-king-county-depts-local-services-permits-building-land-.html",
+    "bytes": 255858,
+    "error": null
+  },
+  {
+    "url": "https://sbcc.wa.gov/sites/default/files/2024-01/2021_WSEC_R_2ndEd_012524.pdf",
+    "fetched_at": "2026-07-08T20:19:12.683Z",
+    "http_status": 200,
+    "file": "016-sbcc-wa-gov-sites-default-files-2024-01-2021-wsec-r-2nded-012524-pdf.html",
+    "bytes": 823095,
+    "error": null
+  },
+  {
+    "url": "https://kingcounty.gov/en/dept/local-services/buildings-property/codes-complaints/energy-codes",
+    "fetched_at": "2026-07-08T20:19:12.683Z",
+    "http_status": 200,
+    "file": "017-kingcounty-gov-en-dept-local-services-buildings-property-codes-complaints-energy.html",
+    "bytes": 52632,
+    "error": null
+  },
+  {
+    "url": "https://cdn.kingcounty.gov/-/media/king-county/depts/local-services/permits/building-land-use-permits/r/residential-basics-program.pdf?rev=17d53dd8aa8c4f23a6577a38c578bf7c&hash=567B4754DCAA969195AD61CA86A13C83",
+    "fetched_at": "2026-07-08T20:19:12.683Z",
+    "http_status": 200,
+    "file": "018-cdn-kingcounty-gov-media-king-county-depts-local-services-permits-building-land-.html",
+    "bytes": 273458,
+    "error": null
+  },
+  {
+    "url": "https://up.codes/viewer/washington/wa-residential-code-2021/chapter/4/foundations",
+    "fetched_at": "2026-07-08T20:19:12.683Z",
+    "http_status": 0,
+    "file": null,
+    "bytes": 0,
+    "error": "fetch failed"
+  },
+  {
+    "url": "https://aqua.kingcounty.gov/council/clerk/code/19_Title_16.htm",
+    "fetched_at": "2026-07-08T20:19:12.683Z",
+    "http_status": 200,
+    "file": "020-aqua-kingcounty-gov-council-clerk-code-19-title-16-htm.html",
+    "bytes": 1213683,
+    "error": null
+  },
+  {
+    "url": "https://cdn.kingcounty.gov/-/media/king-county/depts/local-services/permits/public-rules/16-04snowload.pdf?rev=d69d792da4274539887603b24633927b&hash=BAA759BD2652A948B144458654937CBC",
+    "fetched_at": "2026-07-08T20:19:12.683Z",
+    "http_status": 200,
+    "file": "021-cdn-kingcounty-gov-media-king-county-depts-local-services-permits-public-rules-1.html",
+    "bytes": 98638,
+    "error": null
+  },
+  {
+    "url": "https://aqua.kingcounty.gov/council/clerk/code/12_Title_9.htm",
+    "fetched_at": "2026-07-08T20:19:12.683Z",
+    "http_status": 200,
+    "file": "022-aqua-kingcounty-gov-council-clerk-code-12-title-9-htm.html",
+    "bytes": 325582,
+    "error": null
+  },
+  {
+    "url": "https://cdn.kingcounty.gov/-/media/king-county/depts/local-services/permits/public-notices/building-code-update-plain-language-summary.pdf?rev=401ed8ff094348f385b60502480c3f28&hash=F9605C11B3E796AC9B7AB9514B84A1AD",
+    "fetched_at": "2026-07-08T20:19:12.683Z",
+    "http_status": 200,
+    "file": "023-cdn-kingcounty-gov-media-king-county-depts-local-services-permits-public-notices.html",
+    "bytes": 306201,
+    "error": null
+  },
+  {
+    "url": "https://up.codes/viewer/washington/wa-residential-code-2021/chapter/4/foundations",
+    "fetched_at": "2026-07-08T20:22:15.918Z",
+    "http_status": 0,
+    "file": null,
+    "bytes": 0,
+    "error": "fetch failed"
+  },
+  {
+    "url": "https://up.codes/viewer/washington/wa-residential-code-2021/chapter/4/foundations",
+    "fetched_at": "2026-07-09T16:35:54.657Z",
+    "http_status": 200,
+    "file": "025-up-codes-viewer-washington-wa-residential-code-2021-chapter-4-foundations.html",
+    "bytes": 1945488,
+    "error": null
   }
 ]

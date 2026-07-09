@@ -86,5 +86,125 @@
     "file": "011-www-contracosta-ca-gov-documentcenter-view-45841-work-not-requiring-a-building-p.html",
     "bytes": 71083,
     "error": null
+  },
+  {
+    "url": "https://www.delmar.ca.us/133/Building-Services",
+    "fetched_at": "2026-07-08T20:19:30.697Z",
+    "http_status": 200,
+    "file": "012-www-delmar-ca-us-133-building-services.html",
+    "bytes": 110212,
+    "error": null
+  },
+  {
+    "url": "https://api.municode.com/codesContent?jobId=490350&nodeId=TIT23BUCO_CH23.05COPE&productId=15557",
+    "fetched_at": "2026-07-08T20:19:30.697Z",
+    "http_status": 200,
+    "file": "013-api-municode-com-codescontent.html",
+    "bytes": 21306,
+    "error": null
+  },
+  {
+    "url": "https://www.delmar.ca.us/DocumentCenter/View/9896/June-2025-Chapter-3091-ADU-Regulations",
+    "fetched_at": "2026-07-08T20:19:30.697Z",
+    "http_status": 200,
+    "file": "014-www-delmar-ca-us-documentcenter-view-9896-june-2025-chapter-3091-adu-regulations.html",
+    "bytes": 238747,
+    "error": null
+  },
+  {
+    "url": "https://api.municode.com/codesContent?jobId=490350&nodeId=TIT30ZO_CH30.86SURE&productId=15557",
+    "fetched_at": "2026-07-08T20:19:30.697Z",
+    "http_status": 200,
+    "file": "015-api-municode-com-codescontent.html",
+    "bytes": 94419,
+    "error": null
+  },
+  {
+    "url": "https://api.municode.com/CodesContent?jobId=495573&nodeId=TIT23BUCO_CH23.12CACOCO&productId=15557",
+    "fetched_at": "2026-07-08T20:19:30.697Z",
+    "http_status": 200,
+    "file": "016-api-municode-com-codescontent.html",
+    "bytes": 67883,
+    "error": null
+  },
+  {
+    "url": "https://www.energy.ca.gov/sites/default/files/2025-07/CEC-400-2025-010-F_0.pdf",
+    "fetched_at": "2026-07-08T20:19:30.697Z",
+    "http_status": 200,
+    "file": "017-www-energy-ca-gov-sites-default-files-2025-07-cec-400-2025-010-f-0-pdf.html",
+    "bytes": 7467501,
+    "error": null
+  },
+  {
+    "url": "https://up.codes/viewer/california/ca-residential-code-2025/chapter/4/foundations",
+    "fetched_at": "2026-07-08T20:19:30.697Z",
+    "http_status": 200,
+    "file": "018-up-codes-viewer-california-ca-residential-code-2025-chapter-4-foundations.html",
+    "bytes": 1881641,
+    "error": null
+  },
+  {
+    "url": "https://www.sandiegocounty.gov/content/dam/sdc/pds/docs/pds081.pdf",
+    "fetched_at": "2026-07-08T20:19:30.697Z",
+    "http_status": 0,
+    "file": null,
+    "bytes": 0,
+    "error": "This operation was aborted"
+  },
+  {
+    "url": "https://api.municode.com/CodesContent?jobId=495573&nodeId=TIT30ZO_CH30.55COBLOVZO&productId=15557",
+    "fetched_at": "2026-07-08T20:19:30.697Z",
+    "http_status": 200,
+    "file": "020-api-municode-com-codescontent.html",
+    "bytes": 30663,
+    "error": null
+  },
+  {
+    "url": "https://www.sandiegocounty.gov/content/dam/sdc/pds/docs/pds498_public.pdf",
+    "fetched_at": "2026-07-08T20:19:30.697Z",
+    "http_status": 0,
+    "file": null,
+    "bytes": 0,
+    "error": "This operation was aborted"
+  },
+  {
+    "url": "https://api.municode.com/CodesContent?jobId=495573&nodeId=TIT23BUCO_CH23.08DERE&productId=15557",
+    "fetched_at": "2026-07-08T20:19:30.697Z",
+    "http_status": 200,
+    "file": "022-api-municode-com-codescontent.html",
+    "bytes": 88386,
+    "error": null
+  },
+  {
+    "url": "https://www.sandiegocounty.gov/content/dam/sdc/pds/docs/pds081.pdf",
+    "fetched_at": "2026-07-08T20:21:15.736Z",
+    "http_status": 0,
+    "file": null,
+    "bytes": 0,
+    "error": "This operation was aborted"
+  },
+  {
+    "url": "https://www.sandiegocounty.gov/content/dam/sdc/pds/docs/pds498_public.pdf",
+    "fetched_at": "2026-07-08T20:21:15.736Z",
+    "http_status": 0,
+    "file": null,
+    "bytes": 0,
+    "error": "This operation was aborted"
+  },
+  {
+    "url": "https://web.archive.org/web/20250405002313id_/https://www.sandiegocounty.gov/content/dam/sdc/pds/docs/pds081.pdf",
+    "fetched_at": "2026-07-09T16:38:51.379Z",
+    "http_status": 200,
+    "file": "027-web-archive-org-web-20250405002313id-https-www-sandiegocounty-gov-content-dam-sd.html",
+    "bytes": 280396,
+    "error": null
+  },
+  {
+    "url": "https://web.archive.org/web/20250814115555id_/https://www.sandiegocounty.gov/content/dam/sdc/pds/docs/pds498_public.pdf",
+    "fetched_at": "2026-07-09T16:38:51.379Z",
+    "http_status": 200,
+    "file": "028-web-archive-org-web-20250814115555id-https-www-sandiegocounty-gov-content-dam-sd.html",
+    "bytes": 444130,
+    "error": null
   }
 ]

@@ -154,6 +154,45 @@ Key structure:
 
 ---
 
+## Construction requirements pass — researched 2026-07-08
+
+The Phase A follow-on research pass. All five Tier 1 entries now carry a populated
+`construction_requirements` array (insulation/energy values, footing specs, snow/wind/seismic
+design criteria, and jurisdiction-specific "other" constraints), researched from official
+sources by parallel agents and assembled the same way as the permit rules: everything stays
+inside the draft entries until Fred + Urbatec verify. Snapshots of every cited URL are being
+archived via `fetch-sources.js --from-data` (which now also collects `construction_requirements`
+citation URLs, not just rule citations).
+
+Counts: Seattle 10 · San Jose 12 · Del Mar 13 (1 unverified-bucket) · King County 13 · LA County 13.
+
+Archive status: all 51 cited URLs snapshotted (2026-07-09). Two needed workarounds:
+sandiegocounty.gov does not resolve from this machine, so the two County plan-check PDFs
+(PDS 081, PDS 498) are archived from raw Wayback Machine captures (2025-04-05 and 2025-08-14,
+CDX digests stable across 2025 snapshots) — snapshots 027/028 in the Del Mar manifest; the
+citation code_sections note the Wayback provenance. The up.codes WA foundations page failed
+transiently and archived on retry. Notably, sanjoseca.gov answered the archiver directly this
+time — Bulletin #250 and the Construction Guidelines are archived from the live site.
+The only unverified-bucket item is Del Mar's seismic design category (substantive uncertainty —
+no official page publishes the SDC letter), not an archive gap.
+
+**Editorial decisions during assembly (reversible — raw agent output in the session transcript):**
+
+| Jurisdiction | Decision | Why |
+|---|---|---|
+| Del Mar | Seismic-design-category item forced into the *unverified* bucket (`<<verify>>` in code_section) | No official page publishes Del Mar's SDC letter; the cited county doc only says "specify SDC per CRC Table R301.2.2.1.1". Kept visible but never as a clean claim. |
+| San Jose | Dropped a nonresidential-envelope item (Table 140.3-B) and a PV/BESS-applicability item | Both hinge on the unresolved occupancy-classification question (CF1R vs NRCC path for a conditioned non-dwelling pod). Listing both value sets in the KB invites quoting the wrong one — resolve classification first (open item below). |
+| San Jose / King County / Del Mar | Footing items citing up.codes kept, marked **low** confidence with "non-official mirror" flagged in the citation title | codes.iccsafe.org blocked fetches; the 12-in/12x6 values are corroborated by official plan-check docs (San Jose guidelines, LA County plan review list) but the code text itself should be re-cited from an official source at verification. |
+| King County | Dropped two "other" items (unconditioned-to-be-exempt, critical-areas-void-exemption) | Already captured in the entry's permit rules and notes from the June pass — would have duplicated. |
+
+**Open items for Urbatec (requirements pass):**
+1. **Occupancy classification for CA pods** (San Jose + Del Mar): is a conditioned, non-sleeping office pod reviewed under single-family residential energy standards (150.0/150.1, CF1R) or as nonresidential (140.x, NRCC)? Both cities' items assume the residential path.
+2. **San Jose Bulletin #250 "cannot be air conditioned"**: bulletin (12/09/2019, fetched via archive.org — live site blocks bots) predates the 2025-code adoption; confirm the current accessory-building path for conditioned pods with the Permit Center.
+3. **LA County current ultimate design wind speed**: BCM #11's 85 mph is ASCE 7-05-era; 2026 code uses ASCE 7-22 and the current figure wasn't verifiable on an official page.
+4. **Del Mar SDC letter** (the unverified-bucket item) and whether the whole city's coastal/WUI overlays apply to a given lot.
+5. **King County WSEC compliance-form specifics**: the "energy code specification sheet" requirement comes from the Residential Basics handout (April 2026); confirm required form set for a heated accessory structure.
+6. **Seattle**: whether a non-dwelling conditioned pod owes WSEC R406 additional-efficiency credits (credits language targets "dwelling units").
+
 ## Cross-cutting items
 
 - **Quarterly re-verification:** re-run `node research/fetch-sources.js <id> --from-data` and diff

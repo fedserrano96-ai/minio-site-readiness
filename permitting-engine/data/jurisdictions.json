@@ -86,7 +86,128 @@
       "county": "King",
       "state": "WA",
       "geo": { "place_geoid": "5363000" },
-      "construction_requirements": [],
+      "construction_requirements": [
+        {
+          "id": "seattle-insulation-prescriptive-rvalues",
+          "category": "insulation",
+          "requirement": "Conditioned residential buildings in Seattle (Climate Zone Marine 4) must meet 2021 Seattle Energy Code Table R402.1.3 prescriptive minimums: ceiling R-60, wood-frame wall R-20 cavity + R-5 continuous (or R-13 + R-10 ci), floor R-30, slab-on-grade R-10 to 4 ft depth, and vertical fenestration (window) U-0.30 max. Same values as the 2021 WSEC-R state code.",
+          "citation": {
+            "code_section": "2021 Seattle Energy Code, Residential Provisions, Table R402.1.3",
+            "title": "Seattle Energy Code Residential, Chapter 4 (2021)",
+            "url": "https://www.seattle.gov/documents/Departments/SDCI/Codes/SeattleEnergyCode/2021SECResChapter4.pdf",
+            "snippet": "TABLE R402.1.3 INSULATION MINIMUM R-VALUES AND FENESTRATION REQUIREMENTS BY COMPONENTS — CLIMATE ZONE 5 AND MARINE 4: Fenestration U-Factor 0.30; Ceiling R-Value 60; Wood Frame Wall R-Value 20+5 or 13+10; Floor R-Value 30; Slab R-Value & Depth 10, 4 ft"
+          },
+          "confidence": "high"
+        },
+        {
+          "id": "seattle-insulation-ufactor-alternative",
+          "category": "insulation",
+          "requirement": "As an alternative to R-values, assemblies may comply by maximum U-factor per 2021 Seattle Energy Code Table R402.1.2 (Climate Zone 5 and Marine 4): ceiling U-0.024, above-grade wall U-0.056, floor U-0.029, fenestration U-0.30, slab-on-grade F-0.54.",
+          "citation": {
+            "code_section": "2021 Seattle Energy Code, Residential Provisions, Table R402.1.2",
+            "title": "Seattle Energy Code Residential, Chapter 4 (2021)",
+            "url": "https://www.seattle.gov/documents/Departments/SDCI/Codes/SeattleEnergyCode/2021SECResChapter4.pdf",
+            "snippet": "TABLE R402.1.2 INSULATION AND FENESTRATION REQUIREMENTS BY COMPONENT — CLIMATE ZONE 5 AND MARINE 4: Fenestration U-Factor 0.30; Ceiling U-Factor 0.024; Above-Grade Wall U-Factor 0.056; Floor U-Factor 0.029; Slab on Grade F-Factor 0.54"
+          },
+          "confidence": "high"
+        },
+        {
+          "id": "seattle-energy-conditioned-envelope-applies",
+          "category": "energy",
+          "requirement": "A heated/cooled (conditioned) accessory building must comply with the full building thermal envelope provisions of the 2021 Seattle Energy Code; only buildings with no conditioned space, or with a peak space-conditioning design load under 3.4 Btu/h per sq ft (1.0 W/sq ft), are exempt from envelope requirements (SEC R402.1 exceptions).",
+          "citation": {
+            "code_section": "2021 Seattle Energy Code, Residential Provisions, Section R402.1",
+            "title": "Seattle Energy Code Residential, Chapter 4 (2021)",
+            "url": "https://www.seattle.gov/documents/Departments/SDCI/Codes/SeattleEnergyCode/2021SECResChapter4.pdf",
+            "snippet": "The following buildings, or portions thereof ... shall be exempt from the building thermal envelope provisions of this code: 1. Those with a peak design rate of energy usage less than 3.4 Btu/h • ft2 ... 2. Those that do not contain conditioned space."
+          },
+          "confidence": "high"
+        },
+        {
+          "id": "seattle-energy-compliance-forms",
+          "category": "energy",
+          "requirement": "Energy code compliance documentation is required for heated residential projects in Seattle: duct-leakage and heating-system sizing forms must be submitted with the permit (plus the Total UA Alternative form if that compliance path is used), and an Insulation Certificate must be posted in the completed building. SDCI directs applicants to the 2021 WSEC-R worksheets on the WSU Energy Program site.",
+          "citation": {
+            "code_section": "SDCI Energy Code compliance forms (2021 Seattle Energy Code / 2021 WSEC-R)",
+            "title": "Energy Code - Forms - SDCI | seattle.gov",
+            "url": "https://www.seattle.gov/sdci/codes/codes-we-enforce-(a-z)/energy-code/forms",
+            "snippet": "You must submit duct-leakage forms and heating-system sizing forms. If you use the Total UA Alternative path, you must submit that form as well."
+          },
+          "confidence": "high"
+        },
+        {
+          "id": "seattle-snow_load-25psf-roof",
+          "category": "snow_load",
+          "requirement": "Roofs in Seattle must be designed for a uniform snow load of at least 25 psf (Seattle amendment, 2021 Seattle Building Code 1608.1). The Seattle Residential Code Table R301.2 lists a ground snow load (pg) of 20 psf, with a uniform flat roof snow load of 25 psf permitted as the alternate design value.",
+          "citation": {
+            "code_section": "2021 Seattle Building Code Section 1608.1 (Seattle amendment); see also 2021 Seattle Residential Code Table R301.2",
+            "title": "2021 Seattle Building Code, Chapter 16, Structural Design",
+            "url": "https://www.seattle.gov/documents/departments/sdci/codes/seattlebuildingcode/2021sbcchapter16.pdf",
+            "snippet": "[S] 1608.1 General. Roofs shall be designed for a uniform snow load of at least 25 psf (1200 Pa). Design snow loads shall be determined in accordance with Chapter 7 of ASCE 7"
+          },
+          "confidence": "high"
+        },
+        {
+          "id": "seattle-wind-98mph",
+          "category": "wind",
+          "requirement": "Basic (ultimate, 3-second gust) design wind speed for Seattle residential construction is 98 mph per 2021 Seattle Residential Code Table R301.2, with 'Yes' for topographic wind speed-up effects and 'No' for special wind region and wind-borne debris zone.",
+          "citation": {
+            "code_section": "2021 Seattle Residential Code, Table R301.2 (Climatic and Geographic Design Criteria), Wind Design - Speed",
+            "title": "2021 Seattle Residential Code, Chapter 3, Building Planning",
+            "url": "https://www.seattle.gov/documents/Departments/SDCI/Codes/SeattleResidentialCode/2021SRCChapter3.pdf",
+            "snippet": "TABLE R301.2 CLIMATIC AND GEOGRAPHIC DESIGN CRITERIA ... 20 psf ... 98 ... Yes ... No ... No ... D2 ... Moderate ... 12\""
+          },
+          "confidence": "high"
+        },
+        {
+          "id": "seattle-seismic-d2",
+          "category": "seismic",
+          "requirement": "Seattle residential construction is Seismic Design Category D2 per 2021 Seattle Residential Code Table R301.2 — the most restrictive category under the IRC prescriptive provisions, which triggers seismic bracing/anchorage detailing (e.g., stem wall reinforcement per R403.1.3 applies in SDC D0-D2).",
+          "citation": {
+            "code_section": "2021 Seattle Residential Code, Table R301.2, Seismic Design Category",
+            "title": "2021 Seattle Residential Code, Chapter 3, Building Planning",
+            "url": "https://www.seattle.gov/documents/Departments/SDCI/Codes/SeattleResidentialCode/2021SRCChapter3.pdf",
+            "snippet": "SEISMIC DESIGN CATEGORY ... D2 ... Moderate ... 12\""
+          },
+          "confidence": "high"
+        },
+        {
+          "id": "seattle-foundation-footing-min-size-depth",
+          "category": "foundation",
+          "requirement": "Concrete footings must be at least 12 in wide x 6 in thick, and exterior footings must bear at least 12 in below undisturbed ground surface on undisturbed natural soil or engineered fill (2021 Seattle Residential Code R403.1.1 and R403.1.4). Seattle's frost line depth in Table R301.2 is 12 inches.",
+          "citation": {
+            "code_section": "2021 Seattle Residential Code Sections R403.1.1 and R403.1.4",
+            "title": "2021 Seattle Residential Code, Chapter 4, Foundations",
+            "url": "https://www.seattle.gov/documents/Departments/SDCI/Codes/SeattleResidentialCode/2021SRCChapter4.pdf",
+            "snippet": "R403.1.4 Minimum depth. Exterior footings shall be placed not less than 12 inches (305 mm) below the undisturbed ground surface."
+          },
+          "confidence": "high"
+        },
+        {
+          "id": "seattle-foundation-frost-exemption-accessory",
+          "category": "foundation",
+          "requirement": "Frost protection of foundations is NOT required for free-standing light-frame accessory structures of 600 sq ft or less with eave height 10 ft or less (2021 Seattle Residential Code R403.1.4.1 Exception 1) — this covers typical 96-300 sq ft office pods, so footings need not extend below the 12-in frost line, though minimum footing depth/bearing rules still apply.",
+          "citation": {
+            "code_section": "2021 Seattle Residential Code Section R403.1.4.1, Exception 1",
+            "title": "2021 Seattle Residential Code, Chapter 4, Foundations",
+            "url": "https://www.seattle.gov/documents/Departments/SDCI/Codes/SeattleResidentialCode/2021SRCChapter4.pdf",
+            "snippet": "Protection of free-standing accessory structures with an area of 600 square feet (56 m2) or less, of light-frame construction, with an eave height of 10 feet (3048 mm) or less shall not be required."
+          },
+          "confidence": "high"
+        },
+        {
+          "id": "seattle-other-120sqft-permit-exempt-eca",
+          "category": "other",
+          "requirement": "Seattle exempts from building permit only one-story detached accessory buildings with projected roof area under 120 sq ft on a slab-on-ground foundation — smaller than the 200 sq ft IRC default — and the exemption does not apply in environmentally critical areas (ECAs); exempt or not, the structure must still meet all code requirements and development standards.",
+          "citation": {
+            "code_section": "SDCI permit exemption policy (SRC R105.2 as amended by Seattle)",
+            "title": "Do You Need a Permit? - SDCI | seattle.gov",
+            "url": "https://www.seattle.gov/sdci/permits/do-you-need-a-permit",
+            "snippet": "A one-story detached accessory building such as a greenhouse, tool or storage shed, playhouse, or similar building if the projected roof area is less than 120 square feet and the building foundation is only a slab on the ground"
+          },
+          "confidence": "high"
+        }
+      ],
       "status": "draft",
       "last_verified": "",
       "verified_by": "",
@@ -247,7 +368,152 @@
       "county": "Santa Clara",
       "state": "CA",
       "geo": { "place_geoid": "0668000" },
-      "construction_requirements": [],
+      "construction_requirements": [
+        {
+          "id": "san-jose-energy-climate-zone-4",
+          "category": "energy",
+          "requirement": "San Jose is in California Energy Commission (CEC) Building Climate Zone 4 for Title 24 Part 6 compliance; San Jose-Reid is the representative city/weather station for Climate Zone 4.",
+          "citation": {
+            "code_section": "CEC Building Climate Zones (Title 24 Part 6, Section 100.1 climate zone designations)",
+            "title": "Building Climate Zones - California State Geoportal (California Energy Commission)",
+            "url": "https://gis.data.ca.gov/documents/CAEnergy::building-climate-zones/about",
+            "snippet": "The representative city for each climate zone (CZ) is: ... CZ 4: San Jose-Reid"
+          },
+          "confidence": "high"
+        },
+        {
+          "id": "san-jose-energy-2025-code-effective-date",
+          "category": "energy",
+          "requirement": "The 2025 California Energy Code (Title 24 Part 6) applies to building permit applications submitted on or after January 1, 2026; projects must use 2025 compliance software and 2025 energy compliance documents (CF1R for single-family residential scope, NRCC for nonresidential scope).",
+          "citation": {
+            "code_section": "2025 Building Energy Efficiency Standards (Title 24, Part 6)",
+            "title": "2025 Energy Code Overview (California Energy Commission)",
+            "url": "https://www.energy.ca.gov/sites/default/files/2025-06/2025_Energy_Code_Overview_ADA.pdf",
+            "snippet": "Effective January 1, 2026 — Building permit applications submitted on or after effective date — Must use 2025 software and compliance documents"
+          },
+          "confidence": "high"
+        },
+        {
+          "id": "san-jose-insulation-mandatory-wall-2025",
+          "category": "insulation",
+          "requirement": "Under the 2025 Energy Code single-family residential standards (Section 150.0(c)), mandatory minimum wall insulation is U-factor 0.095 or R-15 for 2x4 walls and U-factor 0.069 or R-21 for 2x6 walls (all climate zones, including CZ4/San Jose).",
+          "citation": {
+            "code_section": "2025 CA Energy Code Section 150.0(c)",
+            "title": "2025 Energy Code Overview (California Energy Commission)",
+            "url": "https://www.energy.ca.gov/sites/default/files/2025-06/2025_Energy_Code_Overview_ADA.pdf",
+            "snippet": "150.0(c) — Updates mandatory wall insulation: 2x4 walls U-factor 0.095 or R-15; 2x6 walls U-factor of 0.069 or R-21"
+          },
+          "confidence": "high"
+        },
+        {
+          "id": "san-jose-insulation-fenestration-2025",
+          "category": "insulation",
+          "requirement": "Under the 2025 Energy Code single-family residential standards, windows have a mandatory maximum U-factor of 0.40 in all climate zones (Section 150.0(q)) and a prescriptive maximum U-factor of 0.27 in climate zones 1-5 (which includes San Jose, CZ4) per Section 150.1(c)3.",
+          "citation": {
+            "code_section": "2025 CA Energy Code Sections 150.0(q) and 150.1(c)3",
+            "title": "2025 Energy Code Overview (California Energy Commission)",
+            "url": "https://www.energy.ca.gov/sites/default/files/2025-06/2025_Energy_Code_Overview_ADA.pdf",
+            "snippet": "150.0(q) — Updates mandatory U-factor 0.40 in all climate zones; 150.1(c)3 — Updates prescriptive U-factor 0.27 in climate zones 1-5, 11-14, 16"
+          },
+          "confidence": "high"
+        },
+        {
+          "id": "san-jose-foundation-footing-size",
+          "category": "foundation",
+          "requirement": "San Jose Building Division inspection guidelines (2022 CRC edition): footings for light-frame residential construction must conform to CRC Table R403.1(1) minimums — not less than 12 inches wide, 6 inches thick, with minimum 2-inch projection.",
+          "citation": {
+            "code_section": "CRC Table R403.1(1) as applied by City of San Jose",
+            "title": "Construction Guidelines for Residential Construction (City of San Jose Building Division)",
+            "url": "https://www.sanjoseca.gov/home/showpublisheddocument/94721",
+            "snippet": "Footing depth & dimensions conform to plan and minimum code requirements (Table R403.1(1)), not less than 12\" in width (W), 6\" in depth (T) and min. 2\" projection (P)"
+          },
+          "confidence": "high"
+        },
+        {
+          "id": "san-jose-foundation-frost-line-5in",
+          "category": "foundation",
+          "requirement": "San Jose's local frost line depth is 5 inches per the Building Division's local climatic and geographic design criteria — frost protection does not govern footing depth (the CRC 12-inch minimum below undisturbed ground controls).",
+          "citation": {
+            "code_section": "CRC Table R301.2(1) local design criteria (City of San Jose)",
+            "title": "Construction Guidelines for Residential Construction (City of San Jose Building Division)",
+            "url": "https://www.sanjoseca.gov/home/showpublisheddocument/94721",
+            "snippet": "Frost Line Depth: 5 inches"
+          },
+          "confidence": "high"
+        },
+        {
+          "id": "san-jose-snow_load-zero",
+          "category": "snow_load",
+          "requirement": "Design ground snow load for San Jose is 0 psf per the City of San Jose Building Division's local climatic and geographic design criteria (2022 CRC/CBC edition).",
+          "citation": {
+            "code_section": "CRC Table R301.2(1) local design criteria (City of San Jose)",
+            "title": "Construction Guidelines for Residential Construction (City of San Jose Building Division)",
+            "url": "https://www.sanjoseca.gov/home/showpublisheddocument/94721",
+            "snippet": "Ground Snow Load 0"
+          },
+          "confidence": "high"
+        },
+        {
+          "id": "san-jose-wind-95mph-ultimate",
+          "category": "wind",
+          "requirement": "Basic (ultimate) design wind speed for San Jose is 95 mph per the City of San Jose Building Division's local design criteria (2022 CRC/CBC edition; Risk Category II ultimate design wind speed).",
+          "citation": {
+            "code_section": "CRC Table R301.2(1) local design criteria (City of San Jose)",
+            "title": "Construction Guidelines for Residential Construction (City of San Jose Building Division)",
+            "url": "https://www.sanjoseca.gov/home/showpublisheddocument/94721",
+            "snippet": "Wind Design Speed (mph) 95 Ultimate"
+          },
+          "confidence": "high"
+        },
+        {
+          "id": "san-jose-seismic-sdc-d1-through-e",
+          "category": "seismic",
+          "requirement": "Seismic Design Category for residential construction in San Jose is D1 through E per the City of San Jose Building Division's local design criteria (2022 CRC edition) — high-seismic detailing and braced-wall/engineered-design provisions apply.",
+          "citation": {
+            "code_section": "CRC Table R301.2(1) local design criteria (City of San Jose)",
+            "title": "Construction Guidelines for Residential Construction (City of San Jose Building Division)",
+            "url": "https://www.sanjoseca.gov/home/showpublisheddocument/94721",
+            "snippet": "Seismic Design Category D1 through E"
+          },
+          "confidence": "high"
+        },
+        {
+          "id": "san-jose-other-accessory-unconditioned",
+          "category": "other",
+          "requirement": "San Jose Bulletin #250 (12/09/2019): ordinary accessory buildings on single-family/duplex lots are limited to one story, limited to two plumbing fixtures, may not contain living or sleeping spaces, and cannot be air conditioned (SJMC similarly limits them to unconditioned space as defined in Title 24). A heated/cooled office pod therefore does not qualify as an ordinary accessory building under this bulletin and needs a different classification or permit path.",
+          "citation": {
+            "code_section": "San Jose Bulletin #250; SJMC Sec. 20.200.020 / 20.30.500",
+            "title": "Bulletin #250 - Accessory Buildings and Structures (City of San Jose)",
+            "url": "https://www.sanjoseca.gov/home/showdocument?id=15445",
+            "snippet": "Limited to one story ... Limited to two plumbing fixtures ... May not contain any living or sleeping spaces ... Cannot be air conditioned"
+          },
+          "confidence": "high"
+        },
+        {
+          "id": "san-jose-other-height-limit-12-16ft",
+          "category": "other",
+          "requirement": "San Jose accessory buildings are limited to 12 feet maximum height (if pitched roof: 12 feet measured halfway up the slope, 16 feet maximum at the roof peak); total coverage by all accessory buildings/structures including detached garage is capped at 650 sq ft unless a Special Use Permit is granted (Bulletin #250, 12/09/2019).",
+          "citation": {
+            "code_section": "San Jose Bulletin #250 - Size and dimension requirements",
+            "title": "Bulletin #250 - Accessory Buildings and Structures (City of San Jose)",
+            "url": "https://www.sanjoseca.gov/home/showdocument?id=15445",
+            "snippet": "Maximum height: 12 feet. If the roof is pitched, the height halfway up any slope may be 12 feet and the roof peak may be 16 feet maximum."
+          },
+          "confidence": "high"
+        },
+        {
+          "id": "san-jose-other-1hr-fire-walls-near-property-line",
+          "category": "other",
+          "requirement": "If a San Jose accessory building exceeds 120 sq ft and is less than 5 feet from the property line, walls parallel to the property line must have 1-hour fire protection; within 3 feet of the property line no wall openings are allowed, between 3-5 feet openings are limited to 25%, and overhangs may not come closer than 2 feet to the property line (Bulletin #250, 12/09/2019).",
+          "citation": {
+            "code_section": "San Jose Bulletin #250 - 1-hour fire protection walls / Openings and overhangs",
+            "title": "Bulletin #250 - Accessory Buildings and Structures (City of San Jose)",
+            "url": "https://www.sanjoseca.gov/home/showdocument?id=15445",
+            "snippet": "Exceeds 120 sf and is less than 5 feet from the property line, walls parallel to the property line must be built with a 1-hour fire protection."
+          },
+          "confidence": "high"
+        }
+      ],
       "status": "draft",
       "last_verified": "",
       "verified_by": "",
@@ -405,7 +671,164 @@
       "county": "San Diego",
       "state": "CA",
       "geo": { "place_geoid": "0618506" },
-      "construction_requirements": [],
+      "construction_requirements": [
+        {
+          "id": "del-mar-energy-2025-energy-code-adopted",
+          "category": "energy",
+          "requirement": "Del Mar has adopted the 2025 California Energy Code (Title 24, Part 6) via Ordinance 1022, effective 10-22-2025; all construction of buildings where energy will be utilized must conform, so a conditioned backyard office pod must comply with the 2025 Energy Code.",
+          "citation": {
+            "code_section": "Del Mar Municipal Code 23.12.050",
+            "title": "Chapter 23.12 - California Codes for Construction, Division 5 - Energy Code",
+            "url": "https://api.municode.com/CodesContent?jobId=495573&nodeId=TIT23BUCO_CH23.12CACOCO&productId=15557",
+            "snippet": "There is adopted and incorporated by reference herein as the city energy code for the purpose of prescribing regulations in the City of Del Mar for the conservation of energy the 2025 California Energy Code, Part 6, Title 24 of the California Code of Regulations"
+          },
+          "confidence": "high"
+        },
+        {
+          "id": "del-mar-insulation-cz7-prescriptive-envelope",
+          "category": "insulation",
+          "requirement": "2025 Energy Code prescriptive envelope package for single-family residential in Climate Zone 7 (Table 150.1-A): ceiling insulation R-30 for vented attics (Option C) with radiant barrier required; above-grade framed wall assembly U-factor max 0.065; raised floor R-19 (U-0.037); no slab-edge insulation requirement; fenestration max U-0.30 and max SHGC 0.23; opaque doors max U-0.20; Quality Insulation Installation (QII) required.",
+          "citation": {
+            "code_section": "2025 California Energy Code, Table 150.1-A and Section 150.1(c)",
+            "title": "2025 Building Energy Efficiency Standards for Residential and Nonresidential Buildings (CEC-400-2025-010-F), pp. 429-430",
+            "url": "https://www.energy.ca.gov/sites/default/files/2025-07/CEC-400-2025-010-F_0.pdf",
+            "snippet": "Above Grade Framed Walls3 U 0.048 U 0.048 U 0.048 U 0.048 U 0.048 U 0.065 U 0.065"
+          },
+          "confidence": "high"
+        },
+        {
+          "id": "del-mar-insulation-mandatory-minimums",
+          "category": "insulation",
+          "requirement": "2025 Energy Code mandatory (floor) insulation minimums for newly constructed single-family residential buildings, regardless of compliance path: ceilings/rafter roofs U-0.043 max or R-22 between framing; 2x4 walls U-0.095 max (R-15 demonstrates compliance) and 2x6 walls U-0.069 max (R-21 demonstrates compliance); raised floors U-0.037 max or R-19.",
+          "citation": {
+            "code_section": "2025 California Energy Code, Sections 150.0(a), 150.0(c), 150.0(d)",
+            "title": "2025 Building Energy Efficiency Standards (CEC-400-2025-010-F), Section 150.0 Mandatory Features and Devices",
+            "url": "https://www.energy.ca.gov/sites/default/files/2025-07/CEC-400-2025-010-F_0.pdf",
+            "snippet": "Ceilings and rafter roofs shall be insulated to achieve an area-weighted average U-factor not exceeding U-0.043 or shall be insulated between wood-framing members with insulation resulting in an installed thermal resistance of R-22 or greater for the insulation alone."
+          },
+          "confidence": "high"
+        },
+        {
+          "id": "del-mar-energy-title24-compliance-docs",
+          "category": "energy",
+          "requirement": "A Title 24 Part 6 compliance report is required: the building permit application must include energy compliance documentation (Certificate of Compliance, CF1R, per Part 1 Sections 10-103(a)1 and 10-103(a)2), demonstrating the design meets either the prescriptive package (Table 150.1-A) or the performance energy budget for Climate Zone 7 under the 2025 Energy Code.",
+          "citation": {
+            "code_section": "2025 California Energy Code, Section 150.1(b)2A",
+            "title": "2025 Building Energy Efficiency Standards (CEC-400-2025-010-F), Section 150.1",
+            "url": "https://www.energy.ca.gov/sites/default/files/2025-07/CEC-400-2025-010-F_0.pdf",
+            "snippet": "The application for a building permit shall include documentation pursuant to Sections 10-103(a)1 and 10-103(a)2 which demonstrates, using an approved calculation method, that the building has been designed so that its energy consumption does not exceed the standard design energy budgets for the applicable climate zone."
+          },
+          "confidence": "high"
+        },
+        {
+          "id": "del-mar-energy-heat-pump-prescriptive",
+          "category": "energy",
+          "requirement": "Under the 2025 Energy Code prescriptive path, space heating must be a heat pump (electric resistance heating is not allowed as the primary heating system in any climate zone, including CZ7); a non-heat-pump system requires the performance compliance path. A supplemental heater up to 2 kW / 7,000 Btu/hr on a 30-minute time-limiting control is permitted.",
+          "citation": {
+            "code_section": "2025 California Energy Code, Section 150.1(c)6 and Table 150.1-A",
+            "title": "2025 Building Energy Efficiency Standards (CEC-400-2025-010-F), Section 150.1",
+            "url": "https://www.energy.ca.gov/sites/default/files/2025-07/CEC-400-2025-010-F_0.pdf",
+            "snippet": "Heating system type. Heating system types shall be installed as required in Table 150.1-A. The space conditioning system shall be a heat pump, or shall meet the performance compliance requirements of Section 150.1(b)1."
+          },
+          "confidence": "high"
+        },
+        {
+          "id": "del-mar-foundation-crc-footing-min",
+          "category": "foundation",
+          "requirement": "Under the 2025 California Residential Code (adopted by Del Mar per DMMC 23.12.060), exterior footings must extend at least 12 inches below undisturbed ground surface (R403.1.4); minimum concrete footing size for one-story light-frame construction per Table R403.1(1) is 12 inches wide by 6 inches thick at 1,500 psf presumptive soil bearing.",
+          "citation": {
+            "code_section": "2025 California Residential Code, R403.1.4 and Table R403.1(1)",
+            "title": "California Residential Code 2025, Chapter 4 Foundations (UpCodes viewer — non-official mirror, verify against official CRC text)",
+            "url": "https://up.codes/viewer/california/ca-residential-code-2025/chapter/4/foundations",
+            "snippet": "Exterior footings shall be placed not less than 12 inches (305 mm) below the undisturbed ground surface."
+          },
+          "confidence": "low"
+        },
+        {
+          "id": "del-mar-foundation-regional-crc-specs",
+          "category": "foundation",
+          "requirement": "Regional (San Diego County) minimum construction specifications under the 2025 CRC applicable to light-frame accessory-structure foundations: continuous footings and stem walls require minimum two longitudinal No. 4 bars (one top, one bottom) per CRC R403.1.3.3 (a Seismic Design Category D0-D2 provision); slabs-on-grade minimum 3.5 inches thick (CRC R506.1); 10-mil vapor retarder under slab (CRC R506.2.3); 1/2-inch anchor bolts embedded 7 inches at max 6 ft on center with 3x3x0.229-inch plate washers (CRC R403.1.6, R602.11.1).",
+          "citation": {
+            "code_section": "CRC R403.1.3.3, R506.1, R506.2.3, R403.1.6 (2025), as applied by County of San Diego PDS #081 (snapshot archived via Wayback capture 2025-04-05)",
+            "title": "COSD Minimum Construction Specifications (County of San Diego PDS 081, 2025 codes)",
+            "url": "https://www.sandiegocounty.gov/content/dam/sdc/pds/docs/pds081.pdf",
+            "snippet": "Continuous footings and stem walls shall be provided with a minimum two longitudinal No. 4 bars, one at the top and one at the bottom of the footing. (CRC R403.1.3.3)"
+          },
+          "confidence": "medium"
+        },
+        {
+          "id": "del-mar-foundation-coastal-bluff-geotech-setback",
+          "category": "foundation",
+          "requirement": "In Del Mar's Coastal Bluff Overlay Zone, all new principal or accessory structures (including new foundations) must be set back a minimum of 40 feet from the top edge of the coastal bluff, no grading is allowed within 40 feet of the bluff top edge, and any new construction on bluff properties requires a geotechnical report addressing site suitability and bluff stability over a 70-year project life; a Conditional Use Permit and Coastal Development Permit are required before construction.",
+          "citation": {
+            "code_section": "Del Mar Municipal Code 30.55.070, 30.55.080, 30.55.090",
+            "title": "Chapter 30.55 - Coastal Bluff Overlay Zone",
+            "url": "https://api.municode.com/CodesContent?jobId=495573&nodeId=TIT30ZO_CH30.55COBLOVZO&productId=15557",
+            "snippet": "all new or redeveloped principal or accessory structures, including new supporting foundations or supports for existing structures, shall be set back a minimum of 40 feet from the top edge of the coastal bluff"
+          },
+          "confidence": "high"
+        },
+        {
+          "id": "del-mar-wind-110mph-exposure-c",
+          "category": "wind",
+          "requirement": "For conventional light-frame design under the 2025 California Residential Code in the San Diego region, plans must specify an ultimate design wind speed of 110 mph (CRC R301.2.1) and wind Exposure Category C (CRC R301.2.1.4); Exposure B is acceptable only with site-specific justification. Values come from County of San Diego plan-check practice — Del Mar adopts the same unamended CRC structural provisions; confirm with Del Mar Building Services.",
+          "citation": {
+            "code_section": "CRC R301.2.1 and R301.2.1.4 (2025), as applied by County of San Diego PDS #498 (snapshot archived via Wayback capture 2025-08-14)",
+            "title": "Residential Building Code Plan Check (County of San Diego PDS 498)",
+            "url": "https://www.sandiegocounty.gov/content/dam/sdc/pds/docs/pds498_public.pdf",
+            "snippet": "Specify ultimate wind speed = 110 mph per CRC R301.2.1 ○ Specify wind exposure category = C per CRC R301.2.1.4"
+          },
+          "confidence": "medium"
+        },
+        {
+          "id": "del-mar-seismic-sdc-determination",
+          "category": "seismic",
+          "requirement": "Seismic design category for Del Mar residential construction must be determined site-specifically from mapped spectral response accelerations per CRC Table R301.2.2.1.1 (or CBC 1613 when engineered); coastal San Diego region residential projects are routinely treated as SDC D — the County's baseline specs apply the CRC SDC D0-D2 footing reinforcement provision to all residential foundations — but no official page publishes Del Mar's exact SDC letter; confirm with Del Mar Building Services.",
+          "citation": {
+            "code_section": "<<verify>> — CRC Table R301.2.2.1.1 (2025); no official page publishes Del Mar's SDC letter",
+            "title": "Residential Building Code Plan Check (County of San Diego PDS 498)",
+            "url": "https://www.sandiegocounty.gov/content/dam/sdc/pds/docs/pds498_public.pdf",
+            "snippet": "Specify seismic design category per CRC Table R301.2.2.1.1"
+          },
+          "confidence": "low"
+        },
+        {
+          "id": "del-mar-other-class-a-roof",
+          "category": "other",
+          "requirement": "Del Mar local amendment (Ord. 1022, 2025 codes): every new structure in any occupancy group must have a fire-retardant roof covering of at least Class A, and wood shake or shingle roof products are prohibited citywide — this applies to backyard office pods.",
+          "citation": {
+            "code_section": "Del Mar Municipal Code 23.12.063 and 23.12.064 (amending CRC R902.1 and R902.1.2)",
+            "title": "Chapter 23.12 - California Codes for Construction, Local Amendments to CRC R902.1",
+            "url": "https://api.municode.com/CodesContent?jobId=495573&nodeId=TIT23BUCO_CH23.12CACOCO&productId=15557",
+            "snippet": "No wood shake or shingle products are permitted to be installed on the roof of any Occupancy Group."
+          },
+          "confidence": "high"
+        },
+        {
+          "id": "del-mar-other-design-review-board",
+          "category": "other",
+          "requirement": "A Design Review Permit is required for construction of the exterior of all structures in Del Mar; only accessory structures of 48 sq ft or less and 6 ft or less in height qualify for streamlined Administrative Design Review, so a 96-300 sq ft office pod is subject to Design Review Board standards, including requirements to coordinate exterior colors, materials, and architectural form on all elevations and to limit the number of exterior materials (DMMC 23.08.078).",
+          "citation": {
+            "code_section": "Del Mar Municipal Code 23.08.030, 23.08.035(A)(5), 23.08.078",
+            "title": "Chapter 23.08 - Design Review",
+            "url": "https://api.municode.com/CodesContent?jobId=495573&nodeId=TIT23BUCO_CH23.08DERE&productId=15557",
+            "snippet": "the construction or installation of an accessory structure which measures not more than 48 square feet in area and not more than six feet in height and which meets all required setbacks"
+          },
+          "confidence": "high"
+        },
+        {
+          "id": "del-mar-other-wui-code-citywide",
+          "category": "other",
+          "requirement": "Del Mar adopted the 2025 California Wildland-Urban Interface Code (Title 24, Part 7) via Ordinance 1022, applying it to the construction of every building or structure in the city per the code's scoping; Del Mar's amendments also state small accessory structures remain regulated by Part 7 even when exempt from a building permit, so WUI ignition-resistant construction provisions can apply to pod materials in designated areas.",
+          "citation": {
+            "code_section": "Del Mar Municipal Code 23.12.100 (and 23.12.062)",
+            "title": "Chapter 23.12 - California Codes for Construction, Division 10 - Wildland-Urban Interface Code",
+            "url": "https://api.municode.com/CodesContent?jobId=495573&nodeId=TIT23BUCO_CH23.12CACOCO&productId=15557",
+            "snippet": "the 2025 California Wildland-Urban Interface Code, Part 7, Title 24 of the California Code of Regulations, a portion of the California Building Standards Code"
+          },
+          "confidence": "high"
+        }
+      ],
       "status": "draft",
       "last_verified": "",
       "verified_by": "",
@@ -568,7 +991,164 @@
       "county": "King",
       "state": "WA",
       "geo": { "county_geoid": "53033", "unincorporated": true },
-      "construction_requirements": [],
+      "construction_requirements": [
+        {
+          "id": "king-county-insulation-wsec-rvalues",
+          "category": "insulation",
+          "requirement": "Conditioned buildings in King County (Climate Zone Marine 4) must meet 2021 WSEC-R Table R402.1.3 prescriptive minimums: ceiling R-60, wood-frame wall R-20 cavity + R-5 continuous (or R-13 + R-10 ci), floor R-30, slab-on-grade R-10 to 4 ft depth, fenestration U-0.30 max, skylight U-0.50 max.",
+          "citation": {
+            "code_section": "2021 WSEC-R Table R402.1.3",
+            "title": "Washington State Energy Code - Residential, 2021 Edition (Chapter 51-11R WAC), 2nd Ed. Jan 2024",
+            "url": "https://sbcc.wa.gov/sites/default/files/2024-01/2021_WSEC_R_2ndEd_012524.pdf",
+            "snippet": "INSULATION MINIMUM R-VALUES AND FENESTRATION REQUIREMENTS BY COMPONENTS ... CLIMATE ZONE 5 AND MARINE 4 ... Ceiling R-Value 60 ... Wood Frame Wall R-Value 20+5 or 13+10 ... Floor R-Value 30 ... Slab R-Value & Depth 10, 4 ft"
+          },
+          "confidence": "high"
+        },
+        {
+          "id": "king-county-insulation-wsec-ufactors",
+          "category": "insulation",
+          "requirement": "As an alternative to R-values, assemblies may comply with 2021 WSEC-R Table R402.1.2 maximum U-factors (Climate Zone 5 and Marine 4): fenestration U-0.30, skylight U-0.50, ceiling U-0.024, above-grade wall U-0.056, floor U-0.029, slab-on-grade F-0.54. Total-UA trade-off compliance is also permitted per R402.1.5.",
+          "citation": {
+            "code_section": "2021 WSEC-R Table R402.1.2",
+            "title": "Washington State Energy Code - Residential, 2021 Edition (Chapter 51-11R WAC), 2nd Ed. Jan 2024",
+            "url": "https://sbcc.wa.gov/sites/default/files/2024-01/2021_WSEC_R_2ndEd_012524.pdf",
+            "snippet": "CLIMATE ZONE 5 AND MARINE 4 Fenestration U-Factor 0.30 Skylight U-Factor 0.50 Ceiling U-Factor 0.024 Above-Grade Wall U-Factor 0.056 Floor U-Factor 0.029 Slab on Grade F-Factor 0.54"
+          },
+          "confidence": "high"
+        },
+        {
+          "id": "king-county-energy-conditioned-in-scope",
+          "category": "energy",
+          "requirement": "A heated/cooled (conditioned) backyard office pod is inside the WSEC building thermal envelope provisions: the 2021 WSEC-R exempts only buildings that do not contain conditioned space, have peak space-conditioning energy use under 3.4 Btu/h per sq ft (1.0 W/sq ft), or are isolated greenhouses. A pod with a heat source exceeding that threshold must meet full envelope requirements.",
+          "citation": {
+            "code_section": "2021 WSEC-R R402.1 Exception",
+            "title": "Washington State Energy Code - Residential, 2021 Edition (Chapter 51-11R WAC), 2nd Ed. Jan 2024",
+            "url": "https://sbcc.wa.gov/sites/default/files/2024-01/2021_WSEC_R_2ndEd_012524.pdf",
+            "snippet": "shall be exempt from the building thermal envelope provisions of this code: 1. Those with a peak design rate of energy usage less than 3.4 Btu/h • ft 2 (10.7 W/m2) or 1.0 watt/ft2 of floor area for space conditioning purposes. 2. Those that do not contain conditioned space."
+          },
+          "confidence": "high"
+        },
+        {
+          "id": "king-county-energy-2021-wsec-effective",
+          "category": "energy",
+          "requirement": "The 2021 Washington State Energy Code applies to King County permit applications deemed complete on or after March 15, 2024 (statewide effective date). King County's own 2025 energy code amendments apply only to commercial and 4+ story multifamily buildings, so a residential accessory pod follows the unamended state 2021 WSEC-R.",
+          "citation": {
+            "code_section": "2021 WSEC (WAC 51-11R) adoption",
+            "title": "King County energy code - King County, Washington",
+            "url": "https://kingcounty.gov/en/dept/local-services/buildings-property/codes-complaints/energy-codes",
+            "snippet": "The 2021 Washington State Energy Code (WSEC) is effective for applications deemed complete on or after March 15, 2024."
+          },
+          "confidence": "high"
+        },
+        {
+          "id": "king-county-energy-compliance-sheet",
+          "category": "energy",
+          "requirement": "King County Permitting requires residential construction plans to include a WSEC energy compliance sheet covering heat-sizing calculations, WSEC R406 energy improvement credits, and IRC indoor air quality (ventilation) requirements (Residential Basics Program submittal requirements, April 2026 handout).",
+          "citation": {
+            "code_section": "King County Residential Basics Program submittal requirements",
+            "title": "Residential Basics Program (King County Permitting handout, April 2026)",
+            "url": "https://cdn.kingcounty.gov/-/media/king-county/depts/local-services/permits/building-land-use-permits/r/residential-basics-program.pdf?rev=17d53dd8aa8c4f23a6577a38c578bf7c&hash=567B4754DCAA969195AD61CA86A13C83",
+            "snippet": "An energy code specification sheet that addresses Washington State Energy Code compliance requirements including heat size calculation, energy code improvement credits and International Residential Code indoor air quality requirements."
+          },
+          "confidence": "medium"
+        },
+        {
+          "id": "king-county-foundation-footing-depth",
+          "category": "foundation",
+          "requirement": "Exterior footings must extend at least 12 inches below undisturbed ground surface, and footings for light-frame construction must be not less than 12 inches wide (sized per IRC Table R403.1(1) by soil bearing and snow load), per the Washington State Residential Code (2021 IRC as amended). King County publishes no deeper local frost-depth amendment; the 12-inch IRC minimum governs in the lowlands.",
+          "citation": {
+            "code_section": "WA Residential Code (2021) R403.1.4 / R403.1.1",
+            "title": "Chapter 4 Foundations: Washington State Residential Code 2021 | UpCodes (non-official mirror — verify against WAC 51-51)",
+            "url": "https://up.codes/viewer/washington/wa-residential-code-2021/chapter/4/foundations",
+            "snippet": "Exterior footings shall be placed not less than 12 inches (305 mm) below the undisturbed ground surface."
+          },
+          "confidence": "low"
+        },
+        {
+          "id": "king-county-foundation-frost-exemption-accessory",
+          "category": "foundation",
+          "requirement": "Frost protection is not required for freestanding light-frame accessory structures of 600 sq ft or less with eave height 10 ft or less (WA Residential Code 2021, R403.1.4.1 Exception 1) — which covers typical 96-300 sq ft office pods; the 12-inch minimum footing embedment of R403.1.4 still applies.",
+          "citation": {
+            "code_section": "WA Residential Code (2021) R403.1.4.1 Exception 1",
+            "title": "Chapter 4 Foundations: Washington State Residential Code 2021 | UpCodes (non-official mirror — verify against WAC 51-51)",
+            "url": "https://up.codes/viewer/washington/wa-residential-code-2021/chapter/4/foundations",
+            "snippet": "Protection of free-standing accessory structures with an area of 600 square feet (56 m2) or less, of light-frame construction, with an eave height of 10 feet (3048 mm) or less shall not be required."
+          },
+          "confidence": "low"
+        },
+        {
+          "id": "king-county-snow-load-25psf-minimum",
+          "category": "snow_load",
+          "requirement": "The minimum roof design snow load in unincorporated King County is 25 psf for all buildings and structures (KCC 16.04.410; reaffirmed in Public Rule 16-04-500/506 and in county plan-submittal design criteria).",
+          "citation": {
+            "code_section": "KCC 16.04.410",
+            "title": "King County Code Title 16 - Building and Construction Standards",
+            "url": "https://aqua.kingcounty.gov/council/clerk/code/19_Title_16.htm",
+            "snippet": "The minimum roof design snow load shall be 25 pounds per square feet."
+          },
+          "confidence": "high"
+        },
+        {
+          "id": "king-county-snow-load-ground-snow-elevation",
+          "category": "snow_load",
+          "requirement": "Ground snow load is elevation-dependent: Pg = Cg x h(msl), where Cg is the isoline coefficient from the King County Ground Snow Load Map (e.g., Seattle/Renton/Enumclaw 0.05, Issaquah 0.054, Duvall 0.056, Fall City 0.073, North Bend 0.075, Skykomish 0.094) and h(msl) is site elevation in feet. Sites over 1,000 ft elevation must also consider drift and sliding snow; roof snow load may never be below 25 psf.",
+          "citation": {
+            "code_section": "King County Public Rule 16-04-506",
+            "title": "16-04-500 -- 16-04-506 King County Public Rules: Structural Loading - Minimum Roof Snow Loads",
+            "url": "https://cdn.kingcounty.gov/-/media/king-county/depts/local-services/permits/public-rules/16-04snowload.pdf?rev=d69d792da4274539887603b24633927b&hash=BAA759BD2652A948B144458654937CBC",
+            "snippet": "The ground snow load, Pg, shall be determined in accordance with the following formula: Pg = Cghmsl ... For all buildings and structures in King County, the roof snow load shall not be less than 25 psf."
+          },
+          "confidence": "high"
+        },
+        {
+          "id": "king-county-wind-110mph",
+          "category": "wind",
+          "requirement": "King County Permitting's published residential structural design criteria specify a design wind speed of 110 mph with Exposure C for lateral and gravity design of one- and two-family structures in unincorporated King County (Residential Basics Program handout, April 2026, under 2021 codes).",
+          "citation": {
+            "code_section": "King County Residential Basics Program - structural design criteria",
+            "title": "Residential Basics Program (King County Permitting handout, April 2026)",
+            "url": "https://cdn.kingcounty.gov/-/media/king-county/depts/local-services/permits/building-land-use-permits/r/residential-basics-program.pdf?rev=17d53dd8aa8c4f23a6577a38c578bf7c&hash=567B4754DCAA969195AD61CA86A13C83",
+            "snippet": "Structural calculations for lateral and gravity design, including design criteria: Seismic design category of D2, Wind speed of 110 mph, Exposure C, Roof snow load 25 lbs. per square foot minimum."
+          },
+          "confidence": "high"
+        },
+        {
+          "id": "king-county-seismic-d2",
+          "category": "seismic",
+          "requirement": "Residential structures in unincorporated King County are designed to Seismic Design Category D2, per King County Permitting's published structural design criteria (Residential Basics Program handout, April 2026).",
+          "citation": {
+            "code_section": "King County Residential Basics Program - structural design criteria",
+            "title": "Residential Basics Program (King County Permitting handout, April 2026)",
+            "url": "https://cdn.kingcounty.gov/-/media/king-county/depts/local-services/permits/building-land-use-permits/r/residential-basics-program.pdf?rev=17d53dd8aa8c4f23a6577a38c578bf7c&hash=567B4754DCAA969195AD61CA86A13C83",
+            "snippet": "Seismic design category of D2"
+          },
+          "confidence": "high"
+        },
+        {
+          "id": "king-county-other-drainage-review-2000sf",
+          "category": "other",
+          "requirement": "Drainage review under the King County Surface Water Design Manual is triggered when a project results in 2,000 sq ft or more of new-plus-replaced impervious surface, or 7,000 sq ft or more of land-disturbing activity (KCC 9.04.030). A 96-300 sq ft pod alone is usually below the threshold, but the count includes all new plus replaced impervious surface on the project site, so site totals must be checked.",
+          "citation": {
+            "code_section": "KCC 9.04.030(A)",
+            "title": "King County Code Title 9 - Surface Water Management",
+            "url": "https://aqua.kingcounty.gov/council/clerk/code/12_Title_9.htm",
+            "snippet": "Would result in two thousand square feet or more of new impervious surface, replaced impervious surface or new plus replaced impervious surface"
+          },
+          "confidence": "high"
+        },
+        {
+          "id": "king-county-other-2021-code-editions",
+          "category": "other",
+          "requirement": "The 2021 code editions (IBC, IRC, WSEC and related state codes) govern: the state-adopted 2021 codes became effective March 15, 2024, and King County's March 2025 ordinance updates KCC Title 16 references from the 2018 to the 2021 editions. Note: the codified KCC 16.02.110 text online still recites the 2018 edition — the state 2021 adoption controls regardless.",
+          "citation": {
+            "code_section": "KCC 16.02.110 (2025 update ordinance)",
+            "title": "Summary of Proposed Ordinance relating to King County Building and Fire Code Updates (March 24, 2025)",
+            "url": "https://cdn.kingcounty.gov/-/media/king-county/depts/local-services/permits/public-notices/building-code-update-plain-language-summary.pdf?rev=401ed8ff094348f385b60502480c3f28&hash=F9605C11B3E796AC9B7AB9514B84A1AD",
+            "snippet": "The proposed ordinance reflects the most recent 2021 international codes, as adopted by the state, which became effective March 15, 2024."
+          },
+          "confidence": "high"
+        }
+      ],
       "status": "draft",
       "last_verified": "",
       "verified_by": "",
@@ -729,7 +1309,164 @@
       "county": "Los Angeles",
       "state": "CA",
       "geo": { "county_geoid": "06037", "unincorporated": true },
-      "construction_requirements": [],
+      "construction_requirements": [
+        {
+          "id": "la-county-energy-wall-insulation-2025",
+          "category": "energy",
+          "requirement": "Under the 2025 California Energy Code (Title 24 Part 6, effective for LA County's 2026 code cycle), mandatory wall insulation for wood-framed walls is maximum U-0.095 for 2x4 framing (minimum R-15 at 16 in. o.c.) and maximum U-0.069 for 2x6 framing (minimum R-21 at 16 in. o.c.) per Section 150.0(c). Applies to a conditioned detached accessory structure such as an office pod.",
+          "citation": {
+            "code_section": "2025 California Energy Code § 150.0(c)",
+            "title": "CEC 2025 Building Energy Efficiency Standards — What's New for Single-Family Residential",
+            "url": "https://www.energy.ca.gov/sites/default/files/2025-03/Whats_New_for_2025_Single-Family_ada.pdf",
+            "snippet": "Updates mandatory wall insulation maximum 0.095 U-factor for 2 x 4 inch wood framing (minimum R-15 with 16\" on center) and maximum 0.069 U-factor for 2 x 6 wood-framing (minimum R-21 with 16\" on center). § 150.0(c)"
+          },
+          "confidence": "high"
+        },
+        {
+          "id": "la-county-insulation-attic-r38-cz9",
+          "category": "insulation",
+          "requirement": "2025 Energy Code prescriptive ceiling insulation: ventilated attics require minimum R-38 in climate zones 1 and 8-16 (which includes climate zone 9 covering most of the unincorporated LA basin) and R-30 in zones 2-7; cathedral ceilings require minimum R-38 in all climate zones. Table 150.1-A Option C.",
+          "citation": {
+            "code_section": "2025 California Energy Code § 150.1(c)1Aiii / Table 150.1-A",
+            "title": "CEC 2025 Building Energy Efficiency Standards — What's New for Single-Family Residential",
+            "url": "https://www.energy.ca.gov/sites/default/files/2025-03/Whats_New_for_2025_Single-Family_ada.pdf",
+            "snippet": "Updates prescriptive Option C of Table 150.1-A ventilated attic minimum R-38 in climate zones 1, 8-16, minimum R-30 in climates zones 2-7. Adds cathedral ceilings minimum R-38 with no radiant barrier in all climate zones"
+          },
+          "confidence": "high"
+        },
+        {
+          "id": "la-county-energy-fenestration-u030",
+          "category": "energy",
+          "requirement": "2025 Energy Code fenestration: mandatory maximum weighted-average U-factor 0.40 including skylights (Section 150.0(q)); prescriptive maximum U-factor 0.30 in climate zones 6-10 and 15 (covers LA basin CZ 9) and 0.27 in zones 1-5, 11-14, 16.",
+          "citation": {
+            "code_section": "2025 California Energy Code § 150.0(q), § 150.1(c)3A",
+            "title": "CEC 2025 Building Energy Efficiency Standards — What's New for Single-Family Residential",
+            "url": "https://www.energy.ca.gov/sites/default/files/2025-03/Whats_New_for_2025_Single-Family_ada.pdf",
+            "snippet": "Updates prescriptive maximum U-factor 0.27 for fenestration in Climate Zones 1-5, 11-14, 16; maximum U-factor 0.30 in Climate Zones 6-10, 15"
+          },
+          "confidence": "high"
+        },
+        {
+          "id": "la-county-energy-heat-pump-prescriptive",
+          "category": "energy",
+          "requirement": "2025 Energy Code prescriptive path requires heating equipment to be a heat pump in all climate zones (or meet the performance path), with refrigerant charge verification for heat pumps in all climate zones — relevant to mini-split-conditioned office pods.",
+          "citation": {
+            "code_section": "2025 California Energy Code § 150.1(c)6-7",
+            "title": "CEC 2025 Building Energy Efficiency Standards — What's New for Single-Family Residential",
+            "url": "https://www.energy.ca.gov/sites/default/files/2025-03/Whats_New_for_2025_Single-Family_ada.pdf",
+            "snippet": "Updates prescriptive requirements: heating equipment to be heat pump in all Climate Zones or meet performance requirements in § 150.1(b)1; refrigerant charge verification for heat pumps in all Climate Zones"
+          },
+          "confidence": "high"
+        },
+        {
+          "id": "la-county-foundation-footing-12x6x12",
+          "category": "foundation",
+          "requirement": "For a one-story light-frame building, LA County's 2026 Residential Code plan review requires continuous footings 12 inches wide, 6 inches thick, and minimum 12 inches deep below natural ground surface or certified fill grade (15 in. wide for two stories), per Table R403.1(1) and Table 1809.7. Allowable soil bearing is limited to 1,500 psf unless a soils report justifies more (Table R401.4.1(1)).",
+          "citation": {
+            "code_section": "2026 LA County Residential Code T-R403.1(1), T-1809.7; T-R401.4.1(1)",
+            "title": "County of Los Angeles Residential Plan Review 2026 (One- & Two-Family Dwelling Plan Review List)",
+            "url": "https://dpw.lacounty.gov/bsd/lib/fp/Building/Residential/2026%20Code%20Version/Residential%20Plan%20Review_2026.pdf",
+            "snippet": "For foundation supporting (1) / (2) floors, sections (12) / (15) inches wide, 6 inches thick and minimum 12 inches in depth below natural ground surface or certified fill grade are required. (T-R403.1 (1), T-1809.7)"
+          },
+          "confidence": "high"
+        },
+        {
+          "id": "la-county-foundation-expansive-soils-default",
+          "category": "foundation",
+          "requirement": "LA County presumes expansive soil by default: unless an approved soils report shows soil is not expansive by the Expansion Index Test, foundations must have continuous exterior footings extending 24 in. below grade (18 in. at interior bearing walls), four continuous #4 bars, a 4-in. slab with #4 bars at 16 in. o.c. each way over a 10-mil moisture barrier sandwiched in sand fill, and 18-in.-deep pre-saturation of soil before the pour (Residential Code Manual R401.4 Art. 1).",
+          "citation": {
+            "code_section": "LA County RCM 401.4 Art. 1 (2026 Residential Plan Review item 111)",
+            "title": "County of Los Angeles Residential Plan Review 2026 (One- & Two-Family Dwelling Plan Review List)",
+            "url": "https://dpw.lacounty.gov/bsd/lib/fp/Building/Residential/2026%20Code%20Version/Residential%20Plan%20Review_2026.pdf",
+            "snippet": "Foundation and floor slabs shall conform to the following requirements, unless an approved soils report indicates that soil is not expansive by the Expansion Index Test method, or recommends other details: (RCM 401.4 Art. 1) a. Continuous footings under exterior walls and interior bearing walls extending below grade 24-in. and 18-in. respectively"
+          },
+          "confidence": "high"
+        },
+        {
+          "id": "la-county-foundation-grading-hillside-triggers",
+          "category": "foundation",
+          "requirement": "Grading permit triggers (2026 LACBC Appendix J103): any excavation exceeding 2 ft deep (except footings, basements, retaining walls); fills intended to support structures; fills obstructing drainage; fills 1 ft+ on natural slopes steeper than 5:1; fills 3 ft+ deep and over 50 cu yd; fills 5 ft+ deep and over 20 cu yd. Buildings on or into slopes steeper than 1:3 (33.3%) must comply with the county hillside provisions and get supplemental Hillside Structures plan review.",
+          "citation": {
+            "code_section": "2026 LACBC Appendix J103; R301.1.3 (plan review items 9, 86, 12c)",
+            "title": "County of Los Angeles Residential Plan Review 2026 (One- & Two-Family Dwelling Plan Review List)",
+            "url": "https://dpw.lacounty.gov/bsd/lib/fp/Building/Residential/2026%20Code%20Version/Residential%20Plan%20Review_2026.pdf",
+            "snippet": "A grading permit is required for the following: a. All excavations exceeding 2-ft. in depth (except for footings, basements and retaining walls)"
+          },
+          "confidence": "high"
+        },
+        {
+          "id": "la-county-snow_load-elevation-table",
+          "category": "snow_load",
+          "requirement": "LA County BCM #95 ground snow load criteria by elevation: under 2,000 ft — no snow load; 2,000-3,500 ft — 20 psf; 3,500-5,000 ft — 40 psf; over 5,000 ft — 80 psf. Applies to pods in mountain areas. Note: the BCM is based on the 2011 LACBC/ASCE 7-05 and has not been reissued for the 2026 code; verify with plan check.",
+          "citation": {
+            "code_section": "LA County BCM #95, Section 1608 Article 1",
+            "title": "Building Code Manual #95 — Snow Loads (County of Los Angeles DPW Building and Safety)",
+            "url": "https://dpw.lacounty.gov/bsd/lib/fp/Building/Building%20Code%20Manuals/2011/BCM%201608%20A1%20-%20Snow%20Loads%2009-20-11.pdf",
+            "snippet": "Between 2,000 and 3,500 feet 20 lbs./sq. ft Snow loads may be excluded in the calculation of the seismic forces."
+          },
+          "confidence": "medium"
+        },
+        {
+          "id": "la-county-wind-85mph-special-region",
+          "category": "wind",
+          "requirement": "LA County BCM #11 policy: buildings shall be designed for a minimum 85 mph (3-second gust) basic wind speed throughout Los Angeles County, including the mapped 'special wind region' in the southern county. Note: this BCM is based on the 2011 LACBC/ASCE 7-05; the 2026 code performs wind analysis per ASCE 7-22 (LACBC 1609), whose ultimate design wind speeds are numerically higher — the current ultimate-speed figure was not verifiable on an official page.",
+          "citation": {
+            "code_section": "LA County BCM #11, Section 1609.1.1 Article 1; 2026 LACBC 1609 / ASCE 7-22",
+            "title": "Building Code Manual #11 — ASCE 7-05 Special Wind Region Loads (County of Los Angeles DPW)",
+            "url": "https://dpw.lacounty.gov/bsd/lib/fp/Building/Building%20Code%20Manuals/2011/BCM%201609.1.1%20A1%20-%20ASCE%207-05%20Special%20Wind%20Region%20Loads%2006-14-11.pdf",
+            "snippet": "Buildings, structures, and parts thereof shall be designed to withstand a minimum wind load based on an 85 mph (3-second gust) basic wind speed throughout Los Angeles County, including the \"special wind region\""
+          },
+          "confidence": "medium"
+        },
+        {
+          "id": "la-county-seismic-sdc-d0-d2",
+          "category": "seismic",
+          "requirement": "LA County one- and two-family construction is reviewed under Seismic Design Categories D0, D1, or D2 (SDC E requires full engineering unless reclassified per R301.2.2.1.2). Practical effects for a pod: seismic bracing provisions of CRC R301.2.2 apply; foundation anchor bolts must be 1/2-in. diameter (5/8-in. for SDC E/F), embedded 7 in., spaced max 6 ft, with 0.229 x 3 in. plate washers; lateral design uses the more restrictive of wind or seismic per LACBC 1609/1613 and ASCE 7-22.",
+          "citation": {
+            "code_section": "2026 LA County Residential Code R301.2.2, R301.2.2.1, R403.1.6; LACBC 1609, 1613",
+            "title": "County of Los Angeles Residential Plan Review 2026 (One- & Two-Family Dwelling Plan Review List)",
+            "url": "https://dpw.lacounty.gov/bsd/lib/fp/Building/Residential/2026%20Code%20Version/Residential%20Plan%20Review_2026.pdf",
+            "snippet": "All one- and two-family dwellings and townhouses in Seismic Design Category D0, D1 or D2 shall comply with seismic provisions in Section R301.2.2."
+          },
+          "confidence": "high"
+        },
+        {
+          "id": "la-county-other-wui-construction-2026",
+          "category": "other",
+          "requirement": "For 2026, LA County wildfire construction standards moved from CBC Chapter 7A to the 2025 California Wildland-Urban Interface Code (Part 7), Chapter 5, applied via the 2026 LA County Building Code to all new buildings in WUI Fire Areas / Fire Hazard Severity Zones. Key pod-relevant requirements: Class A roof covering; ember-resistant vents; ignition-resistant/noncombustible or 1-hr-rated exterior walls; multi-pane exterior glazing with at least one tempered pane. Exception: Group U accessory structures not exceeding 120 sq ft (an occupied office pod over 120 sq ft does not qualify).",
+          "citation": {
+            "code_section": "2025 CA Wildland-Urban Interface Code Ch. 5 (§§ 501.1, 504.2, 504.8, 504.10) via 2026 LACBC",
+            "title": "LA County Building & Safety Standard Construction Notes — Fire Hazard Severity Zone (2026)",
+            "url": "https://dpw.lacounty.gov/bsd/lib/fp/Building/Very%20High%20Fire%20Hazard%20Severity%20Zone/2026%20Code%20Version/Fire%20Hazard%20Notes%202026.pdf",
+            "snippet": "Roof covering shall be Class A fire classification when tested in accordance with ASTM E108 or UL790."
+          },
+          "confidence": "high"
+        },
+        {
+          "id": "la-county-other-exemption-120sf-12ft-limits",
+          "category": "other",
+          "requirement": "Construction-geometry limits on the permit exemption: a one-story detached accessory building is exempt from a building permit only if gross floor area does not exceed 120 sq ft, height does not exceed 12 ft, and maximum roof projection does not exceed 24 in. Electrical, plumbing, or mechanical equipment still requires separate permits, and zoning applies regardless of size — so a conditioned 50A office pod always needs at least electrical/mechanical permits even under 120 sq ft.",
+          "citation": {
+            "code_section": "2026 LACBC / Title 26 permit exemptions (LA County Public Works FAQ)",
+            "title": "LA County Public Works FAQ — I've been told that I don't need permits for buildings that are 120 sq. ft. or less. Is that true?",
+            "url": "https://pw.lacounty.gov/general/faq/index.cfm?37556=37556&Action=getAnswers&FaqID=JSMtIzFSXSQgCg%3D%3D&Keywords=1",
+            "snippet": "the gross floor area does not exceed 120 square feet, the height does not exceed 12 feet, and the maximum roof projection does not exceed 24 inches"
+          },
+          "confidence": "high"
+        },
+        {
+          "id": "la-county-other-property-line-fire-separation",
+          "category": "other",
+          "requirement": "Placement constraint for pods near lot lines (2026 LA County Residential Code R302.1): exterior walls of accessory buildings closer than 5 ft (non-sprinklered) or 3 ft (sprinklered) to the property line must be 1-hour fire-resistance-rated; no openings permitted in walls less than 3 ft from the property line; openings limited to 25% of wall area between 3 and 5 ft (non-sprinklered); eave projections prohibited within 2 ft of the property line.",
+          "citation": {
+            "code_section": "2026 LA County Residential Code R302.1, T-R302.1(1) & (2)",
+            "title": "County of Los Angeles Residential Plan Review 2026 (One- & Two-Family Dwelling Plan Review List)",
+            "url": "https://dpw.lacounty.gov/bsd/lib/fp/Building/Residential/2026%20Code%20Version/Residential%20Plan%20Review_2026.pdf",
+            "snippet": "Exterior walls of dwellings and accessory buildings less than 5-ft.(non-Sprinklered) / 3-ft. (Sprinklered) to the property line shall be 1-hour fire-resistance-rated construction. (R302.1, T-R302.1(1) & (2))"
+          },
+          "confidence": "high"
+        }
+      ],
       "status": "draft",
       "last_verified": "",
       "verified_by": "",

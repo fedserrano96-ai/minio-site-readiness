@@ -46,5 +46,69 @@
     "file": "006-www-sanjoseca-gov-business-development-services-permit-center-accessory-dwelling.html",
     "bytes": 104278,
     "error": null
+  },
+  {
+    "url": "https://www.sanjoseca.gov/your-government/departments-offices/planning-building-code-enforcement/building-division",
+    "fetched_at": "2026-07-08T20:19:18.260Z",
+    "http_status": 200,
+    "file": "007-www-sanjoseca-gov-your-government-departments-offices-planning-building-code-enf.html",
+    "bytes": 111871,
+    "error": null
+  },
+  {
+    "url": "https://www.sanjoseca.gov/home/showdocument?id=25897",
+    "fetched_at": "2026-07-08T20:19:18.260Z",
+    "http_status": 200,
+    "file": "008-www-sanjoseca-gov-home-showdocument.html",
+    "bytes": 244196,
+    "error": null
+  },
+  {
+    "url": "https://www.sanjoseca.gov/home/showpublisheddocument/15445/638682236750270000",
+    "fetched_at": "2026-07-08T20:19:18.260Z",
+    "http_status": 200,
+    "file": "009-www-sanjoseca-gov-home-showpublisheddocument-15445-638682236750270000.html",
+    "bytes": 289631,
+    "error": null
+  },
+  {
+    "url": "https://www.sanjoseca.gov/home/showdocument?id=39038",
+    "fetched_at": "2026-07-08T20:19:18.260Z",
+    "http_status": 200,
+    "file": "010-www-sanjoseca-gov-home-showdocument.html",
+    "bytes": 559637,
+    "error": null
+  },
+  {
+    "url": "https://gis.data.ca.gov/documents/CAEnergy::building-climate-zones/about",
+    "fetched_at": "2026-07-08T20:19:18.260Z",
+    "http_status": 200,
+    "file": "011-gis-data-ca-gov-documents-caenergy-building-climate-zones-about.html",
+    "bytes": 101937,
+    "error": null
+  },
+  {
+    "url": "https://www.energy.ca.gov/sites/default/files/2025-06/2025_Energy_Code_Overview_ADA.pdf",
+    "fetched_at": "2026-07-08T20:19:18.260Z",
+    "http_status": 200,
+    "file": "012-www-energy-ca-gov-sites-default-files-2025-06-2025-energy-code-overview-ada-pdf.html",
+    "bytes": 7112080,
+    "error": null
+  },
+  {
+    "url": "https://www.sanjoseca.gov/home/showpublisheddocument/94721",
+    "fetched_at": "2026-07-08T20:19:18.260Z",
+    "http_status": 200,
+    "file": "013-www-sanjoseca-gov-home-showpublisheddocument-94721.html",
+    "bytes": 9682537,
+    "error": null
+  },
+  {
+    "url": "https://www.sanjoseca.gov/home/showdocument?id=15445",
+    "fetched_at": "2026-07-08T20:19:18.260Z",
+    "http_status": 200,
+    "file": "014-www-sanjoseca-gov-home-showdocument.html",
+    "bytes": 289631,
+    "error": null
   }
 ]
