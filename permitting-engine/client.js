@@ -5,9 +5,11 @@
 
   var engine = window.PermittingEngine;
   var summary = window.PermittingSummary;
+  var report = window.PermittingReport;
   var data = null;
   var searchSeq = 0;
   var matchedAddress = null;
+  var lastResult = null; /* { out, quick } from the latest evaluate — feeds the full-report view */
 
   var el = {
     address: document.getElementById('address'),
@@ -21,15 +23,17 @@
     evaluate: document.getElementById('evaluate'),
     result: document.getElementById('result'),
     resultHeadline: document.getElementById('result-headline'),
-    resultSubline: document.getElementById('result-subline'),
-    resultRows: document.getElementById('result-rows'),
-    resultExtras: document.getElementById('result-extras'),
-    resultFinalsay: document.getElementById('result-finalsay'),
+    resultBrief: document.getElementById('result-brief'),
     resultCta: document.getElementById('result-cta'),
     resultDisclaimer: document.getElementById('result-disclaimer'),
     email: document.getElementById('email'),
     emailSend: document.getElementById('email-send'),
     emailStatus: document.getElementById('email-status'),
+    reportView: document.getElementById('report-view'),
+    reportPage: document.getElementById('report-page'),
+    reportBody: document.getElementById('report-body'),
+    reportBack: document.getElementById('report-back'),
+    reportPrint: document.getElementById('report-print'),
   };
 
   function esc(s) {
@@ -146,26 +150,7 @@
 
   function render(s) {
     el.resultHeadline.textContent = s.headline;
-    el.resultSubline.textContent = s.subline;
-
-    var rowsHtml = '';
-    var PILL_LABELS = { likely: 'Likely needed', check: 'Quick check', clear: 'Likely clear' };
-    s.rows.forEach(function (r) {
-      rowsHtml +=
-        '<div class="c-row">' +
-        '<span class="c-row-pill c-pill-' + esc(r.status) + '">' + esc(PILL_LABELS[r.status]) + '</span>' +
-        '<span class="c-row-text"><strong>' + esc(r.label) + '</strong>' + esc(r.text) + '</span>' +
-        '</div>';
-    });
-    el.resultRows.innerHTML = rowsHtml;
-
-    var extrasHtml = '';
-    s.extra_lines.forEach(function (line) {
-      extrasHtml += '<li>' + esc(line) + '</li>';
-    });
-    el.resultExtras.innerHTML = extrasHtml;
-
-    el.resultFinalsay.textContent = s.final_say_line;
+    el.resultBrief.textContent = s.brief + ' ' + s.final_say_line;
     el.resultCta.hidden = !s.package_cta;
     el.resultDisclaimer.textContent = s.disclaimer;
 
@@ -178,7 +163,25 @@
     var out = engine.evaluate(currentPodConfig(), currentJurisdiction(), {
       productDefault: data.product_default,
     });
-    render(summary.summarize(out));
+    var quick = summary.summarize(out);
+    lastResult = { out: out, quick: quick };
+    render(quick);
+  }
+
+  /* Show the full report in-page, print-ready (browser print → save as PDF).
+     In-page rather than window.open so popup blockers can't eat it. */
+  function onReportView() {
+    if (!lastResult) return;
+    var address = matchedAddress || el.address.value.trim() || null;
+    el.reportBody.innerHTML = report.render(lastResult.out, lastResult.quick, address);
+    document.body.classList.add('report-open');
+    el.reportPage.hidden = false;
+    window.scrollTo(0, 0);
+  }
+
+  function onReportBack() {
+    el.reportPage.hidden = true;
+    document.body.classList.remove('report-open');
   }
 
   function onEmailSend() {
@@ -224,6 +227,9 @@
   });
   el.evaluate.addEventListener('click', onEvaluate);
   el.emailSend.addEventListener('click', onEmailSend);
+  el.reportView.addEventListener('click', onReportView);
+  el.reportBack.addEventListener('click', onReportBack);
+  el.reportPrint.addEventListener('click', function () { window.print(); });
   el.jurisdiction.addEventListener('change', function () {
     matchedAddress = null;
     onEvaluate();

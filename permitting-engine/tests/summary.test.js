@@ -146,7 +146,38 @@ assert(
   'trailer config produces no foundation line'
 );
 
-/* ════ 4. SEND-DETAILS FUNCTION (validation paths, no network) ════ */
+/* ════ 4. BRIEF (one-paragraph client answer) ═════════════════════ */
+
+assert(typeof seattleSum.brief === 'string' && seattleSum.brief.length > 0, 'brief: present');
+assert(/expect/i.test(seattleSum.brief), 'brief: likely items phrased as "expect"');
+assert(/building permit/.test(seattleSum.brief), 'brief: names the building permit');
+assert(/electrical sign-off/.test(seattleSum.brief), 'brief: names the electrical sign-off');
+assert(/energy report \(WSEC\)/.test(seattleSum.brief), 'brief: folds in the WA energy report');
+assert(
+  !/likely_required|depends|not_applicable/.test(seattleSum.brief),
+  'brief: never leaks raw posture identifiers'
+);
+/* All-depends (trailer) brief reads as a quick look, not a demand. */
+assert(/quick look/i.test(trailerSum.brief), 'brief: all-depends phrased as a quick look');
+/* Verified all-exempt brief stays cautious. */
+assert(/recommend a quick confirmation/i.test(greenSum.brief), 'brief: green still recommends confirming');
+
+/* ════ 5. REPORT RENDERER (shared email/download HTML) ════════════ */
+
+const reportMod = require(path.join(__dirname, '..', 'report.js'));
+const seattleReport = reportMod.render(seattleOut, seattleSum, '600 4th Ave, Seattle, WA');
+assert(/Permits at a glance/.test(seattleReport), 'report: permits table present');
+assert(/Building requirements/.test(seattleReport), 'report: requirements section present');
+assert(/R-60/.test(seattleReport), 'report: renders researched requirement values');
+assert(/Citations/.test(seattleReport), 'report: citations section present');
+assert(/600 4th Ave, Seattle, WA/.test(seattleReport), 'report: echoes the address');
+assert(/general guidance/.test(seattleReport), 'report: disclaimer present');
+assert(/<script/i.test(reportMod.render(
+  Object.assign({}, seattleOut, { jurisdiction: '<script>alert(1)</script>' }),
+  seattleSum, null
+)) === false, 'report: escapes HTML in data fields');
+
+/* ════ 6. SEND-DETAILS FUNCTION (validation paths, no network) ════ */
 
 const sendDetails = require(path.join(__dirname, '..', 'netlify', 'functions', 'send-details.js'));
 

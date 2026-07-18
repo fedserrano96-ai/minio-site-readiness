@@ -77,34 +77,40 @@
     <section id="result" class="c-result" hidden aria-live="polite">
       <div class="c-result-head">
         <h2 id="result-headline"></h2>
-        <p id="result-subline"></p>
       </div>
-      <div id="result-rows" class="c-rows"></div>
-      <ul id="result-extras" class="c-extras"></ul>
-      <p id="result-finalsay" class="c-finalsay"></p>
+      <p id="result-brief" class="c-brief"></p>
 
       <div id="result-cta" class="c-package" hidden>
-        <strong>Don’t want to deal with any of this?</strong>
-        <p>Mini·O’s permitting package handles the whole thing — research, drawings, submitting, and any back-and-forth with your city.</p>
+        <strong>Don’t want to deal with any of this?</strong> Mini·O’s permitting package handles the whole thing — research, drawings, submitting, and any back-and-forth with your city.
       </div>
 
       <div class="c-email">
-        <h3>Want the full breakdown?</h3>
-        <p>We’ll email you the complete technical version — exact permits, building requirements, code citations, and who to call.</p>
+        <h3>Get your full report</h3>
+        <p>Exact permits, building requirements, code citations, and who to call.</p>
         <div class="c-email-row">
           <input type="email" id="email" placeholder="you@example.com" autocomplete="email" aria-label="Email address">
-          <button id="email-send" class="c-btn c-btn-red" type="button">Send me the details</button>
+          <button id="email-send" class="c-btn c-btn-red" type="button">Email it to me</button>
         </div>
         <div id="email-status" class="c-email-status" hidden></div>
+        <button id="report-view" class="c-btn-link" type="button">or view &amp; save it now (PDF-ready)</button>
       </div>
 
       <p id="result-disclaimer" class="c-disclaimer"></p>
     </section>
   </main>
 
+  <div id="report-page" class="c-report-page" hidden>
+    <div class="c-report-bar">
+      <button id="report-back" class="c-btn c-btn-dark" type="button">&larr; Back</button>
+      <button id="report-print" class="c-btn c-btn-red" type="button">Save as PDF / Print</button>
+    </div>
+    <div id="report-body" class="c-report-body"></div>
+  </div>
+
   <script src="engine.js"></script>
   <script src="resolver.js"></script>
   <script src="summary.js"></script>
+  <script src="report.js"></script>
   <script src="client.js"></script>
 </body>
 </html>

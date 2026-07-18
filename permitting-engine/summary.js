@@ -57,6 +57,48 @@
   var FINAL_SAY_LINE =
     'Your local permitting office always has the final say — treat this as a friendly heads-up, not a ruling.';
 
+  /* Short names used in the one-paragraph brief. */
+  var BRIEF_NAMES = {
+    building_permit: 'a building permit',
+    electrical_permit: 'an electrical sign-off',
+    plumbing_permit: 'a plumbing permit',
+    zoning_review: 'a zoning check',
+  };
+
+  function joinList(items) {
+    if (items.length <= 1) return items.join('');
+    return items.slice(0, -1).join(', ') + ' and ' + items[items.length - 1];
+  }
+
+  /* One-paragraph plain-English brief: what's likely in play, in general terms. */
+  function buildBrief(out, rows, tone) {
+    if (tone === 'green') {
+      return 'Based on verified local rules, none of the usual permits look necessary for this setup — we still recommend a quick confirmation before you build.';
+    }
+    var likely = rows
+      .filter(function (r) { return r.status === 'likely'; })
+      .map(function (r) { return BRIEF_NAMES[r.key]; });
+    var check = rows
+      .filter(function (r) { return r.status === 'check'; })
+      .map(function (r) { return BRIEF_NAMES[r.key]; });
+    if (out.energy_compliance.posture === 'likely_required') {
+      likely.push(
+        'an energy report' + (out.energy_compliance.code ? ' (' + out.energy_compliance.code + ')' : '')
+      );
+    }
+    var s;
+    if (likely.length && check.length) {
+      s = 'Expect ' + joinList(likely) + ' — and your city may also take a quick look at ' + joinList(check) + '.';
+    } else if (likely.length) {
+      s = 'Expect ' + joinList(likely) + '.';
+    } else if (check.length) {
+      s = 'Your city will want a quick look at ' + joinList(check) + ' before you build.';
+    } else {
+      s = 'We’ll confirm the exact requirements for your setup with your local office.';
+    }
+    return s;
+  }
+
   /*
    * summarize(out) — out is the object returned by PermittingEngine.evaluate().
    * Returns:
@@ -131,6 +173,7 @@
       tone: tone,
       headline: headline,
       subline: subline,
+      brief: buildBrief(out, rows, tone),
       rows: rows,
       extra_lines: extraLines,
       final_say_line: FINAL_SAY_LINE,
