@@ -6,7 +6,8 @@ import type {
 
 /**
  * Smallest gap in feet between the pod's rectangle and any object's bounding box or the yard edge.
- * 0 when the pod overlaps an object or sits past the yard edge. Uses the snapshot's own model.
+ * 0 when the pod overlaps an object or sits past the yard edge. Uses the snapshot's model;
+ * `recommend` passes the effective model (override or snapshot) in.
  */
 export function minClearance(snapshot: PlannerSnapshot): number {
   const dims = MODELS[snapshot.model];
@@ -72,7 +73,7 @@ export function recommend(snapshot: PlannerSnapshot, answers: Answers, modelOver
   if (model === 'twelve' && bathroom === 'shower') notes.push('twelveHalfBathOnly');
   if (door === 'flipped' && !MODELS[model].flipAvailable) notes.push('flipNotAvailable');
   if (method === 'kit') notes.push('kitUnloading');
-  if (minClearance(snapshot) < 3) notes.push('clearance');
+  if (minClearance({ ...snapshot, model }) < 3) notes.push('clearance');
 
   return { model, method, craneFrom, base, methodReason, baseReason, bathroom, door, toCheck, notes };
 }

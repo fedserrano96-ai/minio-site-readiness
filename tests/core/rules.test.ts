@@ -120,6 +120,17 @@ describe('recommend', () => {
   });
 });
 
+describe('recommend clearance with a model override', () => {
+  it('measures clearance with the overridden model footprint', () => {
+    // object spans x 30..31: 4 ft from the Twelve (x 14..26), 2 ft from the Sixteen (x 12..28)
+    const twelve: PlannerSnapshot = { ...snapshot, model: 'twelve', objects: [{ type: 'shed', x: 30.5, y: 15, w: 1, h: 2 }] };
+    expect(recommend(twelve, {}).notes).not.toContain('clearance');
+    const r = recommend(twelve, {}, 'sixteen');
+    expect(r.model).toBe('sixteen');
+    expect(r.notes).toContain('clearance');
+  });
+});
+
 describe('minClearance', () => {
   it('centred fixture is limited by the yard edges', () => {
     expect(minClearance(snapshot)).toBe(10);
