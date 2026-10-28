@@ -36,17 +36,17 @@ For Fred. Plain English, in the order you'd do things. The new yard planner, the
    | Planner Snapshot | Long text |
    | Assessment Version | Single line text |
 
-   Keep these as text, not dropdowns. Pod Use, State and the others hold free text that can change.
+   Keep these as text, not dropdowns (single select). The tool saves with Airtable's "typecast" option on, so a dropdown would quietly add a new option whenever a value doesn't match an existing one exactly, instead of showing an error. Pod Use only ever holds Office, Studio, Guest Suite or Other, but keep it as text for the same reason.
 
-2. **Replace the three placeholder photos in `assets/models/`.** `twelve.jpg`, `sixteen.jpg` and `station.jpg` are all the same picture right now (the Twelve). Put a real photo of each pod in, with the same file names. The plan card shows the one for the model the client ends up with.
+2. **Replace the three placeholder photos in `assets/models/`.** `twelve.jpg`, `sixteen.jpg` and `station.jpg` are all the same placeholder picture right now (a photo of the Sixteen). Put a real photo of each pod in, with the same file names. The plan card shows the one for the model the client ends up with.
 
-3. **Get sales to answer two questions** (they change what the tool asks and says):
-   - **How level must the ground be?** The ops FAQ says under 2 degrees, or 1/4 in. per foot. The handbook slab spec says 1/4 in. per 10 ft. The tool uses 1/4 in. per foot for now. Change `LEVEL_CUTOFF_TEXT` in `src/assessment/core/data.ts` if the answer differs. Also note that phone level apps show degrees, not inches per foot, so the wording "within 1/4 in. per foot" may need a degrees version.
-   - **How wide must the way in be for a kit?** The kit FAQ says any regular door (about 3 ft). Peter's task says 4 ft. The tool uses 3 ft for now. Change `KIT_ACCESS_FT` in the same file if the answer differs.
+3. **Get sales to answer two questions** (they change what the tool asks and says). Send the answers to the developer, who makes the change:
+   - **How level must the ground be?** The ops FAQ says under 2 degrees, or 1/4 in. per foot. The handbook slab spec says 1/4 in. per 10 ft. The tool uses 1/4 in. per foot for now. The developer changes `LEVEL_CUTOFF_TEXT` in `src/assessment/core/data.ts`, which updates the ground question and the base spec sheet together. Also note that phone level apps show degrees, not inches per foot, so the wording "within 1/4 in. per foot" may need a degrees version.
+   - **How wide must the way in be for a kit?** The kit FAQ says any regular door (about 3 ft). Peter's task says 4 ft. The tool uses 3 ft for now. The developer changes `KIT_ACCESS_FT` in the same file.
 
-4. **Read all the client-facing wording** and fix anything that doesn't sound like Mini·O: `src/assessment/ui/copy.ts` (the plan card) and `src/assessment/ui/questions-copy.ts` (the questions and their how-to-measure help). A first draft was written from the facts in the spec, so it needs your eye.
+4. **Read all the client-facing wording** and mark anything that doesn't sound like Mini·O. The easiest way is to go through the tool on the deploy preview; the text lives in `src/assessment/ui/copy.ts` (the plan card) and `src/assessment/ui/questions-copy.ts` (the questions and their how-to-measure help). A first draft was written from the facts in the spec, so it needs your eye. Send your changes to the developer, who edits those files.
 
-5. **Review the ZIP tables in `src/assessment/core/location.ts`.** These decide which ZIPs count as "we arrange contractors here", which price region applies, and which state's shipping figure is used. Tell the developer what to fix. Known gaps to look at: northern Virginia (ZIP prefixes 201 and 224 to 246) is not in the Virginia/Pennsylvania/Maryland price region, and a few Canadian postal codes with invalid first letters are treated as "outside the US and Canada".
+5. **Review the ZIP tables in `src/assessment/core/location.ts`.** These decide which ZIPs count as "we arrange contractors here", which price region applies, and which state's shipping figure is used. Tell the developer what to fix. Known gaps to look at: in Virginia, only ZIP prefixes 220 to 223 (Arlington, Alexandria, Fairfax) are in the Virginia/Pennsylvania/Maryland price region. Prefix 201 (Loudoun County, also northern Virginia) and 224 to 246 (Fredericksburg south, including Richmond and Norfolk) are not, and a few Canadian postal codes with invalid first letters are treated as "outside the US and Canada".
 
 6. **Make sure the Netlify site still has the `AIRTABLE_PAT` setting** (the Airtable access token the old form already used). Without it, every lead save fails.
 
@@ -64,9 +64,9 @@ These all have a working default today. Change them only if you disagree.
 - **Station weight and path clearance** are not confirmed. The Station spec sheet says "ask your Mini·O advisor" for weight.
 - **The Twelve with a shower.** The card says the Twelve fits a half bath only and offers "Switch to the Sixteen". Confirm that is true.
 - **Phone layout.** On phones the plan card collapses into a bar at the bottom with the price and two buttons. Confirm you like it.
-- **"Continue without saving."** If saving a lead fails, the client sees the error with "Try again" and "Continue without saving", so they are never stuck. Confirm you want that fallback.
+- **"Continue without saving."** If saving a lead fails, the client sees the error with "Try again" and "Continue without saving", so they are never stuck. On phones, any button press closes the plan details first, so this message is never hidden behind them. After continuing without saving from "Save my plan", the client can still print the plan. Confirm you want that fallback.
 - **One lead record per visit.** The first save creates the Airtable record and later button clicks update it, so sales doesn't get duplicates. "Buttons Clicked" lists every button used, in order.
-- **Moving from a priced plan to "Let's talk".** If a client's answers change so the card turns into "Let's talk", the old cost figures stay in their Airtable record. Decide whether to clear them.
+- **Moving from a priced plan to "Let's talk".** If a client's answers change so the card turns into "Let's talk", the next save clears Cost Low, Cost High and Shipping Estimate in their Airtable record, so no out-of-date figures are left behind.
 - **Crane price.** Shown as "+ crane, from $3,000" (or $4,000) next to the range, since the client pays the crane company directly.
 - **Outside our install areas.** The card says "We don't arrange contractors in your area yet. These prices are a reference for your own contractor." Confirm the wording, and the list of install areas.
 - **Out-of-area Washington.** A Washington ZIP outside the install area uses Washington's own kit assembly figure, not the general reference figure (for the Sixteen, $11,000 instead of $12,000). Confirm.
@@ -76,11 +76,14 @@ These all have a working default today. Change them only if you disagree.
 
 ## Check on the first deploy preview
 
-1. Open the first Netlify deploy preview and read the **deploy log**. You should see: dependencies installed, the build running (`npm run build`), the functions bundled (`submit` and `geocode`), and no `node_modules` folder in what gets published. Netlify uses Node 18; the work was tested on a newer Node on a laptop, so this is the first real Node 18 run.
+1. In the preview, **go through the tool once like a client** (planner, then the plan card, then the questions) at desktop size and on a phone.
+2. **Submit one real lead** with your own email: press "Save my plan", fill the form, and check the new record in Airtable. ZIP, Pod Model, To Check, Answers, Planner Snapshot and the rest should be filled in. Some fields are empty on purpose: Cost Low and Cost High on a "Let's talk" plan, Shipping Estimate when shipping is quoted separately or there is no ZIP, and Price Region outside the priced regions. If Airtable shows an "Unknown field name" error, a field from the list above is missing or misspelled.
+3. Press "Design my pod" and "Let's talk" afterwards. They should go to minioffice.co/quote and minioffice.co/lets-talk, and the same Airtable record should update (Buttons Clicked grows), not a second record appear.
+4. On the preview, open "Print / save as PDF" after saving and look at the print preview. It should show only the plan summary, not the planner or buttons.
+5. Open the two contractor spec sheets from a plan card ("Get the base spec", "Get the power spec") and print one.
+6. Delete your test records from Airtable.
+
+### For the developer
+
+1. Read the first deploy preview's **deploy log**. You should see: dependencies installed, the build running (`npm run build`), the functions bundled (`submit` and `geocode`), and no `node_modules` folder in what gets published. `package.json` asks for Node 18; confirm the Node version in the deploy log.
 2. Visit `<preview url>/.netlify/functions/submit` in a browser. It should show `{"error":"Method not allowed"}` (a 405), not "not found" or a server error.
-3. In the preview, **go through the tool once like a client** (planner, then the plan card, then the questions) at desktop size and on a phone.
-4. **Submit one real lead** with your own email: press "Save my plan", fill the form, check the new record in Airtable has every field filled in (ZIP, Pod Model, Cost Low/High, To Check, Answers, Planner Snapshot and so on). If Airtable shows an "Unknown field name" error, a field from the list above is missing or misspelled.
-5. Press "Design my pod" and "Let's talk" afterwards. They should go to minioffice.co/quote and minioffice.co/lets-talk, and the same Airtable record should update (Buttons Clicked grows), not a second record appear.
-6. On the preview, open "Print / save as PDF" after saving and look at the print preview. It should show only the plan summary, not the planner or buttons.
-7. Open the two contractor spec sheets from a plan card ("Get the base spec", "Get the power spec") and print one.
-8. Delete your test records from Airtable.
