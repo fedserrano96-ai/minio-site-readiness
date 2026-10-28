@@ -2022,13 +2022,21 @@ function updateToast() {
     return;
   }
 
+  // Same gap the plan card uses (minClearance in src/assessment/core/rules.ts): yard edges and
+  // every placed object's box; 0 when the pod overlaps something.
   const { w, h } = podDims();
-  const minC = Math.min(
+  let minC = Math.min(
     planner.podX - w / 2,
     planner.yardW - (planner.podX + w / 2),
     planner.podY - h / 2,
     planner.yardD - (planner.podY + h / 2)
   );
+  for (const o of planner.objects) {
+    const dx = Math.max(0, Math.abs(planner.podX - o.x) - (w + o.w) / 2);
+    const dy = Math.max(0, Math.abs(planner.podY - o.y) - (h + o.h) / 2);
+    minC = Math.min(minC, Math.hypot(dx, dy));
+  }
+  minC = Math.max(0, minC);
   const good = minC >= 3;
   toast.textContent = good
     ? minC.toFixed(1) + ' ft clearance. Good placement.'
