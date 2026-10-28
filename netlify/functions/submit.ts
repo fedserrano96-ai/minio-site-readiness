@@ -1,7 +1,7 @@
 // Netlify serverless function: keeps the Airtable PAT server-side.
 // POST /.netlify/functions/submit
 // No recordId: creates one Airtable record. With recordId: updates that record.
-import { buildFields, RECORD_ID_RE } from '../../src/server/airtable-fields';
+import { buildFields, RECORD_ID_RE, type FieldValue } from '../../src/server/airtable-fields';
 import type { SubmissionPayload } from '../../src/server/airtable-fields';
 
 const BASE_ID = 'appj87SHEgZafCMC2';
@@ -64,7 +64,7 @@ export async function handler(event: HandlerEvent): Promise<HandlerResult> {
   }
 
   const isCreate = payload.recordId === undefined;
-  let fields: Record<string, string | number | boolean>;
+  let fields: Record<string, FieldValue>;
   try {
     fields = buildFields({ ...payload, contact: { ...payload.contact, email: email.trim() } }, isCreate);
   } catch (err) {
@@ -79,7 +79,15 @@ export async function handler(event: HandlerEvent): Promise<HandlerResult> {
       headers: { 'Authorization': `Bearer ${pat}`, 'Content-Type': 'application/json' },
       body: JSON.stringify({ fields, typecast: true }),
     });
-    const json: unknown = await res.json();
+    let json: unknown;
+    try {
+      json = await res.json();
+    } catch (err) {
+      // An HTML error page (a 502 from a proxy, say) is not JSON and has no Airtable message in it.
+      if (!(err instanceof SyntaxError)) throw err;
+      console.error(`Airtable returned a body that is not JSON (status ${res.status})`);
+      return reply(res.ok ? 502 : res.status, { error: `Airtable returned an unexpected response (status ${res.status})` });
+    }
 
     if (!res.ok) {
       console.error('Airtable error:', json);

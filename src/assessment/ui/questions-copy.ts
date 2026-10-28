@@ -46,7 +46,7 @@ export function questionCopy(id: QuestionId, model: ModelId): QuestionCopy {
       return {
         title: 'How wide is the narrowest point on the way to the spot?',
         options: [
-          { value: 'wide', label: `Wider than ${m.minPathWidth} ft` },
+          { value: 'wide', label: `${m.minPathWidth} ft or wider` },
           { value: 'narrow', label: `Narrower than ${m.minPathWidth} ft` },
           NOT_SURE,
         ],

@@ -1,10 +1,11 @@
-import { MODELS } from '../assessment/core/data';
+import { LEVEL_CUTOFF_TEXT, MODELS } from '../assessment/core/data';
 
 export interface SpecValues {
   name: string;
   size: string;
   weight: string;
   inletCorner: string;
+  levelCutoff: string;
 }
 
 const ADVISOR_WEIGHT = 'ask your Mini·O advisor';
@@ -31,5 +32,6 @@ export function specValues(model: string | null, door: string | null): SpecValue
     size: `${m.w} × ${m.d} ft`,
     weight,
     inletCorner: door === 'flipped' ? 'back left corner' : 'back right corner',
+    levelCutoff: LEVEL_CUTOFF_TEXT,
   };
 }

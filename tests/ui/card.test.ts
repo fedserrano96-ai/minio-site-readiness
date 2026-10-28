@@ -162,6 +162,13 @@ describe('renderCard', () => {
     expect(text(el)).toContain("We don't arrange contractors in your area yet. These prices are a reference for your own contractor.");
   });
 
+  it('power link uses the standard door for a Station whose client asked for a flipped door', () => {
+    const station = { ...snapshot, model: 'station' as const };
+    const el = render(view({ door: 'flipped' }, loc('59001'), undefined, null, station));
+    expect(el.querySelector('a[href="contractor/power.html?model=station&door=standard"]')).toBeTruthy();
+    expect(el.querySelector('a[href*="door=flipped"]')).toBeNull();
+  });
+
   it('links the contractor specs for a gravel pad even inside an install area', () => {
     const el = render(view({}, loc('98101')));
     expect(el.querySelector('a[href="contractor/base.html?model=sixteen"]')).toBeTruthy();

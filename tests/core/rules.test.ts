@@ -103,6 +103,16 @@ describe('recommend', () => {
     expect(recommend(station, { door: 'flipped' }).notes).toContain('flipNotAvailable');
     expect(recommend(snapshot, { door: 'flipped' }).notes).not.toContain('flipNotAvailable');
   });
+  it('Station with a flipped door answer gets the standard door and the note', () => {
+    const station = { ...snapshot, model: 'station' as const };
+    const r = recommend(station, { door: 'flipped' });
+    expect(r.door).toBe('standard');
+    expect(r.notes).toContain('flipNotAvailable');
+    const switched = recommend(snapshot, { door: 'flipped' }, 'station');
+    expect(switched.door).toBe('standard');
+    expect(switched.notes).toContain('flipNotAvailable');
+    expect(recommend(snapshot, { door: 'flipped' }).door).toBe('flipped');
+  });
   it('soft ground note only when path questions are visible', () => {
     expect(recommend(snapshot, { truckAccess: 'no', pathGround: 'soft' }).notes).toEqual(['softGround', 'panelUpgrade']);
     expect(recommend(snapshot, { truckAccess: 'yes', pathGround: 'soft' }).notes).toEqual(['panelUpgrade']);

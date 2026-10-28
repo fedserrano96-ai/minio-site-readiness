@@ -128,10 +128,20 @@ describe('priceRecommendation', () => {
     expect(line(s, 'install')).toMatchObject({ low: 12000, high: 12000, reference: true });
   });
 
-  it('regional gravel figure outside the install area is flagged reference', () => {
+  it('a location with no price region uses the gravel reference range', () => {
     // Texas has no region: reference range 3000-4945 for the Sixteen.
     const s = priceRecommendation(rec(), loc('78701'), {});
     expect(line(s, 'base')).toMatchObject({ low: 3000, high: 4945, reference: true });
+  });
+
+  it('a regional figure outside the install area is used but flagged reference', () => {
+    // Spokane is WA_OTHER, outside the install area: its own figures, marked reference.
+    const spokane = loc('99201');
+    expect(spokane).toMatchObject({ region: 'WA_OTHER', inCoverage: false });
+    expect(line(priceRecommendation(rec(), spokane, {}), 'base'))
+      .toMatchObject({ low: 3500, high: 3500, reference: true });
+    expect(line(priceRecommendation(rec({ method: 'kit' }), spokane, {}), 'install'))
+      .toMatchObject({ low: 11000, high: 11000, reference: true });
   });
 
   it('gravel reference range for the Station is 6000 to 6900', () => {

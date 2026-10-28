@@ -1,5 +1,6 @@
 // ZIP / postal code -> shipping row, price region, install coverage, factory.
-// Tables are a first proposal from USPS ZIP3 assignments; Fred reviews them (spec 8.1).
+// Tables are a first proposal written from published ZIP data and checked against GeoNames;
+// Fred reviews them (spec 8.1).
 import type { Factory, Location, PriceRegion } from './types';
 import { SHIPPING } from './shipping';
 

@@ -35,22 +35,25 @@ function label<K extends string>(table: Record<K, string>, key: K, what: string)
   return value;
 }
 
+/** null clears a field on an update; on a create the field is left out instead. */
+export type FieldValue = string | number | boolean | null;
+
 export function buildFields(
   p: SubmissionPayload,
   isCreate: boolean,
-): Record<string, string | number | boolean> {
+): Record<string, FieldValue> {
   const model = MODELS[p.snapshot.model];
   if (!model) throw new Error(`Unknown pod model: ${String(p.snapshot.model)}`);
 
   const now = new Date().toISOString();
-  const fields: Record<string, string | number | boolean> = {
+  const fields: Record<string, FieldValue> = {
     'Email': p.contact.email,
     'First Name': p.contact.firstName ?? '',
     'Phone': p.contact.phone ?? '',
     'Last Updated': now,
     'Buttons Clicked': p.ctaHistory.join(', '),
 
-    'ZIP': p.answers.zip ?? p.location?.input ?? '',
+    'ZIP': p.answers.zip ?? '',
     'State': p.location?.shippingKey ?? '',
     'Price Region': p.location?.region ?? '',
     'In Coverage': p.location?.inCoverage ?? false,
@@ -74,14 +77,22 @@ export function buildFields(
 
   if (isCreate) fields['Submission Date'] = now;
 
+  // A field that no longer applies is cleared on an update, so an earlier save's figure doesn't
+  // linger in the record. A new record simply leaves it out.
+  const clear = (name: string): void => { if (!isCreate) fields[name] = null; };
+
   if (p.cost.mode === 'talk') {
     fields['Cost Notes'] = "Let's talk";
+    clear('Cost Low');
+    clear('Cost High');
+    clear('Shipping Estimate');
   } else {
     fields['Cost Low'] = p.cost.low;
     fields['Cost High'] = p.cost.high;
     fields['Cost Notes'] = p.readable.costNotes;
     const shipping = p.cost.lines.find(l => l.id === 'shipping');
     if (shipping) fields['Shipping Estimate'] = shipping.low;
+    else clear('Shipping Estimate');
   }
 
   return fields;

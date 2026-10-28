@@ -62,7 +62,9 @@ export function recommend(snapshot: PlannerSnapshot, answers: Answers, modelOver
   const { base, baseReason, code } = baseFor(answers);
 
   const bathroom = answers.bathroom === 'half' || answers.bathroom === 'shower' ? answers.bathroom : 'none';
-  const door = answers.door === 'flipped' ? 'flipped' : 'standard';
+  // The flipped door only exists on some models; anywhere else the pod comes with the standard door.
+  const flipAvailable = MODELS[model].flipAvailable;
+  const door = answers.door === 'flipped' && flipAvailable ? 'flipped' : 'standard';
 
   const toCheck: ToCheckCode[] = visible.filter((id) => answers[id] === 'unsure');
   if (code) toCheck.push(code);
@@ -71,7 +73,7 @@ export function recommend(snapshot: PlannerSnapshot, answers: Answers, modelOver
   if (visible.includes('pathGround') && answers.pathGround === 'soft') notes.push('softGround');
   notes.push('panelUpgrade');
   if (model === 'twelve' && bathroom === 'shower') notes.push('twelveHalfBathOnly');
-  if (door === 'flipped' && !MODELS[model].flipAvailable) notes.push('flipNotAvailable');
+  if (visible.includes('door') && answers.door === 'flipped' && !flipAvailable) notes.push('flipNotAvailable');
   if (method === 'kit') notes.push('kitUnloading');
   if (minClearance({ ...snapshot, model }) < 3) notes.push('clearance');
 

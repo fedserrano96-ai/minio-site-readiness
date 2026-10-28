@@ -33,7 +33,7 @@ describe('renderQuestion', () => {
   it('renders title, drawing, options and help collapsed', () => {
     const el = render();
     const labels = Array.from(el.querySelectorAll('button')).map((b) => b.textContent);
-    expect(labels).toContain('Wider than 10 ft');
+    expect(labels).toContain('10 ft or wider');
     expect(labels).toContain("I'm not sure");
     const details = el.querySelector('details');
     expect(details).not.toBeNull();
@@ -52,7 +52,7 @@ describe('renderQuestion', () => {
 
   it('marks the selected option', () => {
     const el = render({ value: 'wide' });
-    expect(button(el, 'Wider than 10 ft').getAttribute('aria-pressed')).toBe('true');
+    expect(button(el, '10 ft or wider').getAttribute('aria-pressed')).toBe('true');
     expect(button(el, 'Narrower than 10 ft').getAttribute('aria-pressed')).toBe('false');
   });
 
@@ -107,6 +107,12 @@ describe('renderQuestion', () => {
     button(el, 'Next').click();
     expect(el.querySelector('b')).toBeNull();
     expect(el.querySelector('.mo-q__error')!.textContent).toBe("We couldn't find that ZIP or postal code.");
+  });
+
+  it('path width labels cover exactly the minimum width', () => {
+    const labels = questionCopy('pathWidth', 'sixteen').options.map((o) => o.label);
+    expect(labels).toContain('12 ft or wider');
+    expect(labels).toContain('Narrower than 12 ft');
   });
 
   it('uses the model for model-dependent labels', () => {

@@ -148,6 +148,16 @@ describe('submit handler', () => {
     expect(res.statusCode).toBe(422);
     expect(JSON.parse(res.body).error).toContain('Unknown field name');
   });
+
+  it('returns a plain message when Airtable replies with something that is not JSON', async () => {
+    fetchMock.mockResolvedValue({
+      ok: false, status: 502,
+      json: async () => { throw new SyntaxError('Unexpected token < in JSON at position 0'); },
+    });
+    const res = await post(payload());
+    expect(res.statusCode).toBe(502);
+    expect(JSON.parse(res.body).error).toBe('Airtable returned an unexpected response (status 502)');
+  });
 });
 
 describe('buildFields', () => {
@@ -188,7 +198,31 @@ describe('buildFields', () => {
     const f = buildFields(payload({ cost: { mode: 'talk' } }), true);
     expect(f).not.toHaveProperty('Cost Low');
     expect(f).not.toHaveProperty('Cost High');
+    expect(f).not.toHaveProperty('Shipping Estimate');
     expect(f['Cost Notes']).toBe("Let's talk");
+  });
+
+  it('talk mode on update clears the old cost numbers', () => {
+    const f = buildFields(payload({ cost: { mode: 'talk' } }), false);
+    expect(f['Cost Low']).toBeNull();
+    expect(f['Cost High']).toBeNull();
+    expect(f['Shipping Estimate']).toBeNull();
+    expect(f['Cost Notes']).toBe("Let's talk");
+  });
+
+  it('no shipping line: omitted on create, cleared on update', () => {
+    const p = payload();
+    if (p.cost.mode !== 'range') throw new Error('test setup: expected a range');
+    const cost = { ...p.cost, lines: p.cost.lines.filter((l) => l.id !== 'shipping') };
+    expect(buildFields({ ...p, cost }, true)).not.toHaveProperty('Shipping Estimate');
+    const update = buildFields({ ...p, cost }, false);
+    expect(update['Shipping Estimate']).toBeNull();
+    expect(update['Cost Low']).toBe(cost.low);
+  });
+
+  it('takes the ZIP from the answers only', () => {
+    const f = buildFields(payload({ answers: {} }), true);
+    expect(f['ZIP']).toBe('');
   });
 
   it('handles a missing location', () => {
