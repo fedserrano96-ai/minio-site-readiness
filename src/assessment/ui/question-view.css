@@ -41,5 +41,7 @@
 .mo-q__help { margin-bottom: 16px; font-size: 15px; }
 .mo-q__help summary { cursor: pointer; color: var(--mo-red); text-decoration: underline; }
 .mo-q__help p { margin: 8px 0 0; }
+.mo-q__help a { color: var(--mo-red); }
+.mo-q__next { margin-bottom: 16px; }
 
 .mo-q__back { padding: 8px 0; border: 0; background: none; color: var(--mo-muted); font: inherit; text-decoration: underline; cursor: pointer; }

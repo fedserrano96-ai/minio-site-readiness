@@ -2,7 +2,7 @@
 // nothing the client types is ever parsed as HTML. The drawings are the one exception: they are
 // constant SVG strings from drawings.ts.
 import './question-view.css';
-import type { ModelId, QuestionId } from '../core/types';
+import type { ModelId, QuestionId, Recommendation } from '../core/types';
 import { lookupLocation } from '../core/location';
 import { drawing } from './drawings';
 import { questionCopy } from './questions-copy';
@@ -11,7 +11,8 @@ export interface QuestionView {
   id: QuestionId;
   index: number; // zero-based position among the visible questions
   total: number;
-  model: ModelId;
+  model: ModelId; // the effective model (after any "Switch to")
+  door: Recommendation['door']; // the door the pod will have, for the power spec link
   value: string | undefined;
   canGoBack: boolean;
 }
@@ -79,6 +80,18 @@ function zipControls(el: HTMLElement, q: QuestionView): HTMLElement {
   return wrap;
 }
 
+function specLink(kind: 'base' | 'power', q: QuestionView): HTMLElement {
+  const p = h('p', 'mo-q__speclink');
+  const a = h('a', undefined, `Get the ${kind} spec for your contractor`);
+  a.href = kind === 'base'
+    ? `contractor/base.html?model=${q.model}`
+    : `contractor/power.html?model=${q.model}&door=${q.door}`;
+  a.target = '_blank';
+  a.rel = 'noopener';
+  p.append(a);
+  return p;
+}
+
 export function renderQuestion(el: HTMLElement, q: QuestionView): void {
   const copy = questionCopy(q.id, q.model);
   el.className = 'mo-q';
@@ -93,6 +106,7 @@ export function renderQuestion(el: HTMLElement, q: QuestionView): void {
 
   const details = h('details', 'mo-q__help');
   details.append(h('summary', undefined, 'What does this mean, and how do I measure it?'), h('p', undefined, copy.help));
+  if (copy.specLink) details.append(specLink(copy.specLink, q));
 
   let controls: HTMLElement;
   if (q.id === 'zip') {
@@ -115,7 +129,15 @@ export function renderQuestion(el: HTMLElement, q: QuestionView): void {
     if (q.value === 'unsure') details.open = true;
   }
 
-  el.replaceChildren(progress, art, title, controls, details);
+  el.replaceChildren(progress, art, title, controls);
+  // Once a question has an answer (including "I'm not sure", which stays here with the help open),
+  // Next moves on. The ZIP question has its own Next.
+  if (q.id !== 'zip' && q.value !== undefined) {
+    const row = h('div', 'mo-q__row mo-q__next');
+    row.append(button('Next', 'mo-q__btn mo-q__btn--primary', () => emit(el, 'minio:next')));
+    el.append(row);
+  }
+  el.append(details);
 
   if (q.canGoBack) {
     el.append(button('Back', 'mo-q__back', () => emit(el, 'minio:back')));

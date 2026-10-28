@@ -379,6 +379,163 @@ describe('createApp', () => {
     expect(body(fetchFn).recommendation.model).toBe('sixteen');
   });
 
+  it('a CTA from the phone bar closes the open details sheet so the form is not hidden behind it', () => {
+    const { root, app } = setup();
+    app.start(snapshot);
+    const card = root.querySelector<HTMLElement>('.mo-card')!;
+    root.querySelector<HTMLButtonElement>('.mo-card__toggle')!.click();
+    expect(card.dataset.open).toBe('true');
+    button(root.querySelector<HTMLElement>('.mo-card__bar-actions')!, 'Design my pod').click();
+    expect(card.dataset.open).toBe('false');
+    expect(root.querySelector('.mo-card__toggle')!.getAttribute('aria-expanded')).toBe('false');
+    expect(root.querySelector('input[type="email"]')).not.toBeNull();
+  });
+
+  it('start() closes the open details sheet', () => {
+    const { root, app } = setup();
+    app.start(snapshot);
+    root.querySelector<HTMLButtonElement>('.mo-card__toggle')!.click();
+    app.start(snapshot);
+    expect(root.querySelector<HTMLElement>('.mo-card')!.dataset.open).toBe('false');
+  });
+
+  it('the details sheet stays open while answering', () => {
+    const { root, app } = setup();
+    app.start(snapshot);
+    root.querySelector<HTMLButtonElement>('.mo-card__toggle')!.click();
+    button(root, 'Skip for now').click();
+    choose(root, 'truckAccess', 'no');
+    expect(root.querySelector<HTMLElement>('.mo-card')!.dataset.open).toBe('true');
+  });
+
+  it("I'm not sure stays on the question with the help open and a Next button", () => {
+    const { root, app, storage } = setup();
+    app.start(snapshot);
+    button(root, 'Skip for now').click();
+    choose(root, 'truckAccess', 'unsure');
+    const q = root.querySelector('.mo-q')!;
+    expect(text(q)).toContain('Can a truck drive right up to the spot?');
+    expect(q.querySelector('details')!.open).toBe(true);
+    expect(JSON.parse(storage.getItem(STORAGE_KEY)!).answers.truckAccess).toBe('unsure');
+    expect(text(root.querySelector('.mo-card')!)).toContain('Check whether a truck can drive right up to the spot');
+    button(root, 'Next').click();
+    expect(text(root.querySelector('.mo-q')!)).toContain('How wide is the narrowest point');
+  });
+
+  it('an answered question shows Next, which moves on without changing the answer', () => {
+    const { root, app, storage } = setup();
+    app.start(snapshot);
+    button(root, 'Skip for now').click();
+    choose(root, 'truckAccess', 'no');
+    button(root, 'Back').click();
+    button(root, 'Next').click();
+    expect(text(root.querySelector('.mo-q')!)).toContain('How wide is the narrowest point');
+    expect(JSON.parse(storage.getItem(STORAGE_KEY)!).answers.truckAccess).toBe('no');
+  });
+
+  it('the panel question links the power spec with the door the pod will really have', () => {
+    const stored = (model: PlannerSnapshot['model']) => JSON.stringify({
+      snapshot: { ...snapshot, model },
+      answers: { truckAccess: 'yes', existingBase: 'slab', bathroom: 'none', door: 'flipped' },
+      currentId: 'panelDistance', contact: { email: '', firstName: '', phone: '' }, recordId: null, ctaHistory: [],
+    });
+    const station = fakeStorage();
+    station.setItem(STORAGE_KEY, stored('station'));
+    const a = setup({ storage: station });
+    a.app.restore();
+    expect(a.root.querySelector('.mo-q details a')!.getAttribute('href'))
+      .toBe('contractor/power.html?model=station&door=standard');
+
+    const sixteen = fakeStorage();
+    sixteen.setItem(STORAGE_KEY, stored('sixteen'));
+    const b = setup({ storage: sixteen });
+    b.app.restore();
+    expect(b.root.querySelector('.mo-q details a')!.getAttribute('href'))
+      .toBe('contractor/power.html?model=sixteen&door=flipped');
+  });
+
+  it('switching to a model with different clearances clears the path width and overhead answers', () => {
+    const { root, app, storage } = setup();
+    app.start(snapshot);
+    button(root, 'Skip for now').click();
+    choose(root, 'truckAccess', 'no');
+    choose(root, 'pathWidth', 'wide');
+    choose(root, 'overhead', 'clear');
+    root.dispatchEvent(new CustomEvent('minio:switch-model', { detail: 'station', bubbles: true }));
+    const answers = JSON.parse(storage.getItem(STORAGE_KEY)!).answers;
+    expect(answers.pathWidth).toBeUndefined();
+    expect(answers.overhead).toBeUndefined();
+    expect(answers.truckAccess).toBe('no');
+    expect(text(root.querySelector('.mo-q')!)).toContain('Is the way to the spot solid');
+  });
+
+  it('switching model while on a question the cleared answers hid goes back to the path width question', () => {
+    const { root, app } = setup();
+    app.start(snapshot);
+    button(root, 'Skip for now').click();
+    choose(root, 'truckAccess', 'no');
+    choose(root, 'pathWidth', 'narrow');
+    choose(root, 'overhead', 'clear');
+    choose(root, 'pathGround', 'solid');
+    expect(text(root.querySelector('.mo-q')!)).toContain('power lines');
+    root.dispatchEvent(new CustomEvent('minio:switch-model', { detail: 'station', bubbles: true }));
+    expect(text(root.querySelector('.mo-q')!)).toContain('How wide is the narrowest point');
+  });
+
+  it('start() with a model of different clearances clears path width and overhead; the same model keeps them', () => {
+    const first = setup();
+    first.app.start(snapshot);
+    button(first.root, 'Skip for now').click();
+    choose(first.root, 'truckAccess', 'no');
+    choose(first.root, 'pathWidth', 'wide');
+    choose(first.root, 'overhead', 'clear');
+
+    const same = setup({ storage: first.storage });
+    same.app.start(snapshot);
+    let answers = JSON.parse(same.storage.getItem(STORAGE_KEY)!).answers;
+    expect(answers.pathWidth).toBe('wide');
+    expect(answers.overhead).toBe('clear');
+
+    const other = setup({ storage: first.storage });
+    other.app.start({ ...snapshot, model: 'twelve' });
+    answers = JSON.parse(other.storage.getItem(STORAGE_KEY)!).answers;
+    expect(answers.pathWidth).toBeUndefined();
+    expect(answers.overhead).toBeUndefined();
+    expect(answers.truckAccess).toBe('no');
+  });
+
+  it('after a failed save, Continue without saving still offers Print / save as PDF', async () => {
+    const fetchFn = vi.fn(async () => reply(500, { error: 'Nope' })) as unknown as typeof fetch;
+    const { root, app, print, navigate } = setup({ fetchFn });
+    app.start(snapshot);
+    button(root, 'Skip for now').click();
+    choose(root, 'truckAccess', 'yes');
+    choose(root, 'existingBase', 'slab');
+    choose(root, 'bathroom', 'none');
+    choose(root, 'panelDistance', 'lt25');
+    choose(root, 'door', 'standard');
+    button(root, 'Save my plan').click();
+    fillLeadForm(root, 'sam@example.com');
+    await flush();
+    button(root, 'Continue without saving').click();
+    expect(text(root)).toContain("That's everything.");
+    button(root, 'Print / save as PDF').click();
+    expect(print).toHaveBeenCalledTimes(1);
+    expect(navigate).not.toHaveBeenCalled();
+  });
+
+  it('the end panel offers no print before any save attempt', () => {
+    const { root, app } = setup();
+    app.start(snapshot);
+    button(root, 'Skip for now').click();
+    choose(root, 'truckAccess', 'yes');
+    choose(root, 'existingBase', 'slab');
+    choose(root, 'bathroom', 'none');
+    choose(root, 'panelDistance', 'lt25');
+    choose(root, 'door', 'standard');
+    expect(Array.from(root.querySelectorAll('button')).some((b) => b.textContent === 'Print / save as PDF')).toBe(false);
+  });
+
   it('keeps a print summary for the browser to print', () => {
     const { root, app } = setup();
     app.start(snapshot);

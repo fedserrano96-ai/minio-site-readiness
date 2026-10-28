@@ -8,6 +8,8 @@ export interface QuestionCopy {
   title: string;
   options: { value: string; label: string }[];
   help: string;
+  /** A contractor spec sheet linked from the how-to-measure section (spec 9). */
+  specLink?: 'base' | 'power';
 }
 
 const NOT_SURE = { value: 'unsure', label: "I'm not sure" } as const;
@@ -123,6 +125,7 @@ export function questionCopy(id: QuestionId, model: ModelId): QuestionCopy {
           NOT_SURE,
         ],
         help: `The pod sits on a base. If you already have a slab, patio, gravel pad or deck where it's going, tell us which. Measure it with a tape: it needs to be at least as big as the pod, and the ${m.name} is ${m.w} ft by ${m.d} ft.`,
+        specLink: 'base',
       };
 
     case 'groundFlat':
@@ -134,6 +137,7 @@ export function questionCopy(id: QuestionId, model: ModelId): QuestionCopy {
           NOT_SURE,
         ],
         help: `Open a level app on your phone and lay the phone flat on the ground where the pod goes. A gentle slope is fine, up to ${LEVEL_CUTOFF_TEXT}. If it's steeper than that, the pod needs a raised base, which is priced in person.`,
+        specLink: 'base',
       };
 
     case 'bathroom':
@@ -160,6 +164,7 @@ export function questionCopy(id: QuestionId, model: ModelId): QuestionCopy {
         title: "How far is the house's electrical panel from the spot?",
         options: BAND_OPTIONS,
         help: "The electrical panel is the metal box with rows of switches. It's usually in the garage, the basement, or outside near the meter. Measure in a straight line from the panel to where the pod goes. A rough guess is fine.",
+        specLink: 'power',
       };
 
     case 'door':

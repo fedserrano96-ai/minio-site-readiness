@@ -21,9 +21,9 @@ function loc(zip: string): Location {
 }
 
 function view(answers: Answers = {}, location: Location | null = null, model?: ModelId,
-  change: CardView['change'] = null, snap: PlannerSnapshot = snapshot): CardView {
+  change: CardView['change'] = null, snap: PlannerSnapshot = snapshot, open = false): CardView {
   const rec = recommend(snap, answers, model);
-  return { rec, cost: priceRecommendation(rec, location, answers), lead: leadTime(rec, location), location, change };
+  return { rec, cost: priceRecommendation(rec, location, answers), lead: leadTime(rec, location), location, change, open };
 }
 
 function render(v: CardView): HTMLElement {
@@ -64,6 +64,13 @@ describe('renderCard', () => {
 
   it('shows no change line when there is no change', () => {
     expect(text(render(view()))).not.toContain('Changed:');
+  });
+
+  it('shows the change line in the phone bar too', () => {
+    const v = view({ truckAccess: 'no' }, null, undefined, { what: 'truck + shed mule delivery', why: 'a truck cannot reach' });
+    const bar = render(v).querySelector('.mo-card__bar')!;
+    expect(text(bar)).toContain('Changed: truck + shed mule delivery. Why: a truck cannot reach');
+    expect(render(view()).querySelector('.mo-card__bar .mo-card__bar-change')).toBeNull();
   });
 
   it('talk mode hides the range', () => {
@@ -181,14 +188,25 @@ describe('renderCard', () => {
 
   it('collapses on small screens with an aria-expanded toggle', () => {
     const el = render(view());
+    const toggles: unknown[] = [];
+    el.addEventListener('minio:card-toggle', (e) => toggles.push((e as CustomEvent).detail));
     const toggle = el.querySelector('button[aria-expanded]') as HTMLButtonElement;
     expect(toggle.getAttribute('aria-expanded')).toBe('false');
     toggle.click();
     expect(toggle.getAttribute('aria-expanded')).toBe('true');
     expect(el.dataset.open).toBe('true');
-    // The open state survives a re-render.
-    renderCard(el, view({ truckAccess: 'no' }));
-    expect((el.querySelector('button[aria-expanded]') as HTMLButtonElement).getAttribute('aria-expanded')).toBe('true');
+    expect(toggles).toEqual([true]);
+    toggle.click();
+    expect(toggles).toEqual([true, false]);
+  });
+
+  it('takes the open state from the view, not from the last render', () => {
+    const el = render(view(undefined, null, undefined, null, snapshot, true));
+    expect(el.dataset.open).toBe('true');
+    expect(text(el.querySelector('.mo-card__toggle')!)).toContain('Hide details');
+    renderCard(el, view());
+    expect(el.dataset.open).toBe('false');
+    expect((el.querySelector('button[aria-expanded]') as HTMLButtonElement).getAttribute('aria-expanded')).toBe('false');
   });
 
   it('escapes text instead of injecting markup', () => {

@@ -2,11 +2,12 @@
 // 5.2, 5.3, 7). Owns the state, keeps it in sessionStorage, and re-renders the pieces.
 // Storage errors are not caught: if sessionStorage fails the client should see it fail.
 import type { Cta, SubmissionPayload } from '../../server/airtable-fields';
+import { MODELS } from '../core/data';
 import { lookupLocation } from '../core/location';
 import { leadTime, priceRecommendation } from '../core/pricing';
 import { QUESTION_ORDER, visibleQuestions } from '../core/questions';
 import { recommend } from '../core/rules';
-import type { Answers, ModelId, PlannerSnapshot, QuestionId } from '../core/types';
+import type { Answers, ModelId, PlannerSnapshot, QuestionId, Recommendation } from '../core/types';
 import { renderCard } from './card';
 import { describeChange } from './copy';
 import { renderFailure, renderLeadForm, renderSaved, renderSaving, type Contact } from './lead-form';
@@ -48,6 +49,19 @@ function div(className: string): HTMLDivElement {
   return el;
 }
 
+/**
+ * The path width and overhead answers are relative to the model ("12 ft or wider", "nothing lower
+ * than 13 ft"). When the model changes to one with other clearances, those answers no longer mean
+ * what the client picked, so they are cleared and asked again.
+ */
+function clearModelRelativeAnswers(answers: Answers, from: ModelId, to: ModelId): void {
+  const a = MODELS[from];
+  const b = MODELS[to];
+  if (a.minPathWidth === b.minPathWidth && a.minOverhead === b.minOverhead) return;
+  delete answers.pathWidth;
+  delete answers.overhead;
+}
+
 function messageOf(body: unknown): string | null {
   const error = (body as { error?: unknown } | null)?.error;
   return typeof error === 'string' && error !== '' ? error : null;
@@ -64,6 +78,10 @@ export function createApp(root: HTMLElement, deps: AppDeps) {
   let flow: Flow | null = null;
   let change: ReturnType<typeof describeChange> = null;
   let inFlight = false;
+  // Phone details sheet. Closed on every CTA and on start(), so nothing opens behind it.
+  let cardOpen = false;
+  // The client chose "Continue without saving" after a failed save: the end panel offers printing.
+  let offerPrint = false;
 
   const current = (): State => {
     if (!state) throw new Error('The assessment has not been started');
@@ -104,10 +122,19 @@ export function createApp(root: HTMLElement, deps: AppDeps) {
     title.textContent = "That's everything.";
     const line = document.createElement('p');
     line.textContent = 'Save your plan and a Mini·O advisor can pick up where you left off.';
-    el.replaceChildren(title, line, saveBtn, back);
+    el.replaceChildren(title, line, saveBtn);
+    if (offerPrint) {
+      const printBtn = document.createElement('button');
+      printBtn.type = 'button';
+      printBtn.className = 'mo-lead__btn';
+      printBtn.textContent = 'Print / save as PDF';
+      printBtn.addEventListener('click', () => el.dispatchEvent(new CustomEvent('minio:print', { bubbles: true })));
+      el.append(printBtn);
+    }
+    el.append(back);
   }
 
-  function renderPanel(s: State): void {
+  function renderPanel(s: State, rec: Recommendation): void {
     const slot = div('');
     panelHost.replaceChildren(slot);
     if (flow?.kind === 'form') renderLeadForm(slot, s.contact);
@@ -120,7 +147,7 @@ export function createApp(root: HTMLElement, deps: AppDeps) {
       const index = visible.indexOf(s.currentId);
       if (index < 0) throw new Error(`Question "${s.currentId}" is not visible for these answers`);
       renderQuestion(slot, {
-        id: s.currentId, index, total: visible.length, model: s.modelOverride ?? s.snapshot.model,
+        id: s.currentId, index, total: visible.length, model: rec.model, door: rec.door,
         value: s.answers[s.currentId], canGoBack: true,
       });
     }
@@ -130,9 +157,9 @@ export function createApp(root: HTMLElement, deps: AppDeps) {
   function render(focus: boolean): void {
     const s = current();
     const view = compute(s);
-    renderCard(cardHost, { ...view, change });
+    renderCard(cardHost, { ...view, change, open: cardOpen });
     renderPrintSummary(printHost, { ...view, answers: s.answers });
-    renderPanel(s);
+    renderPanel(s, view.rec);
     if (focus) {
       const heading = panelHost.querySelector<HTMLElement>('h2');
       if (heading) { heading.tabIndex = -1; heading.focus(); }
@@ -154,7 +181,8 @@ export function createApp(root: HTMLElement, deps: AppDeps) {
     const before = compute(s).rec;
     (s.answers as Record<string, string>)[id] = value;
     change = describeChange(before, compute(s).rec);
-    goTo(nextAfter(id));
+    // "I'm not sure" stays on the question with the how-to-measure help open; Next moves on.
+    goTo(value === 'unsure' ? id : nextAfter(id));
   }
 
   function onBack(): void {
@@ -222,6 +250,7 @@ export function createApp(root: HTMLElement, deps: AppDeps) {
 
   function onCta(cta: Cta): void {
     if (inFlight) return;
+    cardOpen = false;
     if (current().contact.email === '') {
       flow = { kind: 'form', cta };
       render(true);
@@ -237,7 +266,18 @@ export function createApp(root: HTMLElement, deps: AppDeps) {
   on<void>('minio:next', () => { const id = current().currentId; if (id !== 'end') goTo(nextAfter(id)); });
   on<void>('minio:back', onBack);
   on<Cta>('minio:cta', onCta);
-  on<ModelId>('minio:switch-model', (model) => { current().modelOverride = model; change = null; save(); render(false); });
+  on<ModelId>('minio:switch-model', (model) => {
+    const s = current();
+    clearModelRelativeAnswers(s.answers, s.modelOverride ?? s.snapshot.model, model);
+    s.modelOverride = model;
+    // Clearing pathWidth can hide the question the client is on (it may have ruled out the mule).
+    // Then pathWidth itself is visible again, since that only happens when the truck can't reach.
+    if (s.currentId !== 'end' && !visibleQuestions(s.answers).includes(s.currentId)) s.currentId = 'pathWidth';
+    change = null;
+    save();
+    render(false);
+  });
+  on<boolean>('minio:card-toggle', (open) => { cardOpen = open; });
   on<Contact>('minio:lead-submit', (contact) => {
     const f = flow;
     if (f?.kind !== 'form') return;
@@ -250,7 +290,7 @@ export function createApp(root: HTMLElement, deps: AppDeps) {
   on<void>('minio:continue', () => {
     const f = flow;
     if (f?.kind !== 'failed') return;
-    if (f.cta === 'save') { flow = null; render(true); } else finish(f.cta);
+    if (f.cta === 'save') { flow = null; offerPrint = true; render(true); } else finish(f.cta);
   });
   on<void>('minio:print', () => deps.print());
   on<void>('minio:dismiss', () => { flow = null; render(true); });
@@ -259,9 +299,11 @@ export function createApp(root: HTMLElement, deps: AppDeps) {
     /** Called when the client leaves the yard planner. Keeps the answers, takes the new snapshot. */
     start(snapshot: PlannerSnapshot): void {
       const stored = load();
+      const answers = stored?.answers ?? {};
+      if (stored) clearModelRelativeAnswers(answers, stored.modelOverride ?? stored.snapshot.model, snapshot.model);
       state = {
         snapshot,
-        answers: stored?.answers ?? {},
+        answers,
         currentId: 'zip',
         contact: stored?.contact ?? { email: '', firstName: '', phone: '' },
         recordId: stored?.recordId ?? null,
@@ -269,6 +311,8 @@ export function createApp(root: HTMLElement, deps: AppDeps) {
       };
       flow = null;
       change = null;
+      cardOpen = false;
+      offerPrint = false;
       state.currentId = visibleQuestions(state.answers)[0]!;
       save();
       render(true);

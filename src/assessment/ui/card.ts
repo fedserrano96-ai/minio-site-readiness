@@ -14,6 +14,8 @@ export interface CardView {
   lead: LeadTime;
   location: Location | null;
   change: { what: string; why: string } | null;
+  /** Phone only: whether the details sheet is open. The app owns this; the toggle reports changes. */
+  open: boolean;
 }
 
 const BODY_ID = 'mo-card-body';
@@ -100,8 +102,7 @@ function contractorLinks(rec: Recommendation, location: Location | null): HTMLEl
 }
 
 export function renderCard(el: HTMLElement, view: CardView): void {
-  const { rec, cost, lead, location, change } = view;
-  const open = el.dataset.open === 'true';
+  const { rec, cost, lead, location, change, open } = view;
   el.className = 'mo-card';
   el.dataset.open = open ? 'true' : 'false';
 
@@ -117,7 +118,8 @@ export function renderCard(el: HTMLElement, view: CardView): void {
   img.alt = modelName(rec.model);
   body.append(img);
 
-  if (change) body.append(h('p', 'mo-card__change', `Changed: ${change.what}. Why: ${change.why}`));
+  const changeText = change ? `Changed: ${change.what}. Why: ${change.why}` : null;
+  if (changeText) body.append(h('p', 'mo-card__change', changeText));
 
   body.append(h('h2', 'mo-card__title', methodTitle(rec.model, rec.method)));
 
@@ -176,7 +178,9 @@ export function renderCard(el: HTMLElement, view: CardView): void {
     toggle.setAttribute('aria-expanded', String(next));
     const more = toggle.querySelector('.mo-card__bar-more');
     if (more) more.textContent = next ? 'Hide details' : 'Show details';
+    emit(el, 'minio:card-toggle', next);
   });
+  if (changeText) bar.append(h('p', 'mo-card__bar-change', changeText));
   bar.append(toggle, actions(el, 'mo-card__bar-actions'));
 
   el.replaceChildren(body, bar);

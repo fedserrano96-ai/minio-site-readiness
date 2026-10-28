@@ -12,7 +12,7 @@ function render(over: Partial<View> = {}): HTMLElement {
   const el = document.createElement('div');
   document.body.append(el);
   renderQuestion(el, {
-    id: 'pathWidth', index: 0, total: 5, model: 'twelve', value: undefined, canGoBack: false, ...over,
+    id: 'pathWidth', index: 0, total: 5, model: 'twelve', door: 'standard', value: undefined, canGoBack: false, ...over,
   });
   return el;
 }
@@ -115,6 +115,45 @@ describe('renderQuestion', () => {
     expect(labels).toContain('Narrower than 12 ft');
   });
 
+  it('shows Next once the question has an answer, and Next dispatches minio:next', () => {
+    expect(Array.from(render().querySelectorAll('button')).some((b) => b.textContent === 'Next')).toBe(false);
+    const el = render({ value: 'unsure' });
+    const next = listen(el, 'minio:next');
+    const answers = listen(el, 'minio:answer');
+    button(el, 'Next').click();
+    expect(next).toHaveLength(1);
+    expect(answers).toEqual([]);
+    expect(el.querySelector('details')!.open).toBe(true);
+    expect(button(render({ value: 'wide' }), 'Next')).toBeTruthy();
+  });
+
+  it('links the base spec from the base questions, for the model shown', () => {
+    for (const id of ['existingBase', 'groundFlat'] as const) {
+      const el = render({ id, model: 'sixteen' });
+      const links = el.querySelectorAll('details a');
+      expect(links, id).toHaveLength(1);
+      const a = links[0] as HTMLAnchorElement;
+      expect(a.getAttribute('href'), id).toBe('contractor/base.html?model=sixteen');
+      expect(a.target).toBe('_blank');
+      expect(a.rel).toContain('noopener');
+      expect(a.textContent).toBe('Get the base spec for your contractor');
+    }
+  });
+
+  it('links the power spec from the panel question, with the door', () => {
+    const el = render({ id: 'panelDistance', model: 'twelve', door: 'flipped' });
+    const a = el.querySelector('details a') as HTMLAnchorElement;
+    expect(a.getAttribute('href')).toBe('contractor/power.html?model=twelve&door=flipped');
+    expect(a.target).toBe('_blank');
+    expect(a.textContent).toBe('Get the power spec for your contractor');
+  });
+
+  it('has no spec link on the other questions', () => {
+    for (const id of QUESTION_ORDER.filter((q) => !['existingBase', 'groundFlat', 'panelDistance'].includes(q))) {
+      expect(render({ id }).querySelector('details a'), id).toBeNull();
+    }
+  });
+
   it('uses the model for model-dependent labels', () => {
     const el = render({ id: 'overhead', model: 'station' });
     expect(button(el, 'Nothing lower than 13 ft')).toBeTruthy();
@@ -141,6 +180,13 @@ describe('copy and drawings', () => {
       expect(svg, id).toContain('role="img"');
       expect(svg, id).toContain('aria-label=');
     }
+  });
+
+  it('only the base and panel questions carry a spec link', () => {
+    expect(questionCopy('existingBase', 'twelve').specLink).toBe('base');
+    expect(questionCopy('groundFlat', 'twelve').specLink).toBe('base');
+    expect(questionCopy('panelDistance', 'twelve').specLink).toBe('power');
+    expect(questionCopy('waterDistance', 'twelve').specLink).toBeUndefined();
   });
 
   it('uses the model name and the shared constants in copy', () => {

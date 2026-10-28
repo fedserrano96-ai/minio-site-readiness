@@ -85,5 +85,9 @@
   .mo-card__bar-model { font-weight: 600; }
   .mo-card__bar-more { grid-row: 1; grid-column: 2; color: var(--mo-muted); font-size: 14px; }
   .mo-card__bar-cost { grid-column: 1 / -1; font-size: 14px; }
+  .mo-card__bar-change {
+    margin: 0 0 8px; padding: 6px 8px; font-size: 13px; line-height: 1.35;
+    background: #fff4f5; border-left: 3px solid var(--mo-red); border-radius: 4px;
+  }
   .mo-card__bar .mo-btn { padding: 10px 12px; }
 }
