@@ -132,6 +132,34 @@ describe('createApp', () => {
     expect(JSON.parse(storage.getItem(STORAGE_KEY)!).recordId).toBe(REC_ID);
   });
 
+  it('keeps the record id when start() runs while a submit is in flight', async () => {
+    let resolve!: (r: Response) => void;
+    const pending = new Promise<Response>((r) => { resolve = r; });
+    const fetchFn = vi.fn()
+      .mockImplementationOnce(() => pending)
+      .mockImplementationOnce(async () => reply(200, { id: REC_ID })) as unknown as typeof fetch;
+    const { root, app, fetchFn: spy } = setup({ fetchFn });
+    app.start(snapshot);
+    cardButton(root, 'Design my pod').click();
+    fillLeadForm(root, 'sam@example.com');
+    app.start({ ...snapshot, model: 'twelve' }); // client went to the planner and back
+    resolve(reply(200, { id: REC_ID }));
+    await flush();
+    cardButton(root, "Let's talk").click();
+    await flush();
+    expect(spy).toHaveBeenCalledTimes(2);
+    expect(body(spy, 1).recordId).toBe(REC_ID);
+    expect(body(spy, 1).ctaHistory).toEqual(['design', 'talk']);
+  });
+
+  it('lead form title does not promise an email', () => {
+    const { root, app } = setup();
+    app.start(snapshot);
+    cardButton(root, 'Design my pod').click();
+    expect(text(root)).not.toContain('send your plan');
+    expect(text(root.querySelector('.mo-lead__title')!)).toBe('Save your plan');
+  });
+
   it('rejects an invalid email without sending anything', async () => {
     const { root, app, fetchFn } = setup();
     app.start(snapshot);

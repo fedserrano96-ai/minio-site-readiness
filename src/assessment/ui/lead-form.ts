@@ -89,7 +89,7 @@ export function renderLeadForm(el: HTMLElement, contact: Contact): void {
   form.append(
     field('Email', false, email), error, field('First name', true, firstName), field('Phone', true, phone), row,
   );
-  el.replaceChildren(h('h2', 'mo-lead__title', 'Where should we send your plan?'), h('p', 'mo-lead__line', LEAD_LINE), form);
+  el.replaceChildren(h('h2', 'mo-lead__title', 'Save your plan'), h('p', 'mo-lead__line', LEAD_LINE), form);
 }
 
 export function renderSaving(el: HTMLElement): void {

@@ -212,8 +212,10 @@ export function createApp(root: HTMLElement, deps: AppDeps) {
       return;
     }
     inFlight = false;
-    s.recordId = id;
-    s.ctaHistory = ctaHistory;
+    // start() may have replaced the state while the request was out; record the id on the live one.
+    const live = current();
+    live.recordId = id;
+    live.ctaHistory = [...live.ctaHistory, cta];
     save();
     finish(cta);
   }
