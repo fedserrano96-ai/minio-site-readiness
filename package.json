@@ -11,6 +11,7 @@
     "build": "npm run check && esbuild src/assessment/main.ts src/specs/main.ts --bundle --format=iife --target=es2019 --outbase=src --outdir=build --minify --loader:.svg=text"
   },
   "devDependencies": {
+    "@types/node": "^18.19.130",
     "esbuild": "^0.24.2",
     "jsdom": "^25.0.1",
     "typescript": "^5.9.3",
