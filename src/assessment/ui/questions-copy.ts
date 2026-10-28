@@ -2,7 +2,7 @@
 // construction knowledge. Help text uses only facts Ops has confirmed. Fred reviews every string.
 import { FLIP_DOOR, KIT_ACCESS_FT, LEVEL_CUTOFF_TEXT, MODELS } from '../core/data';
 import type { ModelId, QuestionId } from '../core/types';
-import { modelName } from './copy';
+
 
 export interface QuestionCopy {
   title: string;
@@ -122,7 +122,7 @@ export function questionCopy(id: QuestionId, model: ModelId): QuestionCopy {
           { value: 'none', label: "No, it's grass or dirt" },
           NOT_SURE,
         ],
-        help: `The pod sits on a base. If you already have a slab, patio, gravel pad or deck where it's going, tell us which. Measure it with a tape: it needs to be at least as big as the pod, and ${modelName(model)} is ${m.w} ft by ${m.d} ft.`,
+        help: `The pod sits on a base. If you already have a slab, patio, gravel pad or deck where it's going, tell us which. Measure it with a tape: it needs to be at least as big as the pod, and the ${m.name} is ${m.w} ft by ${m.d} ft.`,
       };
 
     case 'groundFlat':
