@@ -38,7 +38,7 @@ export function questionCopy(id: QuestionId, model: ModelId): QuestionCopy {
           { value: 'no', label: 'No' },
           NOT_SURE,
         ],
-        help: 'Your pod usually arrives on a tilt trailer. The truck backs up to the spot and slides the pod off. So we need to know if a truck can get right to where the pod goes, like up a driveway or across an open front yard. If you\'re not sure, we\'ll keep this on your list to check.',
+        help: 'Your pod usually arrives on a tilt trailer. The truck backs up to the spot and slides the pod off. So we need to know if a truck can get right to where the pod goes, like up a driveway or across an open front yard. If you pick "I\'m not sure", it goes on the "To check" list on your plan.',
       };
 
     case 'pathWidth': {
@@ -133,7 +133,7 @@ export function questionCopy(id: QuestionId, model: ModelId): QuestionCopy {
           { value: 'steep', label: 'Steeper than that' },
           NOT_SURE,
         ],
-        help: `Open a level app on your phone and lay the phone flat on the ground where the pod goes. A gentle slope is fine, up to ${LEVEL_CUTOFF_TEXT}. If it's steeper than that, we'll need to look at it in person.`,
+        help: `Open a level app on your phone and lay the phone flat on the ground where the pod goes. A gentle slope is fine, up to ${LEVEL_CUTOFF_TEXT}. If it's steeper than that, the pod needs a raised base, which is priced in person.`,
       };
 
     case 'bathroom':

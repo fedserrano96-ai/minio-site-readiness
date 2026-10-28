@@ -98,11 +98,15 @@ describe('renderQuestion', () => {
     expect(answers).toEqual([]);
   });
 
-  it('shows the typed ZIP as text, never as markup', () => {
-    const el = render({ id: 'zip' });
-    el.querySelector('input')!.value = '<img src=x>';
+  it('treats a saved or typed ZIP as text, never as markup', () => {
+    const el = render({ id: 'zip', value: '<b>x</b>' });
+    const input = el.querySelector('input')!;
+    expect(input.value).toBe('<b>x</b>');
+    expect(el.querySelector('b')).toBeNull();
+    input.value = '<b>y</b>';
     button(el, 'Next').click();
-    expect(el.querySelector('img')).toBeNull();
+    expect(el.querySelector('b')).toBeNull();
+    expect(el.querySelector('.mo-q__error')!.textContent).toBe("We couldn't find that ZIP or postal code.");
   });
 
   it('uses the model for model-dependent labels', () => {
