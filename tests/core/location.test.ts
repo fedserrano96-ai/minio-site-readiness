@@ -98,6 +98,15 @@ describe('lookupLocation', () => {
     expect(lookupLocation('B3H 1A1')).toMatchObject({ country: 'CA', shippingKey: 'OTHER', factory: null });
   });
 
+  it('pins known assigned and unassigned ZIP3s', () => {
+    expect(lookupLocation('20301')?.shippingKey).toBe('DC');
+    expect(lookupLocation('45999')?.shippingKey).toBe('Ohio');
+    expect(lookupLocation('87654')?.shippingKey).toBe('New Mexico');
+    expect(lookupLocation('05501')?.shippingKey).toBe('Massachusetts');
+    expect(lookupLocation('56901')?.shippingKey).toBe('DC');
+    for (const zip of ['21301', '26901', '98701']) expect(lookupLocation(zip), zip).toBeNull();
+  });
+
   it('rejects junk', () => {
     for (const junk of ['', '1234', 'ABCDE', '00000', '123456', '98101-12']) {
       expect(lookupLocation(junk), junk).toBeNull();
