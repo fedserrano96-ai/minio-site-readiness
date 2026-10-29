@@ -1,0 +1,47 @@
+/* One-question view (spec 6.1). Page layout is styled separately. */
+.mo-q {
+  --mo-red: #ED3648;
+  --mo-ink: #1f2328;
+  --mo-muted: #5b636b;
+  --mo-line: #e3e5e8;
+  box-sizing: border-box;
+  color: var(--mo-ink);
+  font: 16px/1.45 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+}
+.mo-q *, .mo-q *::before, .mo-q *::after { box-sizing: inherit; }
+
+.mo-q__progress { margin: 0 0 12px; color: var(--mo-muted); font-size: 14px; }
+.mo-q__art { margin: 0 0 12px; padding: 8px; border: 1px solid var(--mo-line); border-radius: 12px; background: #f7f8f9; }
+.mo-q__art svg { display: block; width: 100%; height: auto; max-height: 200px; }
+.mo-q__title { margin: 0 0 16px; font-size: 22px; line-height: 1.25; }
+
+.mo-q__options { display: flex; flex-direction: column; gap: 8px; margin-bottom: 16px; }
+.mo-q__option, .mo-q__btn {
+  min-height: 48px; padding: 10px 16px;
+  border: 2px solid var(--mo-line); border-radius: 10px; background: #fff;
+  color: var(--mo-ink); font: inherit; text-align: left; cursor: pointer;
+}
+.mo-q__option:hover, .mo-q__btn:hover { border-color: var(--mo-red); }
+.mo-q__option[aria-pressed="true"] { border-color: var(--mo-red); background: #fff4f5; font-weight: 600; }
+.mo-q__btn { text-align: center; }
+.mo-q__btn--primary { border-color: var(--mo-red); background: var(--mo-red); color: #fff; font-weight: 600; }
+.mo-q__option:focus-visible, .mo-q__btn:focus-visible, .mo-q__back:focus-visible, .mo-q__input:focus-visible,
+.mo-q__help summary:focus-visible { outline: 3px solid var(--mo-ink); outline-offset: 2px; }
+
+.mo-q__zip { margin-bottom: 16px; }
+.mo-q__input {
+  display: block; width: 100%; max-width: 280px; min-height: 48px; margin-bottom: 8px; padding: 10px 12px;
+  border: 2px solid var(--mo-line); border-radius: 10px; font: inherit;
+}
+.mo-q__input[aria-invalid="true"] { border-color: var(--mo-red); }
+.mo-q__error { margin: 0 0 8px; color: #b3202f; font-size: 14px; }
+.mo-q__error:empty { display: none; }
+.mo-q__row { display: flex; flex-wrap: wrap; gap: 8px; }
+
+.mo-q__help { margin-bottom: 16px; font-size: 15px; }
+.mo-q__help summary { cursor: pointer; color: var(--mo-red); text-decoration: underline; }
+.mo-q__help p { margin: 8px 0 0; }
+.mo-q__help a { color: var(--mo-red); }
+.mo-q__next { margin-bottom: 16px; }
+
+.mo-q__back { padding: 8px 0; border: 0; background: none; color: var(--mo-muted); font: inherit; text-decoration: underline; cursor: pointer; }

@@ -1,0 +1,78 @@
+/* Screen 2 page layout, the lead form and end panel, and the print rules (spec 5.2, 7).
+   The card and the question view style themselves (card.css, question-view.css). */
+.mo-app {
+  --mo-red: var(--red, #ED3648);
+  --mo-ink: var(--dark-blue, #1f2328);
+  --mo-muted: #5b636b;
+  --mo-line: #e3e5e8;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  width: 100%;
+  max-width: 640px;
+  margin: 0 auto;
+  font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  color: var(--mo-ink);
+}
+.mo-app *, .mo-app *::before, .mo-app *::after { box-sizing: inherit; }
+.mo-app .mo-card, .mo-app .mo-q { font-family: inherit; }
+
+.mo-app__panel { padding: 0 16px; }
+
+/* On phones the card is a fixed bar along the bottom; keep the panel clear of it. */
+@media (max-width: 767px) {
+  .mo-app { padding-bottom: 120px; }
+}
+
+/* Lead form, saving / failure / saved panels, and the end panel */
+.mo-lead, .mo-end { font-size: 16px; line-height: 1.45; }
+.mo-lead__title, .mo-end__title { margin: 0 0 12px; font-size: 22px; line-height: 1.25; }
+.mo-lead__title:focus, .mo-end__title:focus { outline: none; }
+.mo-lead__line, .mo-end p { margin: 0 0 16px; color: var(--mo-muted); }
+
+.mo-lead__form { display: flex; flex-direction: column; gap: 4px; }
+.mo-lead__field { display: flex; flex-direction: column; gap: 6px; margin-bottom: 12px; }
+.mo-lead__label { font-size: 14px; font-weight: 600; }
+.mo-lead__optional { font-weight: 400; color: var(--mo-muted); }
+.mo-lead__input {
+  width: 100%; min-height: 48px; padding: 10px 12px;
+  border: 2px solid var(--mo-line); border-radius: 10px; font: inherit; color: var(--mo-ink); background: #fff;
+}
+.mo-lead__input[aria-invalid="true"] { border-color: var(--mo-red); }
+.mo-lead__error { margin: 0 0 8px; color: #b3202f; font-size: 14px; }
+.mo-lead__error:empty { display: none; }
+.mo-lead__error--block { margin-bottom: 16px; font-size: 16px; }
+
+.mo-lead__row { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 12px; }
+.mo-lead__btn {
+  min-height: 48px; padding: 10px 20px;
+  border: 2px solid var(--mo-line); border-radius: 10px; background: #fff;
+  color: var(--mo-ink); font: inherit; cursor: pointer;
+}
+.mo-lead__btn--primary { border-color: var(--mo-red); background: var(--mo-red); color: #fff; font-weight: 600; }
+.mo-lead__link { padding: 0; border: 0; background: none; color: var(--mo-muted); font: inherit; font-size: 14px; text-decoration: underline; cursor: pointer; }
+.mo-end .mo-lead__btn { margin-bottom: 12px; }
+.mo-lead__btn:focus-visible, .mo-lead__link:focus-visible, .mo-lead__input:focus-visible, .mo-end .mo-q__back:focus-visible {
+  outline: 3px solid var(--mo-ink); outline-offset: 2px;
+}
+.mo-end .mo-q__back { display: block; padding: 8px 0; border: 0; background: none; color: var(--mo-muted); font: inherit; text-decoration: underline; cursor: pointer; }
+
+/* Print: only the plan summary (print.ts). The page's other screens are already hidden by the
+   page itself while screen 2 shows. */
+.print-summary { display: none; }
+
+@media print {
+  body * { visibility: hidden; }
+  .mo-app > :not(.print-summary) { display: none; }
+  .print-summary, .print-summary * { visibility: visible; }
+  .print-summary {
+    display: block; position: absolute; left: 0; top: 0; width: 100%; padding: 0;
+    color: #000; font: 12pt/1.45 Inter, system-ui, sans-serif;
+  }
+  .print-summary h1 { margin: 0 0 8pt; font-size: 20pt; }
+  .print-summary h2 { margin: 0 0 6pt; font-size: 15pt; }
+  .print-summary h3 { margin: 14pt 0 4pt; font-size: 12pt; }
+  .print-summary p { margin: 0 0 6pt; }
+  .print-summary ul { margin: 0 0 6pt; padding-left: 18pt; }
+}
