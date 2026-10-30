@@ -29,7 +29,7 @@ const BAND_OPTIONS: QuestionCopy['options'] = [
 export const PANEL_EXPLAINER: { title: "What's an electrical panel?"; paragraphs: string[] } = {
   title: "What's an electrical panel?",
   paragraphs: [
-    "The electrical panel is the metal box where your home's power comes in. Behind a small door are rows of switches, called breakers. The big one at the top is the main breaker.",
+    "The electrical panel is the metal box where your home's power comes in. Behind a small door are rows of switches, called breakers. The one at the top is the main breaker.",
     "It's usually in the garage, the basement or a utility room. Some homes have it outside, on a wall next to the electric meter.",
     "You don't need to know anything else about it. Your electrician checks the panel. If you can't find it, choose \"I'm not sure\" and we'll help you on the call.",
   ],
@@ -126,7 +126,7 @@ export function questionCopy(id: QuestionId, model: ModelId): QuestionCopy {
         steps: [
           'Look at the narrow spot or tight corner you just checked.',
           "Find what's causing it, like a fence, a gate, a planter or a small shed.",
-          'Think about whether it could come down for a day and go back up after.',
+          'Check whether it could be taken down and put back up, like a fence panel or a gate.',
         ],
       };
 
@@ -274,8 +274,7 @@ export function questionCopy(id: QuestionId, model: ModelId): QuestionCopy {
         ],
         help: 'Your electrician will bring power from the panel to the pod. Tell us what the ground is like along the way, so we know what to plan for. A rough idea is fine.',
         steps: [
-          'Find the panel, then picture a straight line from it to the spot.',
-          'Walk along that line.',
+          'Find the panel, then walk in a straight line from it to the spot.',
           'Notice if you cross lawn or dirt, a driveway, patio or path, or both.',
         ],
       };
