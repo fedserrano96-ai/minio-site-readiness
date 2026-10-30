@@ -41,9 +41,8 @@ describe('reasons and notes', () => {
     expect(reasonText('pathSteep').length).toBeGreaterThan(0);
   });
   it('has text for every remaining note', () => {
-    const r = rec({});
     for (const code of ['softGround', 'twelveHalfBathOnly', 'kitUnloading', 'clearance'] as const) {
-      expect(noteText(code, r).length).toBeGreaterThan(0);
+      expect(noteText(code).length).toBeGreaterThan(0);
     }
   });
 });

@@ -1,8 +1,8 @@
 // @vitest-environment jsdom
 import { describe, it, expect } from 'vitest';
 import { renderQuestion } from '../../src/assessment/ui/question-view';
-import { questionCopy } from '../../src/assessment/ui/questions-copy';
-import { drawing } from '../../src/assessment/ui/drawings';
+import { PANEL_EXPLAINER, questionCopy } from '../../src/assessment/ui/questions-copy';
+import { drawing, panelDrawing } from '../../src/assessment/ui/drawings';
 import { QUESTION_ORDER } from '../../src/assessment/core/questions';
 import type { ModelId, QuestionId } from '../../src/assessment/core/types';
 
@@ -12,10 +12,14 @@ function render(over: Partial<View> = {}): HTMLElement {
   const el = document.createElement('div');
   document.body.append(el);
   renderQuestion(el, {
-    id: 'pathWidth', index: 0, total: 5, model: 'twelve', door: 'standard', value: undefined, canGoBack: false, ...over,
+    id: 'pathWidth', index: 0, total: 5, model: 'twelve', value: undefined, canGoBack: false, ...over,
   });
   return el;
 }
+
+const text = (el: Element) => (el.textContent ?? '').replace(/\s+/g, ' ');
+/** An SVG string as the DOM serializes it, to compare with an element's innerHTML. */
+const serialized = (svg: string) => { const d = document.createElement('div'); d.innerHTML = svg; return d.innerHTML; };
 
 function listen(el: HTMLElement, type: string): unknown[] {
   const events: unknown[] = [];
@@ -56,9 +60,41 @@ describe('renderQuestion', () => {
     expect(button(el, 'Narrower than 10 ft').getAttribute('aria-pressed')).toBe('false');
   });
 
-  it('progress text', () => {
-    const el = render({ index: 2, total: 9 });
-    expect(el.textContent).toContain('Question 3 of 9');
+  it('progress line shows the group', () => {
+    const el = render({ id: 'turn', index: 2, total: 10 });
+    expect(text(el.querySelector('.mo-q__progress')!)).toBe('Getting it there · Question 3 of 10');
+    expect(text(render({ id: 'panelRoute', index: 9, total: 10 }).querySelector('.mo-q__progress')!))
+      .toBe('Power · Question 10 of 10');
+  });
+
+  it('draws the question for the model shown', () => {
+    const el = render({ id: 'pathWidth', model: 'sixteen' });
+    expect(el.querySelector('.mo-q__art')!.innerHTML).toBe(serialized(drawing('pathWidth', 'sixteen')));
+    expect(el.querySelector('.mo-q__art')!.innerHTML).not.toBe(serialized(drawing('pathWidth', 'twelve')));
+  });
+
+  it('help lists the numbered steps', () => {
+    const el = render({ id: 'pathWidth', model: 'sixteen' });
+    const steps = questionCopy('pathWidth', 'sixteen').steps;
+    const items = Array.from(el.querySelectorAll('.mo-q__help ol li')).map((li) => li.textContent);
+    expect(items.length).toBe(steps.length);
+    expect(items).toEqual(steps);
+    expect(el.querySelector('.mo-q__help p')!.textContent).toBe(questionCopy('pathWidth', 'sixteen').help);
+  });
+
+  it('panel question shows the explainer and its drawing', () => {
+    const el = render({ id: 'panelDistance' });
+    expect(text(el)).toContain("What's an electrical panel?");
+    for (const p of PANEL_EXPLAINER.paragraphs) expect(text(el)).toContain(p);
+    const explainer = el.querySelector('.mo-q__explainer')!;
+    expect(explainer.closest('details')).not.toBeNull();
+    expect(explainer.querySelector('.mo-q__art')!.innerHTML).toBe(serialized(panelDrawing()));
+  });
+
+  it('only the panel question has the explainer', () => {
+    for (const id of QUESTION_ORDER.filter((q) => q !== 'panelDistance')) {
+      expect(text(render({ id })), id).not.toContain("What's an electrical panel?");
+    }
   });
 
   it('shows Back only when it can go back, and dispatches minio:back', () => {
@@ -140,10 +176,10 @@ describe('renderQuestion', () => {
     }
   });
 
-  it('links the power spec from the panel question, with the door', () => {
-    const el = render({ id: 'panelDistance', model: 'twelve', door: 'flipped' });
+  it('links the power spec from the panel question, with the standard door', () => {
+    const el = render({ id: 'panelDistance', model: 'twelve' });
     const a = el.querySelector('details a') as HTMLAnchorElement;
-    expect(a.getAttribute('href')).toBe('contractor/power.html?model=twelve&door=flipped');
+    expect(a.getAttribute('href')).toBe('contractor/power.html?model=twelve&door=standard');
     expect(a.target).toBe('_blank');
     expect(a.textContent).toBe('Get the power spec for your contractor');
   });
@@ -175,7 +211,7 @@ describe('copy and drawings', () => {
           expect(c.options.length, id).toBeLessThanOrEqual(5);
         }
       }
-      const svg = drawing(id);
+      const svg = drawing(id, 'sixteen');
       expect(svg.startsWith('<svg'), id).toBe(true);
       expect(svg, id).toContain('role="img"');
       expect(svg, id).toContain('aria-label=');
@@ -186,7 +222,7 @@ describe('copy and drawings', () => {
     expect(questionCopy('existingBase', 'twelve').specLink).toBe('base');
     expect(questionCopy('groundFlat', 'twelve').specLink).toBe('base');
     expect(questionCopy('panelDistance', 'twelve').specLink).toBe('power');
-    expect(questionCopy('waterDistance', 'twelve').specLink).toBeUndefined();
+    expect(questionCopy('panelRoute', 'twelve').specLink).toBeUndefined();
   });
 
   it('uses the model name and the shared constants in copy', () => {

@@ -15,7 +15,7 @@ function payload(overrides: Partial<SubmissionPayload> = {}): SubmissionPayload 
   const recommendation: Recommendation = {
     model: 'sixteen', method: 'shedMule', craneFrom: null, base: 'gravel',
     methodReason: null, baseReason: null, bathroom: 'none', door: 'standard',
-    toCheck: [], notes: [],
+    ramps: false, takeDown: null, hardSurface: false, toCheck: [], notes: [],
   };
   const answers = { zip: '98101', panelDistance: '25to50' as const };
   return {

@@ -1,5 +1,5 @@
-/* Screen 2 page layout, the lead form and end panel, and the print rules (spec 5.2, 7).
-   The card and the question view style themselves (card.css, question-view.css). */
+/* Screen 2 page layout, the lead form, and the print rules (spec 5.2, 7). The card, the question
+   view and Your plan style themselves (card.css, question-view.css, plan-view.css). */
 .mo-app {
   --mo-red: var(--red, #ED3648);
   --mo-ink: var(--dark-blue, #1f2328);
@@ -16,7 +16,7 @@
   color: var(--mo-ink);
 }
 .mo-app *, .mo-app *::before, .mo-app *::after { box-sizing: inherit; }
-.mo-app .mo-card, .mo-app .mo-q { font-family: inherit; }
+.mo-app .mo-card, .mo-app .mo-q, .mo-app .mo-plan { font-family: inherit; }
 
 .mo-app__panel { padding: 0 16px; }
 
@@ -25,11 +25,11 @@
   .mo-app { padding-bottom: 120px; }
 }
 
-/* Lead form, saving / failure / saved panels, and the end panel */
-.mo-lead, .mo-end { font-size: 16px; line-height: 1.45; }
-.mo-lead__title, .mo-end__title { margin: 0 0 12px; font-size: 22px; line-height: 1.25; }
-.mo-lead__title:focus, .mo-end__title:focus { outline: none; }
-.mo-lead__line, .mo-end p { margin: 0 0 16px; color: var(--mo-muted); }
+/* Lead form, saving / failure / saved panels */
+.mo-lead { font-size: 16px; line-height: 1.45; }
+.mo-lead__title { margin: 0 0 12px; font-size: 22px; line-height: 1.25; }
+.mo-lead__title:focus { outline: none; }
+.mo-lead__line { margin: 0 0 16px; color: var(--mo-muted); }
 
 .mo-lead__form { display: flex; flex-direction: column; gap: 4px; }
 .mo-lead__field { display: flex; flex-direction: column; gap: 6px; margin-bottom: 12px; }
@@ -52,11 +52,9 @@
 }
 .mo-lead__btn--primary { border-color: var(--mo-red); background: var(--mo-red); color: #fff; font-weight: 600; }
 .mo-lead__link { padding: 0; border: 0; background: none; color: var(--mo-muted); font: inherit; font-size: 14px; text-decoration: underline; cursor: pointer; }
-.mo-end .mo-lead__btn { margin-bottom: 12px; }
-.mo-lead__btn:focus-visible, .mo-lead__link:focus-visible, .mo-lead__input:focus-visible, .mo-end .mo-q__back:focus-visible {
+.mo-lead__btn:focus-visible, .mo-lead__link:focus-visible, .mo-lead__input:focus-visible {
   outline: 3px solid var(--mo-ink); outline-offset: 2px;
 }
-.mo-end .mo-q__back { display: block; padding: 8px 0; border: 0; background: none; color: var(--mo-muted); font: inherit; text-decoration: underline; cursor: pointer; }
 
 /* Print: only the plan summary (print.ts). The page's other screens are already hidden by the
    page itself while screen 2 shows. */
@@ -74,5 +72,5 @@
   .print-summary h2 { margin: 0 0 6pt; font-size: 15pt; }
   .print-summary h3 { margin: 14pt 0 4pt; font-size: 12pt; }
   .print-summary p { margin: 0 0 6pt; }
-  .print-summary ul { margin: 0 0 6pt; padding-left: 18pt; }
+  .print-summary ul, .print-summary ol { margin: 0 0 6pt; padding-left: 18pt; }
 }

@@ -1,5 +1,5 @@
-// Screen 2: the card on top, one question at a time below, the lead form behind the CTAs (spec
-// 5.2, 5.3, 7). Owns the state, keeps it in sessionStorage, and re-renders the pieces.
+// Screen 2: the card on top, one question at a time below, then Your plan, and the lead form behind
+// the CTAs (spec 5.2, 5.3, 6, 7). Owns the state, keeps it in sessionStorage, and re-renders the pieces.
 // Storage errors are not caught: if sessionStorage fails the client should see it fail.
 import type { Cta, SubmissionPayload } from '../../server/airtable-fields';
 import { MODELS } from '../core/data';
@@ -7,10 +7,11 @@ import { lookupLocation } from '../core/location';
 import { leadTime, priceRecommendation } from '../core/pricing';
 import { QUESTION_ORDER, visibleQuestions } from '../core/questions';
 import { recommend } from '../core/rules';
-import type { Answers, ModelId, PlannerSnapshot, QuestionId, Recommendation } from '../core/types';
+import type { Answers, ModelId, PlannerSnapshot, QuestionId } from '../core/types';
 import { renderCard } from './card';
 import { describeChange } from './copy';
 import { renderFailure, renderLeadForm, renderSaved, renderSaving, type Contact } from './lead-form';
+import { renderPlan } from './plan-view';
 import { buildReadable, renderPrintSummary } from './print';
 import { renderQuestion } from './question-view';
 
@@ -21,7 +22,7 @@ export interface AppDeps {
   print: () => void;
 }
 
-const STORAGE_KEY = 'minio-assessment-v2';
+const STORAGE_KEY = 'minio-assessment-v3';
 const SUBMIT_URL = '/.netlify/functions/submit';
 const CTA_URL = { design: 'https://minioffice.co/quote', talk: 'https://minioffice.co/lets-talk' } as const;
 
@@ -80,7 +81,7 @@ export function createApp(root: HTMLElement, deps: AppDeps) {
   let inFlight = false;
   // Phone details sheet. Closed on every CTA and on start(), so nothing opens behind it.
   let cardOpen = false;
-  // The client chose "Continue without saving" after a failed save: the end panel offers printing.
+  // The client chose "Continue without saving" after a failed save: Your plan offers printing.
   let offerPrint = false;
 
   const current = (): State => {
@@ -105,49 +106,20 @@ export function createApp(root: HTMLElement, deps: AppDeps) {
     return { rec, location, cost: priceRecommendation(rec, location, s.answers), lead: leadTime(rec, location) };
   }
 
-  function renderEnd(el: HTMLElement): void {
-    el.className = 'mo-end';
-    const saveBtn = document.createElement('button');
-    saveBtn.type = 'button';
-    saveBtn.className = 'mo-lead__btn mo-lead__btn--primary';
-    saveBtn.textContent = 'Save my plan';
-    saveBtn.addEventListener('click', () => el.dispatchEvent(new CustomEvent('minio:cta', { bubbles: true, detail: 'save' })));
-    const back = document.createElement('button');
-    back.type = 'button';
-    back.className = 'mo-q__back';
-    back.textContent = 'Back';
-    back.addEventListener('click', () => el.dispatchEvent(new CustomEvent('minio:back', { bubbles: true })));
-    const title = document.createElement('h2');
-    title.className = 'mo-end__title';
-    title.textContent = "That's everything.";
-    const line = document.createElement('p');
-    line.textContent = 'Save your plan and a Mini·O advisor can pick up where you left off.';
-    el.replaceChildren(title, line, saveBtn);
-    if (offerPrint) {
-      const printBtn = document.createElement('button');
-      printBtn.type = 'button';
-      printBtn.className = 'mo-lead__btn';
-      printBtn.textContent = 'Print / save as PDF';
-      printBtn.addEventListener('click', () => el.dispatchEvent(new CustomEvent('minio:print', { bubbles: true })));
-      el.append(printBtn);
-    }
-    el.append(back);
-  }
-
-  function renderPanel(s: State, rec: Recommendation): void {
+  function renderPanel(s: State, view: ReturnType<typeof compute>): void {
     const slot = div('');
     panelHost.replaceChildren(slot);
     if (flow?.kind === 'form') renderLeadForm(slot, s.contact);
     else if (flow?.kind === 'submitting') renderSaving(slot);
     else if (flow?.kind === 'failed') renderFailure(slot, flow.message);
     else if (flow?.kind === 'saved') renderSaved(slot);
-    else if (s.currentId === 'end') renderEnd(slot);
+    else if (s.currentId === 'end') renderPlan(slot, { ...view, offerPrint });
     else {
       const visible = visibleQuestions(s.answers);
       const index = visible.indexOf(s.currentId);
       if (index < 0) throw new Error(`Question "${s.currentId}" is not visible for these answers`);
       renderQuestion(slot, {
-        id: s.currentId, index, total: visible.length, model: rec.model, door: rec.door,
+        id: s.currentId, index, total: visible.length, model: view.rec.model,
         value: s.answers[s.currentId], canGoBack: true,
       });
     }
@@ -159,7 +131,7 @@ export function createApp(root: HTMLElement, deps: AppDeps) {
     const view = compute(s);
     renderCard(cardHost, { ...view, change, open: cardOpen });
     renderPrintSummary(printHost, { ...view, answers: s.answers });
-    renderPanel(s, view.rec);
+    renderPanel(s, view);
     if (focus) {
       const heading = panelHost.querySelector<HTMLElement>('h2');
       if (heading) { heading.tabIndex = -1; heading.focus(); }
@@ -270,9 +242,12 @@ export function createApp(root: HTMLElement, deps: AppDeps) {
     const s = current();
     clearModelRelativeAnswers(s.answers, s.modelOverride ?? s.snapshot.model, model);
     s.modelOverride = model;
-    // Clearing pathWidth can hide the question the client is on (it may have ruled out the mule).
-    // Then pathWidth itself is visible again, since that only happens when the truck can't reach.
-    if (s.currentId !== 'end' && !visibleQuestions(s.answers).includes(s.currentId)) s.currentId = 'pathWidth';
+    // Clearing pathWidth can hide the question the client is on (it may have shown removable or
+    // ruled out the mule). Then ask pathWidth again if it is asked at all, else start from the top.
+    const visible = visibleQuestions(s.answers);
+    if (s.currentId !== 'end' && !visible.includes(s.currentId)) {
+      s.currentId = visible.includes('pathWidth') ? 'pathWidth' : visible[0]!;
+    }
     change = null;
     save();
     render(false);

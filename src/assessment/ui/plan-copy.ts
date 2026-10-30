@@ -29,7 +29,7 @@ function deliveryStep(rec: Recommendation, location: Location | null): PlanStep 
   if (rec.takeDown === 'other') lines.push("What's in the way comes down on delivery day and goes back up after.");
   if (rec.ramps) lines.push('Ramps go over the steps.');
   for (const code of rec.notes) {
-    if (code === 'softGround' || code === 'kitUnloading') lines.push(noteText(code, rec));
+    if (code === 'softGround' || code === 'kitUnloading') lines.push(noteText(code));
   }
   return { id: 'delivery', title: 'Delivery', lines, link: null };
 }
@@ -53,7 +53,7 @@ function baseStep(rec: Recommendation, location: Location | null): PlanStep {
       lines.push("The ground is too steep for a gravel pad, so the pod needs a raised base. We'll price it with you in person.");
       break;
   }
-  if (rec.notes.includes('clearance')) lines.push(noteText('clearance', rec));
+  if (rec.notes.includes('clearance')) lines.push(noteText('clearance'));
   return { id: 'base', title: 'Base', lines, link };
 }
 

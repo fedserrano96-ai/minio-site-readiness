@@ -4,9 +4,10 @@ import './card.css';
 import { MODELS } from '../core/data';
 import type { CostLine, CostSummary, ModelId, Recommendation, Location, LeadTime } from '../core/types';
 import {
-  PRICE_DISCLAIMER, coverageText, costLineText, leadTimeText, methodTitle, modelName,
+  PRICE_DISCLAIMER, REP_LIST_TITLE, coverageText, costLineText, headline, leadTimeText, modelName,
   noteText, pillText, rangeText, sideItemText, toCheckText,
 } from './copy';
+import { ctaButtons } from './plan-view';
 
 export interface CardView {
   rec: Recommendation;
@@ -26,7 +27,7 @@ const LINE_LABEL: Record<CostLine['id'], string> = {
   base: 'Base',
   power: 'Power',
   plumbing: 'Water and sewer',
-  door: 'Flipped door',
+  ramps: 'Ramps for the steps',
 };
 
 function h<K extends keyof HTMLElementTagNameMap>(
@@ -42,15 +43,9 @@ function emit(el: HTMLElement, type: string, detail?: unknown): void {
   el.dispatchEvent(new CustomEvent(type, { bubbles: true, detail }));
 }
 
-function actions(el: HTMLElement, className: string): HTMLElement {
+function actions(el: HTMLElement, className: string, rec: Recommendation): HTMLElement {
   const wrap = h('div', className);
-  const design = h('button', 'mo-btn mo-btn--primary', 'Design my pod');
-  design.type = 'button';
-  design.addEventListener('click', () => emit(el, 'minio:cta', 'design'));
-  const talk = h('button', 'mo-btn mo-btn--secondary', "Let's talk");
-  talk.type = 'button';
-  talk.addEventListener('click', () => emit(el, 'minio:cta', 'talk'));
-  wrap.append(design, talk);
+  wrap.append(...ctaButtons(el, rec));
   return wrap;
 }
 
@@ -75,9 +70,9 @@ function breakdown(cost: Extract<CostSummary, { mode: 'range' }>): HTMLElement {
   return details;
 }
 
-function noteItem(el: HTMLElement, code: Recommendation['notes'][number], rec: Recommendation): HTMLElement {
+function noteItem(el: HTMLElement, code: Recommendation['notes'][number]): HTMLElement {
   const li = h('li');
-  li.append(h('span', undefined, noteText(code, rec)));
+  li.append(h('span', undefined, noteText(code)));
   if (code === 'clearance') {
     li.append(' ', linkButton('Adjust in the yard planner', () => emit(el, 'minio:edit-yard')));
   }
@@ -86,19 +81,6 @@ function noteItem(el: HTMLElement, code: Recommendation['notes'][number], rec: R
     li.append(' ', linkButton(`Switch to the ${MODELS[to].name}`, () => emit(el, 'minio:switch-model', to)));
   }
   return li;
-}
-
-function contractorLinks(rec: Recommendation, location: Location | null): HTMLElement | null {
-  const outside = location !== null && !location.inCoverage;
-  const ownBase = rec.base === 'gravel' || rec.base === 'existing';
-  if (!outside && !ownBase) return null;
-  const wrap = h('p', 'mo-card__links');
-  const base = h('a', undefined, 'Get the base spec for your contractor');
-  base.href = `contractor/base.html?model=${rec.model}`;
-  const power = h('a', undefined, 'Get the power spec for your contractor');
-  power.href = `contractor/power.html?model=${rec.model}&door=${rec.door}`;
-  wrap.append(base, power);
-  return wrap;
 }
 
 export function renderCard(el: HTMLElement, view: CardView): void {
@@ -121,7 +103,7 @@ export function renderCard(el: HTMLElement, view: CardView): void {
   const changeText = change ? `Changed: ${change.what}. Why: ${change.why}` : null;
   if (changeText) body.append(h('p', 'mo-card__change', changeText));
 
-  body.append(h('h2', 'mo-card__title', methodTitle(rec.model, rec.method)));
+  body.append(h('h2', 'mo-card__title', headline(rec)));
 
   const pillRow = h('div', 'mo-card__pills');
   pillRow.append(h('span', 'mo-pill', `Delivery: ${pills.delivery}`), h('span', 'mo-pill', `Base: ${pills.base}`));
@@ -143,23 +125,20 @@ export function renderCard(el: HTMLElement, view: CardView): void {
 
   if (rec.notes.length > 0) {
     const notes = h('ul', 'mo-card__notes');
-    for (const code of rec.notes) notes.append(noteItem(el, code, rec));
+    for (const code of rec.notes) notes.append(noteItem(el, code));
     body.append(notes);
   }
 
   if (rec.toCheck.length > 0) {
     const section = h('div', 'mo-card__tocheck');
-    section.append(h('h3', undefined, 'To check'));
+    section.append(h('h3', undefined, REP_LIST_TITLE));
     const list = h('ul');
     for (const code of rec.toCheck) list.append(h('li', undefined, toCheckText(code)));
     section.append(list);
     body.append(section);
   }
 
-  const links = contractorLinks(rec, location);
-  if (links) body.append(links);
-
-  body.append(actions(el, 'mo-card__actions'));
+  body.append(actions(el, 'mo-card__actions', rec));
 
   // Compact bar, shown instead of the card below 768 px (see card.css)
   const bar = h('div', 'mo-card__bar');
@@ -181,7 +160,7 @@ export function renderCard(el: HTMLElement, view: CardView): void {
     emit(el, 'minio:card-toggle', next);
   });
   if (changeText) bar.append(h('p', 'mo-card__bar-change', changeText));
-  bar.append(toggle, actions(el, 'mo-card__bar-actions'));
+  bar.append(toggle, actions(el, 'mo-card__bar-actions', rec));
 
   el.replaceChildren(body, bar);
 }

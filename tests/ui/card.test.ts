@@ -2,7 +2,7 @@
 import { describe, it, expect } from 'vitest';
 import { renderCard, type CardView } from '../../src/assessment/ui/card';
 import {
-  coverageText, costLineText, describeChange, formatMoney, leadTimeText, methodTitle, pillText,
+  REP_LIST_TITLE, coverageText, costLineText, describeChange, formatMoney, headline, leadTimeText, pillText,
   noteText, toCheckText, reasonText,
 } from '../../src/assessment/ui/copy';
 import { recommend } from '../../src/assessment/core/rules';
@@ -42,9 +42,10 @@ const button = (el: HTMLElement, label: string): HTMLButtonElement => {
 
 describe('renderCard', () => {
   it('renders the starting card', () => {
-    const el = render(view());
+    const v = view();
+    const el = render(v);
     const t = text(el);
-    expect(t).toContain('The Sixteen, delivered ready-built');
+    expect(el.querySelector('.mo-card__title')!.textContent).toBe(headline(v.rec));
     expect(t).toContain('Delivery: tilt trailer');
     expect(t).toContain('Base: gravel pad');
     expect(t).toContain('Delivery and site prep: $4,500 – $10,545');
@@ -78,9 +79,35 @@ describe('renderCard', () => {
     const t = text(el);
     expect(t).toContain("We'll work this out with you");
     expect(t).not.toContain('Delivery and site prep');
-    expect(t).toContain("The Sixteen: let's work out the best way in");
+    expect(t).toContain("Your yard needs a closer look. Let's work out the best way in together.");
     expect(button(el, 'Design my pod')).toBeTruthy();
     expect(button(el, "Let's talk")).toBeTruthy();
+  });
+
+  it('card title is the headline and the rep-list heading is renamed', () => {
+    const v = view({ truckAccess: 'no', bathroom: 'half', existingBase: 'none', groundFlat: 'unsure' });
+    const el = render(v);
+    expect(el.querySelector('h2')!.textContent).toBe(headline(v.rec));
+    expect(el.querySelector('h2')!.textContent).toBe(
+      "You can have a Sixteen delivered by truck and shed mule. You'll need a gravel pad, an outdoor outlet and a plumber for the bathroom.",
+    );
+    expect(el.querySelector('.mo-card__tocheck h3')!.textContent).toBe(REP_LIST_TITLE);
+    expect(text(el)).not.toContain('To check');
+  });
+
+  it("puts Let's talk first when there is something to check, in the card and the phone bar", () => {
+    const labels = (el: Element, sel: string) => Array.from(el.querySelectorAll(`${sel} button`)).map(b => b.textContent);
+    const classes = (el: Element, sel: string) => Array.from(el.querySelectorAll(`${sel} button`)).map(b => b.className);
+    const talk = render(view({ truckAccess: 'unsure' }));
+    for (const sel of ['.mo-card__actions', '.mo-card__bar-actions']) {
+      expect(labels(talk, sel), sel).toEqual(["Let's talk", 'Design my pod']);
+      expect(classes(talk, sel), sel).toEqual(['mo-btn mo-btn--primary', 'mo-btn mo-btn--secondary']);
+    }
+    const design = render(view());
+    for (const sel of ['.mo-card__actions', '.mo-card__bar-actions']) {
+      expect(labels(design, sel), sel).toEqual(['Design my pod', "Let's talk"]);
+      expect(classes(design, sel), sel).toEqual(['mo-btn mo-btn--primary', 'mo-btn mo-btn--secondary']);
+    }
   });
 
   it('buttons dispatch minio:cta', () => {
@@ -119,19 +146,21 @@ describe('renderCard', () => {
     expect(fired).toBe(true);
   });
 
-  it('lists to-checks and notes', () => {
-    const el = render(view({ truckAccess: 'unsure' }));
-    const heading = Array.from(el.querySelectorAll('h3, h4')).find(h => h.textContent === 'To check');
+  it('lists the rep list and notes', () => {
+    const el = render(view({ truckAccess: 'unsure', pathGround: 'soft' }));
+    const heading = Array.from(el.querySelectorAll('h3, h4')).find(h => h.textContent === REP_LIST_TITLE);
     expect(heading).toBeTruthy();
     const items = el.querySelectorAll('.mo-card__tocheck li');
     expect(items).toHaveLength(1);
     expect(items[0].textContent).toBe(toCheckText('truckAccess'));
-    expect(text(el)).toContain('Some homes need a panel upgrade (about $2,500)');
+    expect(text(el.querySelector('.mo-card__notes')!)).toContain(noteText('softGround'));
+    expect(text(el)).not.toContain('panel upgrade');
   });
 
-  it('shows no To check heading when there is nothing to check', () => {
+  it('shows no rep list when there is nothing to check', () => {
     const el = render(view());
-    expect(text(el)).not.toContain('To check');
+    expect(text(el)).not.toContain(REP_LIST_TITLE);
+    expect(el.querySelector('.mo-card__tocheck')).toBeNull();
   });
 
   it('shows side items beside the range', () => {
@@ -153,37 +182,22 @@ describe('renderCard', () => {
     const priced = Array.from(render(view({}, loc('98101'))).querySelectorAll('details li')).map(li => text(li));
     expect(priced.find(r => r.startsWith('Shipping'))).toContain('$1,100');
     expect(priced.find(r => r.startsWith('Base'))).not.toContain('(reference)');
+    const steps = view({ truckAccess: 'no', pathWidth: 'wide', turn: 'none', overhead: 'clear', pathGround: 'shortSteps' });
+    const ramps = Array.from(render(steps).querySelectorAll('details li')).map(li => text(li));
+    expect(ramps.find(r => r.startsWith('Ramps for the steps'))).toContain('$250');
   });
 
   it('shows the coverage label for the location', () => {
     expect(text(render(view({}, loc('98101'))))).toContain('Mini·O arranges local contractors in your area.');
   });
 
-  it('links the contractor specs outside install areas', () => {
+  it('has no contractor links, since they live in the plan steps', () => {
     const outside = loc('59001'); // Montana: not an install area
     expect(outside.inCoverage).toBe(false);
-    const el = render(view({}, outside));
-    const hrefs = Array.from(el.querySelectorAll('a')).map(a => a.getAttribute('href'));
-    expect(hrefs).toContain('contractor/base.html?model=sixteen');
-    expect(hrefs).toContain('contractor/power.html?model=sixteen&door=standard');
-    expect(text(el)).toContain("We don't arrange contractors in your area yet. These prices are a reference for your own contractor.");
-  });
-
-  it('power link uses the standard door for a Station whose client asked for a flipped door', () => {
-    const station = { ...snapshot, model: 'station' as const };
-    const el = render(view({ door: 'flipped' }, loc('59001'), undefined, null, station));
-    expect(el.querySelector('a[href="contractor/power.html?model=station&door=standard"]')).toBeTruthy();
-    expect(el.querySelector('a[href*="door=flipped"]')).toBeNull();
-  });
-
-  it('links the contractor specs for a gravel pad even inside an install area', () => {
-    const el = render(view({}, loc('98101')));
-    expect(el.querySelector('a[href="contractor/base.html?model=sixteen"]')).toBeTruthy();
-  });
-
-  it('omits the contractor links for a raised base inside an install area', () => {
-    const el = render(view({ existingBase: 'none', groundFlat: 'steep' }, loc('98101')));
-    expect(el.querySelectorAll('a[href^="contractor/"]')).toHaveLength(0);
+    for (const el of [render(view({}, outside)), render(view({}, loc('98101')))]) {
+      expect(el.querySelectorAll('a[href^="contractor/"]')).toHaveLength(0);
+    }
+    expect(text(render(view({}, outside)))).toContain("We don't arrange contractors in your area yet. These prices are a reference for your own contractor.");
   });
 
   it('collapses on small screens with an aria-expanded toggle', () => {
@@ -259,14 +273,6 @@ describe('copy', () => {
     expect(() => formatMoney(NaN)).toThrow();
   });
 
-  it('writes method titles', () => {
-    expect(methodTitle('sixteen', 'tiltTrailer')).toBe('The Sixteen, delivered ready-built');
-    expect(methodTitle('twelve', 'shedMule')).toBe('The Twelve, delivered ready-built');
-    expect(methodTitle('station', 'crane')).toBe('The Station, lifted in by crane');
-    expect(methodTitle('sixteen', 'kit')).toBe('The Sixteen as a kit, assembled on site');
-    expect(methodTitle('sixteen', 'talk')).toBe("The Sixteen: let's work out the best way in");
-  });
-
   it('writes pill text', () => {
     const r = (o: Partial<Recommendation>): Recommendation => ({ ...recommend(snapshot, {}), ...o });
     expect(pillText(r({ method: 'shedMule' }))).toEqual({ delivery: 'truck + shed mule', base: 'gravel pad' });
@@ -297,16 +303,15 @@ describe('copy', () => {
   });
 
   it('has text for every note, to-check and reason code', () => {
-    const r = recommend(snapshot, {});
-    for (const n of ['softGround', 'panelUpgrade', 'twelveHalfBathOnly', 'flipNotAvailable', 'kitUnloading', 'clearance'] as const) {
-      expect(noteText(n, { ...r, model: 'station' }).length).toBeGreaterThan(0);
+    for (const n of ['softGround', 'twelveHalfBathOnly', 'kitUnloading', 'clearance'] as const) {
+      expect(noteText(n).length).toBeGreaterThan(0);
     }
-    for (const c of ['zip', 'truckAccess', 'pathWidth', 'overhead', 'pathGround', 'powerLines', 'streetDistance',
-      'kitAccess', 'existingBase', 'groundFlat', 'bathroom', 'waterDistance', 'panelDistance', 'door',
+    for (const c of ['zip', 'truckAccess', 'pathWidth', 'turn', 'removable', 'overhead', 'pathGround', 'powerLines',
+      'streetDistance', 'kitAccess', 'existingBase', 'groundFlat', 'bathroom', 'panelDistance', 'panelRoute',
       'baseSlab', 'baseGravel', 'baseDeck'] as const) {
       expect(toCheckText(c).length).toBeGreaterThan(0);
     }
-    for (const c of ['truckNo', 'pathNarrow', 'overheadLow', 'pathSteps', 'powerLines', 'tooFar', 'noKitAccess',
+    for (const c of ['truckNo', 'pathNarrow', 'pathTurn', 'overheadLow', 'pathSteep', 'powerLines', 'tooFar', 'noKitAccess',
       'existingBase', 'steepGround'] as const) {
       expect(reasonText(c).length).toBeGreaterThan(0);
     }
@@ -316,7 +321,7 @@ describe('copy', () => {
     const all = [
       leadTimeText({ minWeeks: 5, maxWeeks: 6 }),
       reasonText('truckNo'), reasonText('noKitAccess'), toCheckText('kitAccess'),
-      noteText('kitUnloading', recommend(snapshot, {})),
+      noteText('kitUnloading'),
     ].join(' ');
     expect(all).not.toMatch(/\b(20\d\d|January|February|March|April|May|June|July|August|September|October|November|December)\b/);
   });

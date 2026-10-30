@@ -36,6 +36,8 @@ export function headline(rec: Recommendation): string {
 }
 
 export const REP_LIST_TITLE = "We'll check these with you on the call";
+/** Under the rep list in Your plan, when Let's talk is the primary button (spec 6.5). */
+export const TALK_FIRST_LINE = "Book a call and we'll go over these with you.";
 
 const DELIVERY_PILL: Record<Method, string> = {
   tiltTrailer: 'tilt trailer',
@@ -103,7 +105,7 @@ export function toCheckText(code: ToCheckCode): string {
   }
 }
 
-export function noteText(code: NoteCode, rec: Recommendation): string {
+export function noteText(code: NoteCode): string {
   switch (code) {
     case 'softGround':
       return 'Soft ground can get marked by the delivery. Stop watering the area a week before.';

@@ -2,17 +2,17 @@
 // nothing the client types is ever parsed as HTML. The drawings are the one exception: they are
 // constant SVG strings from drawings.ts.
 import './question-view.css';
-import type { ModelId, QuestionId, Recommendation } from '../core/types';
+import type { ModelId, QuestionId } from '../core/types';
 import { lookupLocation } from '../core/location';
-import { drawing } from './drawings';
-import { questionCopy } from './questions-copy';
+import { QUESTION_GROUP } from '../core/questions';
+import { drawing, panelDrawing } from './drawings';
+import { PANEL_EXPLAINER, questionCopy } from './questions-copy';
 
 export interface QuestionView {
   id: QuestionId;
   index: number; // zero-based position among the visible questions
   total: number;
   model: ModelId; // the effective model (after any "Switch to")
-  door: Recommendation['door']; // the door the pod will have, for the power spec link
   value: string | undefined;
   canGoBack: boolean;
 }
@@ -80,12 +80,23 @@ function zipControls(el: HTMLElement, q: QuestionView): HTMLElement {
   return wrap;
 }
 
+/** "What's an electrical panel?" with its drawing, inside the panel question's help (spec 5.1). */
+function panelExplainer(): HTMLElement {
+  const wrap = h('div', 'mo-q__explainer');
+  wrap.append(h('h3', undefined, PANEL_EXPLAINER.title));
+  const art = h('div', 'mo-q__art');
+  art.innerHTML = panelDrawing(); // constant SVG from drawings.ts, never user input
+  wrap.append(art);
+  for (const text of PANEL_EXPLAINER.paragraphs) wrap.append(h('p', undefined, text));
+  return wrap;
+}
+
 function specLink(kind: 'base' | 'power', q: QuestionView): HTMLElement {
   const p = h('p', 'mo-q__speclink');
   const a = h('a', undefined, `Get the ${kind} spec for your contractor`);
   a.href = kind === 'base'
     ? `contractor/base.html?model=${q.model}`
-    : `contractor/power.html?model=${q.model}&door=${q.door}`;
+    : `contractor/power.html?model=${q.model}&door=standard`; // every pod has the standard door
   a.target = '_blank';
   a.rel = 'noopener';
   p.append(a);
@@ -96,16 +107,21 @@ export function renderQuestion(el: HTMLElement, q: QuestionView): void {
   const copy = questionCopy(q.id, q.model);
   el.className = 'mo-q';
 
-  const progress = h('p', 'mo-q__progress', `Question ${q.index + 1} of ${q.total}`);
+  const progress = h('p', 'mo-q__progress', `${QUESTION_GROUP[q.id]} · Question ${q.index + 1} of ${q.total}`);
 
   const art = h('div', 'mo-q__art');
-  art.innerHTML = drawing(q.id); // constant SVG from drawings.ts, never user input
+  art.innerHTML = drawing(q.id, q.model); // constant SVG from drawings.ts, never user input
 
   const title = h('h2', 'mo-q__title', copy.title);
   title.id = TITLE_ID;
 
   const details = h('details', 'mo-q__help');
   details.append(h('summary', undefined, 'What does this mean, and how do I measure it?'), h('p', undefined, copy.help));
+  // Step n matches callout n in the drawing.
+  const steps = h('ol', 'mo-q__steps');
+  for (const step of copy.steps) steps.append(h('li', undefined, step));
+  details.append(steps);
+  if (q.id === 'panelDistance') details.append(panelExplainer());
   if (copy.specLink) details.append(specLink(copy.specLink, q));
 
   let controls: HTMLElement;

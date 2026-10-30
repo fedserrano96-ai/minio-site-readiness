@@ -89,10 +89,10 @@ describe('planSteps', () => {
   it('notes go inside their steps', () => {
     const r = rec({ notes: ['softGround', 'kitUnloading', 'clearance', 'twelveHalfBathOnly'] });
     const s = planSteps(r, null);
-    expect(s[0]!.lines).toContain(noteText('softGround', r));
-    expect(s[0]!.lines).toContain(noteText('kitUnloading', r));
-    expect(s[1]!.lines).toContain(noteText('clearance', r));
-    expect(s.flatMap(x => x.lines)).not.toContain(noteText('twelveHalfBathOnly', r));
+    expect(s[0]!.lines).toContain(noteText('softGround'));
+    expect(s[0]!.lines).toContain(noteText('kitUnloading'));
+    expect(s[1]!.lines).toContain(noteText('clearance'));
+    expect(s.flatMap(x => x.lines)).not.toContain(noteText('twelveHalfBathOnly'));
   });
   it('no forbidden topics in any plan text', () => {
     const variants = [rec({ bathroom: 'shower', method: 'kit' }), rec({ method: 'talk', base: 'raised' })];
