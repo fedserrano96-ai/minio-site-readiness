@@ -2,6 +2,7 @@ import { describe, it, expect } from 'vitest';
 import { drawing, panelDrawing } from '../../src/assessment/ui/drawings';
 import { questionCopy } from '../../src/assessment/ui/questions-copy';
 import { QUESTION_ORDER } from '../../src/assessment/core/questions';
+import { MULE_TURN_FT } from '../../src/assessment/core/data';
 
 describe('drawings', () => {
   it('every question has a drawing whose callouts match its steps', () => {
@@ -29,6 +30,14 @@ describe('drawings', () => {
     expect(drawing('overhead', 'station')).toContain('13 ft');
     expect(drawing('turn', 'sixteen')).toContain('24 ft');
     expect(drawing('turn', 'twelve')).toContain('20 ft');
+  });
+
+  it('the turn drawing and the turn question use the same MULE_TURN_FT figure', () => {
+    for (const model of ['twelve', 'sixteen', 'station'] as const) {
+      const ft = `${MULE_TURN_FT[model]} ft`;
+      expect(drawing('turn', model)).toContain(ft);
+      expect(questionCopy('turn', model).options.find((o) => o.value === 'roomy')!.label).toContain(ft);
+    }
   });
 
   it('panel drawing exists', () => expect(panelDrawing()).toContain('role="img"'));

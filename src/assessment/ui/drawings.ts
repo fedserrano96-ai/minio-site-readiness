@@ -1,7 +1,7 @@
 // One drawing per question (spec 7), plus the electrical panel (spec 5.1). Static, trusted SVG
 // strings: illustrative, not to scale. Red marks what the question is about, and each numbered
 // callout (data-callout="n") points at what step n of the how-to-measure section asks for.
-import { KIT_ACCESS_FT, MODELS, MULE_MAX_SLOPE_DEG, MULE_MAX_STEP_FT } from '../core/data';
+import { KIT_ACCESS_FT, MODELS, MULE_MAX_SLOPE_DEG, MULE_MAX_STEP_FT, MULE_TURN_FT } from '../core/data';
 import type { ModelId, QuestionId } from '../core/types';
 
 const RED = '#ED3648';
@@ -156,7 +156,7 @@ const DRAWINGS: Record<QuestionId, (model: ModelId) => string> = {
     + room(14, 26, 146, 142, 64) + toilet(28, 32, RED, RED_LT) + sink(100, 32, RED, RED_LT)
     + room(180, 26, 146, 142, 206) + toilet(194, 32, INK, WHITE) + sink(266, 32, INK, WHITE)
     + shower(264, 104, 58, RED, RED_LT) + label(293, 98, 'shower', { size: 13, color: RED })
-    + callout(1, 87, 104) + callout(2, 240, 124)),
+    + callout(1, 56, 70) + callout(2, 276, 116)),
 
   truckAccess: () => svg('A yard from above: a truck on the street, a driveway beside the house with a gate across it, and the route to the spot for the pod',
     yard() + streetBottom(166)
@@ -169,7 +169,7 @@ const DRAWINGS: Record<QuestionId, (model: ModelId) => string> = {
     + box(56, 172, 82, 22, WHITE, INK, 2, 3) + box(30, 173, 26, 20, INK, INK, 2, 4)
     + line('M140 183C166 183 173 176 173 156V72C173 46 186 30 206 30', RED, 3, ' stroke-dasharray="7 6"')
     + arrowHead(212, 30, 0)
-    + callout(1, 294, 30) + callout(2, 218, 114) + callout(3, 128, 44)),
+    + callout(1, 294, 30) + callout(2, 186, 120) + callout(3, 128, 44)),
 
   pathWidth: (model) => svg('A side path from above, between the house and a fence, with the narrowest width marked',
     yard() + streetBottom(166)
@@ -187,10 +187,9 @@ const DRAWINGS: Record<QuestionId, (model: ModelId) => string> = {
     + podTop(268, 26, 62, 52)
     + `<circle cx="66" cy="62" r="52" fill="${RED_LT}" stroke="${RED}" stroke-width="2"${DASH}/>`
     + line('M90 170V110C90 96 100 86 118 86H262', INK, 2, DASH) + arrowHead(266, 86, 0, INK)
-    // How much room the shed mule needs to turn a corner: 20 ft for the Twelve, 24 ft otherwise.
-    + dimH(14, 118, 62) + label(66, 53, `${model === 'twelve' ? 20 : 24} ft`, { bold: true, size: 14, color: RED })
+    + dimH(14, 118, 62) + label(66, 53, `${MULE_TURN_FT[model]} ft`, { bold: true, size: 14, color: RED })
     + label(126, 34, 'room to turn', { anchor: 'start', size: 13, bold: true, color: RED })
-    + callout(1, 106, 140) + callout(2, 36, 88) + callout(3, 66, 30)),
+    + callout(1, 110, 108) + callout(2, 36, 62) + callout(3, 66, 30)),
 
   removable: () => svg('A fence beside a narrow gate, with one fence section taken down and set aside, to go back up after',
     ground()
@@ -236,7 +235,7 @@ const DRAWINGS: Record<QuestionId, (model: ModelId) => string> = {
     + house(126, 88, 100, 72) + pod(254, 76, 50)
     + line('M240 34V160', INK, 4) + line('M226 34H254', INK, 3)
     + line('M0 44Q117 70 226 34M0 52Q117 80 254 34M226 34Q290 52 340 46M254 34Q300 60 340 54', RED, 2)
-    + callout(1, 120, 96) + callout(2, 176, 30)),
+    + callout(1, 104, 98) + callout(2, 176, 30)),
 
   streetDistance: () => svg('A yard from above, with a straight line from the middle of the spot for the pod to the street',
     yard() + box(0, 0, 46, 200, INK_LT, 'none', 0) + line('M46 0V200') + line('M23 0V200', WHITE, 2, ' stroke-dasharray="10 8"')

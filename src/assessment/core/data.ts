@@ -52,6 +52,8 @@ export const CRANE_FROM = { near: 3000, far: 4000 } as const; // near: up to 100
 export const MULE_MAX_SLOPE_DEG = 10;
 export const MULE_MAX_STEP_FT = 1.5;
 export const MULE_RAMPS = 250;
+// Room the shed mule needs to turn a corner, in feet across (v2 spec 6.1, client prep PDF).
+export const MULE_TURN_FT: Record<ModelId, number> = { twelve: 20, sixteen: 24, station: 24 };
 
 // Open items for sales (spec section 10, items 1 and 2): one place to change each.
 export const LEVEL_CUTOFF_TEXT = '¼ in. per foot';

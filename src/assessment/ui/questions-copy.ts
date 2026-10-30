@@ -1,6 +1,6 @@
 // Client-facing wording for the 15 questions (spec 5). Plain English: clients have no
 // construction knowledge. Help text uses only facts Ops has confirmed. Fred reviews every string.
-import { KIT_ACCESS_FT, LEVEL_CUTOFF_TEXT, MODELS, MULE_MAX_SLOPE_DEG, MULE_MAX_STEP_FT } from '../core/data';
+import { KIT_ACCESS_FT, LEVEL_CUTOFF_TEXT, MODELS, MULE_MAX_SLOPE_DEG, MULE_MAX_STEP_FT, MULE_TURN_FT } from '../core/data';
 import type { ModelId, QuestionId } from '../core/types';
 
 
@@ -37,8 +37,7 @@ export const PANEL_EXPLAINER: { title: "What's an electrical panel?"; paragraphs
 
 export function questionCopy(id: QuestionId, model: ModelId): QuestionCopy {
   const m = MODELS[model];
-  // How much room the shed mule needs to turn a corner: 20 ft for the Twelve, 24 ft otherwise.
-  const turnFt = model === 'twelve' ? 20 : 24;
+  const turnFt = MULE_TURN_FT[model];
   switch (id) {
     case 'zip':
       return {
