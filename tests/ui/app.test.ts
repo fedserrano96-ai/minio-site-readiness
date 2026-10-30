@@ -578,6 +578,17 @@ describe('createApp', () => {
     expect(text(root.querySelector('.print-summary')!)).not.toContain(questionCopy('turn', 'sixteen').title);
   });
 
+  it('switching model before any model-relative answer exists stays on the current question', () => {
+    const { root, app, storage } = setup();
+    app.start({ ...snapshot, model: 'twelve' });
+    button(root, 'Skip for now').click();
+    choose(root, 'bathroom', 'shower', 'twelve');
+    expect(qTitle(root)).toBe(questionCopy('truckAccess', 'twelve').title);
+    cardButton(root, 'Switch to the Sixteen').click();
+    expect(qTitle(root)).toBe(questionCopy('truckAccess', 'sixteen').title);
+    expect(JSON.parse(storage.getItem(STORAGE_KEY)!).answers).toEqual({ bathroom: 'shower' });
+  });
+
   it('start() with a model of different clearances clears path width and overhead; the same model keeps them', () => {
     const first = setup();
     first.app.start(snapshot);

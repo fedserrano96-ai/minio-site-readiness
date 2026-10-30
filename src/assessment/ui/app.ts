@@ -55,14 +55,15 @@ function div(className: string): HTMLDivElement {
  * The path width, overhead and turn answers are relative to the model ("12 ft or wider", "nothing
  * lower than 13 ft", "a turn about 20 ft across"). When the model changes to one with other
  * clearances or another turning space, those answers no longer mean what the client picked, so they
- * are cleared and asked again. Returns the ids it cleared.
+ * are cleared and asked again. Returns the ids that actually held an answer.
  */
 function clearModelRelativeAnswers(answers: Answers, from: ModelId, to: ModelId): QuestionId[] {
   const a = MODELS[from];
   const b = MODELS[to];
-  const cleared: QuestionId[] = [];
-  if (a.minPathWidth !== b.minPathWidth || a.minOverhead !== b.minOverhead) cleared.push('pathWidth', 'overhead');
-  if (MULE_TURN_FT[from] !== MULE_TURN_FT[to]) cleared.push('turn');
+  const affected: QuestionId[] = [];
+  if (a.minPathWidth !== b.minPathWidth || a.minOverhead !== b.minOverhead) affected.push('pathWidth', 'overhead');
+  if (MULE_TURN_FT[from] !== MULE_TURN_FT[to]) affected.push('turn');
+  const cleared = affected.filter((id) => answers[id] !== undefined);
   for (const id of cleared) delete answers[id];
   return cleared;
 }
