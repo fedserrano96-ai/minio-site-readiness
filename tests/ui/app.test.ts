@@ -2,13 +2,15 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { createApp } from '../../src/assessment/ui/app';
 import { questionCopy } from '../../src/assessment/ui/questions-copy';
-import type { PlannerSnapshot, QuestionId } from '../../src/assessment/core/types';
+import { headline, toCheckText } from '../../src/assessment/ui/copy';
+import { recommend } from '../../src/assessment/core/rules';
+import type { Answers, ModelId, PlannerSnapshot, QuestionId } from '../../src/assessment/core/types';
 
 const snapshot: PlannerSnapshot = {
   model: 'sixteen', rotation: 0, yardW: 40, yardD: 30, podX: 20, podY: 15, podUse: 'office', objects: [],
 };
 const REC_ID = 'recAAAAAAAAAAAAAA';
-const STORAGE_KEY = 'minio-assessment-v2';
+const STORAGE_KEY = 'minio-assessment-v3';
 
 function fakeStorage(): Storage {
   const map = new Map<string, string>();
@@ -50,11 +52,29 @@ function button(root: HTMLElement, label: string): HTMLButtonElement {
 /** The card's buttons exist twice (full card and phone bar); the first is enough. */
 const cardButton = (root: HTMLElement, label: string) => button(root.querySelector<HTMLElement>('.mo-card')!, label);
 
-function choose(root: HTMLElement, id: QuestionId, value: string): void {
-  const label = questionCopy(id, 'sixteen').options.find((o) => o.value === value)?.label;
+function choose(root: HTMLElement, id: QuestionId, value: string, model: ModelId = 'sixteen'): void {
+  const label = questionCopy(id, model).options.find((o) => o.value === value)?.label;
   if (!label) throw new Error(`no option ${value} for ${id}`);
   button(root, label).click();
 }
+
+/** Skips the ZIP and answers the bathroom question, so the next question is the truck one. */
+function toTruck(root: HTMLElement): void {
+  button(root, 'Skip for now').click();
+  choose(root, 'bathroom', 'none');
+}
+
+/** The shortest way through: a truck reaches the spot, which already has a slab. */
+const SHORT_ANSWERS: Answers = { bathroom: 'none', truckAccess: 'yes', existingBase: 'slab', panelDistance: 'lt25', panelRoute: 'soft' };
+function answerAll(root: HTMLElement): void {
+  toTruck(root);
+  choose(root, 'truckAccess', 'yes');
+  choose(root, 'existingBase', 'slab');
+  choose(root, 'panelDistance', 'lt25');
+  choose(root, 'panelRoute', 'soft');
+}
+
+const qTitle = (root: HTMLElement) => text(root.querySelector('.mo-q__title')!);
 
 function fillLeadForm(root: HTMLElement, email: string): void {
   const input = root.querySelector<HTMLInputElement>('input[type="email"]');
@@ -72,7 +92,7 @@ describe('createApp', () => {
   it('start shows the starting card and the ZIP question', () => {
     const { root, app } = setup();
     app.start(snapshot);
-    expect(text(root.querySelector('.mo-card')!)).toContain('The Sixteen, delivered ready-built');
+    expect(text(root.querySelector('.mo-card')!)).toContain(headline(recommend(snapshot, {})));
     expect(text(root.querySelector('.mo-q')!)).toContain("What's the ZIP code where the pod is going?");
     expect(text(root)).toContain('Question 1 of');
   });
@@ -87,6 +107,9 @@ describe('createApp', () => {
     const { root, app } = setup();
     app.start(snapshot);
     button(root, 'Skip for now').click();
+    expect(text(root.querySelector('.mo-q')!)).toContain('Will the pod have a bathroom?');
+    expect(text(root.querySelector('.mo-q__progress')!)).toBe('Your pod · Question 2 of 10');
+    choose(root, 'bathroom', 'none');
     expect(text(root.querySelector('.mo-q')!)).toContain('Can a truck drive right up to the spot?');
     choose(root, 'truckAccess', 'no');
     const card = text(root.querySelector('.mo-card')!);
@@ -256,7 +279,7 @@ describe('createApp', () => {
   it('restores screen 2 and record id from storage', async () => {
     const first = setup();
     first.app.start(snapshot);
-    button(first.root, 'Skip for now').click();
+    toTruck(first.root);
     choose(first.root, 'truckAccess', 'no');
     cardButton(first.root, 'Design my pod').click();
     fillLeadForm(first.root, 'sam@example.com');
@@ -281,7 +304,7 @@ describe('createApp', () => {
   it('start with a new snapshot keeps answers and clears the model override', () => {
     const first = setup();
     first.app.start(snapshot);
-    button(first.root, 'Skip for now').click();
+    toTruck(first.root);
     choose(first.root, 'truckAccess', 'no');
     first.root.dispatchEvent(new CustomEvent('minio:switch-model', { detail: 'station' }));
     expect(text(first.root.querySelector('.mo-card')!)).toContain('The Station');
@@ -310,16 +333,32 @@ describe('createApp', () => {
     expect(errors.some((m) => m.includes('quota exceeded'))).toBe(true);
   });
 
+  it('the end shows the Your plan panel', () => {
+    const { root, app } = setup();
+    app.start(snapshot);
+    answerAll(root);
+    expect(root.querySelector('.mo-q')).toBeNull();
+    const plan = root.querySelector<HTMLElement>('.mo-app__panel .mo-plan')!;
+    expect(plan.querySelector('h2')!.textContent).toBe(headline(recommend(snapshot, SHORT_ANSWERS)));
+    expect(document.activeElement).toBe(plan.querySelector('h2'));
+    expect(text(plan)).toContain(toCheckText('baseSlab'));
+    expect(Array.from(plan.querySelectorAll('button')).map((b) => b.textContent))
+      .toEqual(["Let's talk", 'Design my pod', 'Save my plan', 'Back']);
+  });
+
+  it('Back from Your plan returns to the last question', () => {
+    const { root, app } = setup();
+    app.start(snapshot);
+    answerAll(root);
+    button(root.querySelector<HTMLElement>('.mo-plan')!, 'Back').click();
+    expect(qTitle(root)).toBe(questionCopy('panelRoute', 'sixteen').title);
+  });
+
   it('shows the end panel after the last question and Save my plan saves', async () => {
     const { root, app, fetchFn, print, navigate } = setup();
     app.start(snapshot);
-    button(root, 'Skip for now').click();
-    choose(root, 'truckAccess', 'yes');
-    choose(root, 'existingBase', 'slab');
-    choose(root, 'bathroom', 'none');
-    choose(root, 'panelDistance', 'lt25');
-    choose(root, 'door', 'standard');
-    expect(text(root)).toContain("That's everything.");
+    answerAll(root);
+    expect(root.querySelector('.mo-plan')).not.toBeNull();
 
     button(root, 'Save my plan').click();
     fillLeadForm(root, 'sam@example.com');
@@ -334,33 +373,29 @@ describe('createApp', () => {
   it('changing an earlier answer after the end panel recomputes and stays consistent', () => {
     const { root, app } = setup();
     app.start(snapshot);
-    button(root, 'Skip for now').click();
-    choose(root, 'truckAccess', 'yes');
-    choose(root, 'existingBase', 'slab');
-    choose(root, 'bathroom', 'none');
-    choose(root, 'panelDistance', 'lt25');
-    choose(root, 'door', 'standard');
-    for (let i = 0; i < 5; i++) button(root, 'Back').click(); // door, panel, bathroom, base, truck
+    answerAll(root);
+    for (let i = 0; i < 4; i++) button(root.querySelector<HTMLElement>('.mo-app__panel')!, 'Back').click(); // route, panel, base, truck
     expect(text(root.querySelector('.mo-q')!)).toContain('Can a truck drive right up to the spot?');
     choose(root, 'truckAccess', 'no');
     expect(text(root.querySelector('.mo-q')!)).toContain('How wide is the narrowest point');
     expect(text(root.querySelector('.mo-card')!)).toContain('truck + shed mule');
-    expect(text(root)).not.toContain("That's everything.");
+    expect(root.querySelector('.mo-plan')).toBeNull();
   });
 
   it('sends readable text for the answers, to-check list and lead time', async () => {
     const { root, app, fetchFn } = setup();
     app.start(snapshot);
-    button(root, 'Skip for now').click();
+    toTruck(root);
     choose(root, 'truckAccess', 'unsure');
     cardButton(root, "Let's talk").click();
     fillLeadForm(root, 'sam@example.com');
     await flush();
     const sent = body(fetchFn);
-    expect(sent.readable.answers).toBe(
+    expect(sent.readable.answers).toBe([
+      `${questionCopy('bathroom', 'sixteen').title}: No bathroom`,
       `${questionCopy('truckAccess', 'sixteen').title}: I'm not sure`,
-    );
-    expect(sent.readable.toCheck).toContain('Check whether a truck can drive right up to the spot');
+    ].join('\n'));
+    expect(sent.readable.toCheck).toContain(toCheckText('truckAccess'));
     expect(sent.readable.method).toBe('tilt trailer');
     expect(sent.readable.base).toBe('gravel pad');
     expect(sent.readable.leadTime).toContain('after we receive payment');
@@ -403,7 +438,7 @@ describe('createApp', () => {
     const { root, app } = setup();
     app.start(snapshot);
     root.querySelector<HTMLButtonElement>('.mo-card__toggle')!.click();
-    button(root, 'Skip for now').click();
+    toTruck(root);
     choose(root, 'truckAccess', 'no');
     expect(root.querySelector<HTMLElement>('.mo-card')!.dataset.open).toBe('true');
   });
@@ -411,13 +446,13 @@ describe('createApp', () => {
   it("I'm not sure stays on the question with the help open and a Next button", () => {
     const { root, app, storage } = setup();
     app.start(snapshot);
-    button(root, 'Skip for now').click();
+    toTruck(root);
     choose(root, 'truckAccess', 'unsure');
     const q = root.querySelector('.mo-q')!;
     expect(text(q)).toContain('Can a truck drive right up to the spot?');
     expect(q.querySelector('details')!.open).toBe(true);
     expect(JSON.parse(storage.getItem(STORAGE_KEY)!).answers.truckAccess).toBe('unsure');
-    expect(text(root.querySelector('.mo-card')!)).toContain('Check whether a truck can drive right up to the spot');
+    expect(text(root.querySelector('.mo-card')!)).toContain(toCheckText('truckAccess'));
     button(root, 'Next').click();
     expect(text(root.querySelector('.mo-q')!)).toContain('How wide is the narrowest point');
   });
@@ -425,7 +460,7 @@ describe('createApp', () => {
   it('an answered question shows Next, which moves on without changing the answer', () => {
     const { root, app, storage } = setup();
     app.start(snapshot);
-    button(root, 'Skip for now').click();
+    toTruck(root);
     choose(root, 'truckAccess', 'no');
     button(root, 'Back').click();
     button(root, 'Next').click();
@@ -433,48 +468,51 @@ describe('createApp', () => {
     expect(JSON.parse(storage.getItem(STORAGE_KEY)!).answers.truckAccess).toBe('no');
   });
 
-  it('the panel question links the power spec with the door the pod will really have', () => {
-    const stored = (model: PlannerSnapshot['model']) => JSON.stringify({
-      snapshot: { ...snapshot, model },
-      answers: { truckAccess: 'yes', existingBase: 'slab', bathroom: 'none', door: 'flipped' },
+  it('the panel question links the power spec with the standard door', () => {
+    const storage = fakeStorage();
+    storage.setItem(STORAGE_KEY, JSON.stringify({
+      snapshot: { ...snapshot, model: 'station' },
+      answers: { bathroom: 'none', truckAccess: 'yes', existingBase: 'slab' },
       currentId: 'panelDistance', contact: { email: '', firstName: '', phone: '' }, recordId: null, ctaHistory: [],
-    });
-    const station = fakeStorage();
-    station.setItem(STORAGE_KEY, stored('station'));
-    const a = setup({ storage: station });
-    a.app.restore();
-    expect(a.root.querySelector('.mo-q details a')!.getAttribute('href'))
+    }));
+    const { root, app } = setup({ storage });
+    app.restore();
+    expect(root.querySelector('.mo-q details a')!.getAttribute('href'))
       .toBe('contractor/power.html?model=station&door=standard');
+  });
 
-    const sixteen = fakeStorage();
-    sixteen.setItem(STORAGE_KEY, stored('sixteen'));
-    const b = setup({ storage: sixteen });
-    b.app.restore();
-    expect(b.root.querySelector('.mo-q details a')!.getAttribute('href'))
-      .toBe('contractor/power.html?model=sixteen&door=flipped');
+  it('Review Focus 2: a v2 session is ignored', () => {
+    const storage = fakeStorage();
+    storage.setItem('minio-assessment-v2', JSON.stringify({ snapshot, answers: { door: 'flipped' }, currentId: 'door' }));
+    const { app } = setup({ storage });
+    expect(app.restore()).toBeNull();
   });
 
   it('switching to a model with different clearances clears the path width and overhead answers', () => {
     const { root, app, storage } = setup();
     app.start(snapshot);
-    button(root, 'Skip for now').click();
+    toTruck(root);
     choose(root, 'truckAccess', 'no');
     choose(root, 'pathWidth', 'wide');
+    choose(root, 'turn', 'none');
     choose(root, 'overhead', 'clear');
     root.dispatchEvent(new CustomEvent('minio:switch-model', { detail: 'station', bubbles: true }));
     const answers = JSON.parse(storage.getItem(STORAGE_KEY)!).answers;
     expect(answers.pathWidth).toBeUndefined();
     expect(answers.overhead).toBeUndefined();
     expect(answers.truckAccess).toBe('no');
-    expect(text(root.querySelector('.mo-q')!)).toContain('Is the way to the spot solid');
+    // The client was on pathGround; the cleared questions come first, so they are asked again.
+    expect(qTitle(root)).toBe(questionCopy('pathWidth', 'station').title);
   });
 
   it('switching model while on a question the cleared answers hid goes back to the path width question', () => {
     const { root, app } = setup();
     app.start(snapshot);
-    button(root, 'Skip for now').click();
+    toTruck(root);
     choose(root, 'truckAccess', 'no');
     choose(root, 'pathWidth', 'narrow');
+    choose(root, 'turn', 'none');
+    choose(root, 'removable', 'no');
     choose(root, 'overhead', 'clear');
     choose(root, 'pathGround', 'solid');
     expect(text(root.querySelector('.mo-q')!)).toContain('power lines');
@@ -482,12 +520,82 @@ describe('createApp', () => {
     expect(text(root.querySelector('.mo-q')!)).toContain('How wide is the narrowest point');
   });
 
+  it('Review Focus 3: switching model while on removable lands on a visible question', () => {
+    const { root, app } = setup();
+    app.start({ ...snapshot, model: 'twelve' });
+    button(root, 'Skip for now').click();
+    choose(root, 'bathroom', 'none', 'twelve');
+    choose(root, 'truckAccess', 'no', 'twelve');
+    choose(root, 'pathWidth', 'narrow', 'twelve');
+    expect(qTitle(root)).toBe(questionCopy('turn', 'twelve').title);
+    choose(root, 'turn', 'none', 'twelve');
+    expect(qTitle(root)).toBe(questionCopy('removable', 'twelve').title);
+    root.dispatchEvent(new CustomEvent('minio:switch-model', { detail: 'sixteen', bubbles: true }));
+    expect(qTitle(root)).toBe(questionCopy('pathWidth', 'sixteen').title);
+  });
+
+  it('switching model on a visible question with pathWidth hidden stays on that question', () => {
+    // A truck reaches the spot, so pathWidth is not asked (the stored pathWidth answer is stale).
+    // The client is on existingBase, which stays visible, so the switch must not move them to pathWidth.
+    const storage = fakeStorage();
+    storage.setItem(STORAGE_KEY, JSON.stringify({
+      snapshot: { ...snapshot, model: 'twelve' },
+      answers: { bathroom: 'none', truckAccess: 'yes', pathWidth: 'narrow' },
+      currentId: 'existingBase', contact: { email: '', firstName: '', phone: '' }, recordId: null, ctaHistory: [],
+    }));
+    const { root, app } = setup({ storage });
+    app.restore();
+    expect(qTitle(root)).toBe(questionCopy('existingBase', 'twelve').title);
+    root.dispatchEvent(new CustomEvent('minio:switch-model', { detail: 'sixteen', bubbles: true }));
+    expect(qTitle(root)).toBe(questionCopy('existingBase', 'sixteen').title);
+  });
+
+  it('switching model from the end panel clears the turn answer and asks the earliest cleared question', () => {
+    const { root, app, storage } = setup();
+    app.start({ ...snapshot, model: 'twelve' });
+    button(root, 'Skip for now').click();
+    choose(root, 'bathroom', 'shower', 'twelve');
+    choose(root, 'truckAccess', 'no', 'twelve');
+    choose(root, 'pathWidth', 'wide', 'twelve');
+    choose(root, 'turn', 'roomy', 'twelve');
+    choose(root, 'overhead', 'clear', 'twelve');
+    choose(root, 'pathGround', 'solid', 'twelve');
+    choose(root, 'existingBase', 'slab', 'twelve');
+    choose(root, 'panelDistance', 'lt25', 'twelve');
+    choose(root, 'panelRoute', 'soft', 'twelve');
+    expect(root.querySelector('.mo-plan')).not.toBeNull();
+    expect(text(root)).toContain('A turn with plenty of room');
+
+    cardButton(root, 'Switch to the Sixteen').click();
+
+    const answers = JSON.parse(storage.getItem(STORAGE_KEY)!).answers;
+    expect(answers.turn).toBeUndefined();
+    expect(answers.pathWidth).toBeUndefined();
+    expect(answers.truckAccess).toBe('no');
+    expect(root.querySelector('.mo-plan')).toBeNull();
+    expect(qTitle(root)).toBe(questionCopy('pathWidth', 'sixteen').title);
+    // The readable answers (what the print summary and the lead record show) carry no turn line.
+    expect(text(root.querySelector('.print-summary')!)).not.toContain(questionCopy('turn', 'sixteen').title);
+  });
+
+  it('switching model before any model-relative answer exists stays on the current question', () => {
+    const { root, app, storage } = setup();
+    app.start({ ...snapshot, model: 'twelve' });
+    button(root, 'Skip for now').click();
+    choose(root, 'bathroom', 'shower', 'twelve');
+    expect(qTitle(root)).toBe(questionCopy('truckAccess', 'twelve').title);
+    cardButton(root, 'Switch to the Sixteen').click();
+    expect(qTitle(root)).toBe(questionCopy('truckAccess', 'sixteen').title);
+    expect(JSON.parse(storage.getItem(STORAGE_KEY)!).answers).toEqual({ bathroom: 'shower' });
+  });
+
   it('start() with a model of different clearances clears path width and overhead; the same model keeps them', () => {
     const first = setup();
     first.app.start(snapshot);
-    button(first.root, 'Skip for now').click();
+    toTruck(first.root);
     choose(first.root, 'truckAccess', 'no');
     choose(first.root, 'pathWidth', 'wide');
+    choose(first.root, 'turn', 'none');
     choose(first.root, 'overhead', 'clear');
 
     const same = setup({ storage: first.storage });
@@ -508,17 +616,12 @@ describe('createApp', () => {
     const fetchFn = vi.fn(async () => reply(500, { error: 'Nope' })) as unknown as typeof fetch;
     const { root, app, print, navigate } = setup({ fetchFn });
     app.start(snapshot);
-    button(root, 'Skip for now').click();
-    choose(root, 'truckAccess', 'yes');
-    choose(root, 'existingBase', 'slab');
-    choose(root, 'bathroom', 'none');
-    choose(root, 'panelDistance', 'lt25');
-    choose(root, 'door', 'standard');
+    answerAll(root);
     button(root, 'Save my plan').click();
     fillLeadForm(root, 'sam@example.com');
     await flush();
     button(root, 'Continue without saving').click();
-    expect(text(root)).toContain("That's everything.");
+    expect(root.querySelector('.mo-plan h2')!.textContent).toBe(headline(recommend(snapshot, SHORT_ANSWERS)));
     button(root, 'Print / save as PDF').click();
     expect(print).toHaveBeenCalledTimes(1);
     expect(navigate).not.toHaveBeenCalled();
@@ -527,27 +630,27 @@ describe('createApp', () => {
   it('the end panel offers no print before any save attempt', () => {
     const { root, app } = setup();
     app.start(snapshot);
-    button(root, 'Skip for now').click();
-    choose(root, 'truckAccess', 'yes');
-    choose(root, 'existingBase', 'slab');
-    choose(root, 'bathroom', 'none');
-    choose(root, 'panelDistance', 'lt25');
-    choose(root, 'door', 'standard');
+    answerAll(root);
+    expect(root.querySelector('.mo-plan')).not.toBeNull();
     expect(Array.from(root.querySelectorAll('button')).some((b) => b.textContent === 'Print / save as PDF')).toBe(false);
   });
 
   it('keeps a print summary for the browser to print', () => {
     const { root, app } = setup();
     app.start(snapshot);
-    button(root, 'Skip for now').click();
+    toTruck(root);
     choose(root, 'truckAccess', 'unsure');
     const summary = root.querySelector('.print-summary');
     expect(summary).not.toBeNull();
     const t = text(summary!);
-    expect(t).toContain('The Sixteen, delivered ready-built');
+    expect(t).toContain(headline(recommend(snapshot, { bathroom: 'none', truckAccess: 'unsure' })));
     expect(t).toContain('Delivery and site prep:');
     expect(t).toContain('Ready to ship about');
-    expect(t).toContain('Check whether a truck can drive right up to the spot');
+    expect(t).toContain("We'll check these with you on the call");
+    expect(t).toContain(toCheckText('truckAccess'));
     expect(t).toContain("I'm not sure");
+    const steps = Array.from(summary!.querySelectorAll('ol > li')).map((li) => li.firstChild!.textContent);
+    expect(steps).toEqual(['Delivery', 'Base', 'Power']);
+    expect(t).toContain('An electrician adds an outdoor outlet near the pod');
   });
 });

@@ -72,7 +72,7 @@ export function buildFields(
     'To Check': p.readable.toCheck,
     'Answers': p.readable.answers,
     'Planner Snapshot': JSON.stringify(p.snapshot),
-    'Assessment Version': 'v2',
+    'Assessment Version': 'v3',
   };
 
   if (isCreate) fields['Submission Date'] = now;

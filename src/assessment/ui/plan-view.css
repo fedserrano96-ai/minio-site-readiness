@@ -1,0 +1,61 @@
+/* "Your plan" end panel (spec 6). Same fonts, colours and buttons as the card (card.css). */
+.mo-plan {
+  --mo-red: #ED3648;
+  --mo-ink: #1f2328;
+  --mo-muted: #5b636b;
+  --mo-line: #e3e5e8;
+  box-sizing: border-box;
+  color: var(--mo-ink);
+  font: 16px/1.45 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+}
+.mo-plan *, .mo-plan *::before, .mo-plan *::after { box-sizing: inherit; }
+
+.mo-plan__title { margin: 0 0 12px; font-size: 22px; line-height: 1.25; }
+.mo-plan__title:focus { outline: none; }
+.mo-plan__note {
+  margin: 0 0 12px; padding: 10px 12px; font-size: 14px;
+  background: #fff4f5; border-left: 3px solid var(--mo-red); border-radius: 4px;
+}
+
+/* The walk-through: big red step numbers, one block per step. */
+.mo-plan__steps { margin: 16px 0; padding: 0; list-style: none; counter-reset: mo-step; }
+.mo-plan__step {
+  position: relative; margin: 0 0 12px; padding: 12px 16px 12px 56px;
+  border: 1px solid var(--mo-line); border-radius: 12px; background: #fff;
+  counter-increment: mo-step;
+}
+.mo-plan__step::before {
+  content: counter(mo-step); position: absolute; left: 16px; top: 12px;
+  width: 28px; height: 28px; border-radius: 50%; background: var(--mo-red); color: #fff;
+  font-weight: 600; font-size: 15px; line-height: 28px; text-align: center;
+}
+.mo-plan__step h3 { margin: 2px 0 4px; font-size: 17px; line-height: 1.3; }
+.mo-plan__step p { margin: 0 0 4px; font-size: 15px; }
+.mo-plan__step p:last-child { margin-bottom: 0; }
+.mo-plan__link { margin-top: 6px; }
+.mo-plan a { color: var(--mo-red); }
+
+.mo-plan__replist { margin: 0 0 16px; padding: 10px 12px; background: #f7f8f9; border-radius: 8px; font-size: 14px; }
+.mo-plan__replist h3 { margin: 0 0 4px; font-size: 14px; }
+.mo-plan__replist ul { margin: 0; padding-left: 20px; }
+.mo-plan__talk { margin: 8px 0 0; font-weight: 600; }
+
+.mo-plan__price { margin: 0 0 16px; }
+.mo-plan__cost { margin: 0 0 4px; font-size: 18px; font-weight: 600; }
+.mo-plan__side { margin: 0 0 4px; padding: 0; list-style: none; font-weight: 600; }
+.mo-plan__disclaimer { margin: 4px 0 12px; color: var(--mo-muted); font-size: 14px; }
+.mo-plan__breakdown { margin-bottom: 12px; font-size: 14px; }
+.mo-plan__breakdown summary { cursor: pointer; color: var(--mo-muted); }
+.mo-plan__breakdown ul { margin: 8px 0 0; padding: 0; list-style: none; }
+.mo-plan__breakdown li { display: flex; justify-content: space-between; gap: 16px; padding: 4px 0; border-bottom: 1px solid var(--mo-line); }
+.mo-plan__lead, .mo-plan__coverage { margin: 0 0 8px; font-size: 14px; }
+.mo-plan__coverage { color: var(--mo-muted); }
+
+.mo-plan__actions { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 8px; }
+.mo-plan__back { display: block; padding: 8px 0; border: 0; background: none; color: var(--mo-muted); font: inherit; text-decoration: underline; cursor: pointer; }
+.mo-plan__back:focus-visible, .mo-plan__breakdown summary:focus-visible { outline: 3px solid var(--mo-ink); outline-offset: 2px; }
+
+@media (max-width: 767px) {
+  .mo-plan__step { padding: 12px 12px 12px 48px; }
+  .mo-plan__step::before { left: 12px; }
+}

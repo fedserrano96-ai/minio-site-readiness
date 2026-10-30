@@ -5,9 +5,10 @@ import type { SubmissionPayload } from '../../server/airtable-fields';
 import { visibleQuestions } from '../core/questions';
 import type { Answers, CostLine, CostSummary, LeadTime, Location, Recommendation } from '../core/types';
 import {
-  PRICE_DISCLAIMER, coverageText, costLineText, leadTimeText, methodTitle, noteText, pillText,
+  PRICE_DISCLAIMER, REP_LIST_TITLE, coverageText, costLineText, headline, leadTimeText, noteText, pillText,
   rangeText, sideItemText, toCheckText,
 } from './copy';
+import { planSteps } from './plan-copy';
 import { questionCopy } from './questions-copy';
 
 export interface PrintView {
@@ -18,13 +19,13 @@ export interface PrintView {
   answers: Answers;
 }
 
-const LINE_LABEL: Record<CostLine['id'], string> = {
+export const LINE_LABEL: Record<CostLine['id'], string> = {
   shipping: 'Shipping',
   install: 'Installation',
   base: 'Base',
   power: 'Power',
   plumbing: 'Water and sewer',
-  door: 'Flipped door',
+  ramps: 'Ramps for the steps',
 };
 
 function lineText(line: CostLine): string {
@@ -82,17 +83,24 @@ export function renderPrintSummary(el: HTMLElement, view: PrintView): void {
   const pills = pillText(rec);
   const nodes: HTMLElement[] = [
     h('h1', 'Your Mini·O plan'),
-    h('h2', methodTitle(rec.model, rec.method)),
+    h('h2', headline(rec)),
     h('p', `Delivery: ${pills.delivery}. Base: ${pills.base}.`),
-    h('p', costLineText(cost)),
   ];
+  // The walk-through: each step's title, then its lines.
+  const steps = h('ol');
+  for (const step of planSteps(rec, location)) {
+    const li = h('li', step.title);
+    li.append(list(step.lines));
+    steps.append(li);
+  }
+  nodes.push(steps, h('p', costLineText(cost)));
   if (cost.mode === 'range') {
     if (cost.side.length > 0) nodes.push(list(cost.side.map(sideItemText)));
     nodes.push(h('p', PRICE_DISCLAIMER), list(cost.lines.map(lineText)), h('p', leadTimeText(lead)));
   }
   nodes.push(h('p', coverageText(location)));
-  if (rec.notes.length > 0) nodes.push(list(rec.notes.map((code) => noteText(code, rec))));
-  if (rec.toCheck.length > 0) nodes.push(h('h3', 'To check'), list(rec.toCheck.map(toCheckText)));
+  if (rec.notes.length > 0) nodes.push(list(rec.notes.map(noteText)));
+  if (rec.toCheck.length > 0) nodes.push(h('h3', REP_LIST_TITLE), list(rec.toCheck.map(toCheckText)));
   const lines = answerLines(answers, rec);
   if (lines.length > 0) nodes.push(h('h3', 'Your answers'), list(lines));
   el.replaceChildren(...nodes);

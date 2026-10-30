@@ -11,7 +11,7 @@ describe('recommend', () => {
     expect(recommend(snapshot, {})).toEqual({
       model: 'sixteen', method: 'tiltTrailer', craneFrom: null, base: 'gravel',
       methodReason: null, baseReason: null, bathroom: 'none', door: 'standard',
-      toCheck: [], notes: ['panelUpgrade'],
+      ramps: false, takeDown: null, hardSurface: false, toCheck: [], notes: [],
     });
   });
   it('truck no -> shed mule', () => {
@@ -34,8 +34,8 @@ describe('recommend', () => {
     expect(recommend(snapshot, { truckAccess: 'no', pathWidth: 'narrow', streetDistance: '100to150' }).craneFrom).toBe(4000);
   });
   it('crane reason is the first path cause in order', () => {
-    expect(recommend(snapshot, { truckAccess: 'no', overhead: 'other', pathGround: 'steps' }).methodReason).toBe('overheadLow');
-    expect(recommend(snapshot, { truckAccess: 'no', pathGround: 'steps' }).methodReason).toBe('pathSteps');
+    expect(recommend(snapshot, { truckAccess: 'no', overhead: 'other', pathGround: 'steep' }).methodReason).toBe('overheadLow');
+    expect(recommend(snapshot, { truckAccess: 'no', pathGround: 'steep' }).methodReason).toBe('pathSteep');
   });
   it('power lines -> kit', () => {
     const r = recommend(snapshot, { truckAccess: 'no', overhead: 'other', powerLines: 'yes' });
@@ -66,12 +66,12 @@ describe('recommend', () => {
     expect(recommend(snapshot, { truckAccess: 'yes', pathWidth: 'unsure' }).toCheck).toEqual([]);
   });
   it('toCheck lists unsure visible answers in question order, then the base code', () => {
-    const r = recommend(snapshot, { door: 'unsure', bathroom: 'unsure', existingBase: 'slab', truckAccess: 'unsure' });
-    expect(r.toCheck).toEqual(['truckAccess', 'bathroom', 'door', 'baseSlab']);
+    const r = recommend(snapshot, { bathroom: 'unsure', existingBase: 'slab', truckAccess: 'unsure' });
+    expect(r.toCheck).toEqual(['bathroom', 'truckAccess', 'baseSlab']);
     expect(r.bathroom).toBe('none');
     expect(r.door).toBe('standard');
-    const r2 = recommend(snapshot, { door: 'unsure', existingBase: 'slab' });
-    expect(r2.toCheck).toEqual(['door', 'baseSlab']);
+    const r2 = recommend(snapshot, { panelRoute: 'unsure', existingBase: 'slab' });
+    expect(r2.toCheck).toEqual(['panelRoute', 'baseSlab']);
   });
   it('existing slab', () => {
     const r = recommend(snapshot, { existingBase: 'slab', groundFlat: 'steep' });
@@ -98,29 +98,67 @@ describe('recommend', () => {
     expect(r.notes).not.toContain('twelveHalfBathOnly');
     expect(r.model).toBe('sixteen');
   });
-  it('flip not on station', () => {
-    const station = { ...snapshot, model: 'station' as const };
-    expect(recommend(station, { door: 'flipped' }).notes).toContain('flipNotAvailable');
-    expect(recommend(snapshot, { door: 'flipped' }).notes).not.toContain('flipNotAvailable');
-  });
-  it('Station with a flipped door answer gets the standard door and the note', () => {
-    const station = { ...snapshot, model: 'station' as const };
-    const r = recommend(station, { door: 'flipped' });
-    expect(r.door).toBe('standard');
-    expect(r.notes).toContain('flipNotAvailable');
-    const switched = recommend(snapshot, { door: 'flipped' }, 'station');
-    expect(switched.door).toBe('standard');
-    expect(switched.notes).toContain('flipNotAvailable');
-    expect(recommend(snapshot, { door: 'flipped' }).door).toBe('flipped');
-  });
   it('soft ground note only when path questions are visible', () => {
-    expect(recommend(snapshot, { truckAccess: 'no', pathGround: 'soft' }).notes).toEqual(['softGround', 'panelUpgrade']);
-    expect(recommend(snapshot, { truckAccess: 'yes', pathGround: 'soft' }).notes).toEqual(['panelUpgrade']);
+    expect(recommend(snapshot, { truckAccess: 'no', pathGround: 'soft' }).notes).toEqual(['softGround']);
+    expect(recommend(snapshot, { truckAccess: 'yes', pathGround: 'soft' }).notes).toEqual([]);
   });
   it('notes come in the documented order', () => {
     const twelve = { ...snapshot, model: 'twelve' as const, objects: [{ type: 'shed', x: 29, y: 15, w: 2, h: 2 }] };
     const r = recommend(twelve, { truckAccess: 'no', overhead: 'other', powerLines: 'yes', pathGround: 'soft', bathroom: 'shower' });
-    expect(r.notes).toEqual(['softGround', 'panelUpgrade', 'twelveHalfBathOnly', 'kitUnloading', 'clearance']);
+    expect(r.notes).toEqual(['softGround', 'twelveHalfBathOnly', 'kitUnloading', 'clearance']);
+  });
+  it('removable fence keeps the shed mule and names it', () => {
+    const r = recommend(snapshot, { truckAccess: 'no', pathWidth: 'narrow', removable: 'fence' });
+    expect(r.method).toBe('shedMule');
+    expect(r.takeDown).toBe('fence');
+  });
+  it('removable other keeps the shed mule and names it', () => {
+    const r = recommend(snapshot, { truckAccess: 'no', pathWidth: 'narrow', removable: 'other' });
+    expect(r.method).toBe('shedMule');
+    expect(r.takeDown).toBe('other');
+  });
+  it('a stale removable answer is ignored once nothing is narrow or tight', () => {
+    const r = recommend(snapshot, { truckAccess: 'no', pathWidth: 'wide', removable: 'fence' });
+    expect(r.method).toBe('shedMule');
+    expect(r.takeDown).toBeNull();
+  });
+  it('tight turn that cannot come down -> crane, reason pathTurn', () => {
+    const r = recommend(snapshot, { truckAccess: 'no', turn: 'tight', removable: 'no' });
+    expect(r.method).toBe('crane');
+    expect(r.methodReason).toBe('pathTurn');
+    expect(r.takeDown).toBeNull();
+  });
+  it('narrow beats turn as the reason', () => {
+    expect(recommend(snapshot, { truckAccess: 'no', pathWidth: 'narrow', turn: 'tight' }).methodReason).toBe('pathNarrow');
+  });
+  it('removable unsure keeps the crane and goes on the rep list', () => {
+    const r = recommend(snapshot, { truckAccess: 'no', pathWidth: 'narrow', removable: 'unsure' });
+    expect(r.method).toBe('crane');
+    expect(r.toCheck).toContain('removable');
+  });
+  it('short steps keep the mule and add ramps', () => {
+    const r = recommend(snapshot, { truckAccess: 'no', pathGround: 'shortSteps' });
+    expect(r.method).toBe('shedMule');
+    expect(r.ramps).toBe(true);
+  });
+  it('ramps and take-down only apply to the shed mule', () => {
+    const crane = recommend(snapshot, { truckAccess: 'no', overhead: 'other', pathGround: 'shortSteps', pathWidth: 'narrow', removable: 'fence' });
+    expect(crane.method).toBe('crane');
+    expect(crane.ramps).toBe(false);
+    expect(crane.takeDown).toBeNull();
+  });
+  it('Review Focus 1: switching the truck answer to yes clears hidden effects', () => {
+    const r = recommend(snapshot, { truckAccess: 'yes', pathWidth: 'narrow', removable: 'fence', pathGround: 'shortSteps' });
+    expect(r).toMatchObject({ method: 'tiltTrailer', ramps: false, takeDown: null, methodReason: null });
+  });
+  it('hard surface between panel and spot', () => {
+    expect(recommend(snapshot, { panelRoute: 'hard' }).hardSurface).toBe(true);
+    expect(recommend(snapshot, { panelRoute: 'both' }).hardSurface).toBe(true);
+    expect(recommend(snapshot, { panelRoute: 'soft' }).hardSurface).toBe(false);
+    expect(recommend(snapshot, { panelRoute: 'unsure' }).toCheck).toContain('panelRoute');
+  });
+  it('no panel-upgrade note any more', () => {
+    expect(recommend(snapshot, {}).notes).not.toContain('panelUpgrade' as never);
   });
   it('clearance note', () => {
     const near = { ...snapshot, objects: [{ type: 'shed', x: 31, y: 15, w: 2, h: 2 }] };

@@ -48,8 +48,12 @@ export const KIT_ASSEMBLY_REFERENCE: Record<ModelId, number> = {
 
 export const SHED_MULE = 2000;
 export const CRANE_FROM = { near: 3000, far: 4000 } as const; // near: up to 100 ft, far: 100-150 ft
-export const FLIP_DOOR = 500;
-export const PANEL_UPGRADE = 2500;
+// Shed mule limits (FAQ Q059, Q067): slopes up to 10 degrees, steps up to 1.5 ft with ramps (+$250).
+export const MULE_MAX_SLOPE_DEG = 10;
+export const MULE_MAX_STEP_FT = 1.5;
+export const MULE_RAMPS = 250;
+// Room the shed mule needs to turn a corner, in feet across (v2 spec 6.1, client prep PDF).
+export const MULE_TURN_FT: Record<ModelId, number> = { twelve: 20, sixteen: 24, station: 24 };
 
 // Open items for sales (spec section 10, items 1 and 2): one place to change each.
 export const LEVEL_CUTOFF_TEXT = '¼ in. per foot';

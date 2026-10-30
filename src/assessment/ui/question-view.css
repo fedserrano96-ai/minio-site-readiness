@@ -11,8 +11,12 @@
 .mo-q *, .mo-q *::before, .mo-q *::after { box-sizing: inherit; }
 
 .mo-q__progress { margin: 0 0 12px; color: var(--mo-muted); font-size: 14px; }
-.mo-q__art { margin: 0 0 12px; padding: 8px; border: 1px solid var(--mo-line); border-radius: 12px; background: #f7f8f9; }
-.mo-q__art svg { display: block; width: 100%; height: auto; max-height: 200px; }
+.mo-q__art { max-width: 420px; margin: 0 0 12px; padding: 8px; border: 1px solid var(--mo-line); border-radius: 12px; background: #f7f8f9; }
+.mo-q__art svg { display: block; width: 100%; height: auto; }
+/* Phones: the drawing takes the full width. */
+@media (max-width: 767px) {
+  .mo-q__art { max-width: none; }
+}
 .mo-q__title { margin: 0 0 16px; font-size: 22px; line-height: 1.25; }
 
 .mo-q__options { display: flex; flex-direction: column; gap: 8px; margin-bottom: 16px; }
@@ -41,6 +45,11 @@
 .mo-q__help { margin-bottom: 16px; font-size: 15px; }
 .mo-q__help summary { cursor: pointer; color: var(--mo-red); text-decoration: underline; }
 .mo-q__help p { margin: 8px 0 0; }
+.mo-q__steps { margin: 8px 0 0; padding-left: 24px; }
+.mo-q__steps li { margin-bottom: 4px; }
+.mo-q__explainer { margin-top: 16px; padding-top: 12px; border-top: 1px solid var(--mo-line); }
+.mo-q__explainer h3 { margin: 0 0 8px; font-size: 16px; }
+.mo-q__explainer .mo-q__art { max-width: 280px; margin-bottom: 0; }
 .mo-q__help a { color: var(--mo-red); }
 .mo-q__next { margin-bottom: 16px; }
 

@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { GRAVEL, KIT_ASSEMBLY, KIT_ASSEMBLY_REFERENCE, RAISED_FROM, MODELS } from '../../src/assessment/core/data';
+import { GRAVEL, KIT_ASSEMBLY, KIT_ASSEMBLY_REFERENCE, RAISED_FROM, MODELS, MULE_MAX_SLOPE_DEG, MULE_MAX_STEP_FT, MULE_RAMPS } from '../../src/assessment/core/data';
 import { SHIPPING } from '../../src/assessment/core/shipping';
 
 describe('price data', () => {
@@ -14,6 +14,9 @@ describe('price data', () => {
   });
   it('raised base figures', () => {
     expect(RAISED_FROM.WA?.sixteen).toBe(14025);
+  });
+  it('shed mule limits', () => {
+    expect([MULE_MAX_SLOPE_DEG, MULE_MAX_STEP_FT, MULE_RAMPS]).toEqual([10, 1.5, 250]);
   });
   it('models', () => {
     expect(MODELS.station.flipAvailable).toBe(false);

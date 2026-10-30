@@ -1,13 +1,18 @@
 import { describe, it, expect } from 'vitest';
 import { priceRecommendation, leadTime, bandFeet } from '../../src/assessment/core/pricing';
 import { lookupLocation } from '../../src/assessment/core/location';
-import type { Answers, CostLine, CostSummary, Location, Recommendation } from '../../src/assessment/core/types';
+import { recommend } from '../../src/assessment/core/rules';
+import type { Answers, CostLine, CostSummary, Location, PlannerSnapshot, Recommendation } from '../../src/assessment/core/types';
+
+const snapshot: PlannerSnapshot = {
+  model: 'sixteen', rotation: 0, yardW: 40, yardD: 30, podX: 20, podY: 15, podUse: 'office', objects: [],
+};
 
 function rec(overrides: Partial<Recommendation> = {}): Recommendation {
   return {
     model: 'sixteen', method: 'tiltTrailer', craneFrom: null, base: 'gravel',
     methodReason: null, baseReason: null, bathroom: 'none', door: 'standard',
-    toCheck: [], notes: [], ...overrides,
+    ramps: false, takeDown: null, hardSurface: false, toCheck: [], notes: [], ...overrides,
   };
 }
 
@@ -151,18 +156,27 @@ describe('priceRecommendation', () => {
 
   it('bathroom adds plumbing', () => {
     const s = priceRecommendation(
-      rec({ bathroom: 'half' }), loc('98101'), { waterDistance: '25to50' });
+      rec({ bathroom: 'half' }), loc('98101'), {});
     expect(line(s, 'plumbing')).toMatchObject({ low: 5100, high: 5100, reference: false });
   });
 
   it('no bathroom has no plumbing line', () => {
-    const s = priceRecommendation(rec(), loc('98101'), { waterDistance: '25to50' });
+    const s = priceRecommendation(rec(), loc('98101'), {});
     expect(line(s, 'plumbing')).toBeUndefined();
   });
 
   it('plumbing in Southern California is 8000', () => {
-    const s = priceRecommendation(rec({ bathroom: 'shower' }), loc('90012'), { waterDistance: 'lt25' });
+    const s = priceRecommendation(rec({ bathroom: 'shower' }), loc('90012'), {});
     expect(line(s, 'plumbing')).toMatchObject({ low: 8000, high: 8000, reference: false });
+  });
+
+  it('plumbing is priced at the 25-50 ft band with no distance question', () => {
+    const rec = recommend(snapshot, { bathroom: 'half' });
+    const s = priceRecommendation(rec, loc('98101'), {});
+    if (s.mode !== 'range') throw new Error('expected range');
+    const p = s.lines.find(l => l.id === 'plumbing')!;
+    expect(p.andUp).toBe(false);
+    expect(p.low).toBe(72 * 50 + 1500);
   });
 
   it('plumbing without a ZIP is the reference range', () => {
@@ -199,13 +213,11 @@ describe('priceRecommendation', () => {
     expect(range(priceRecommendation(rec(), loc('98101'), { panelDistance: '50to100' })).andUp).toBe(false);
   });
 
-  it('flipped door adds 500 only where available', () => {
-    const sixteen = priceRecommendation(rec({ door: 'flipped' }), loc('98101'), {});
-    expect(line(sixteen, 'door')).toMatchObject({ low: 500, high: 500 });
-    const station = priceRecommendation(rec({ model: 'station', door: 'flipped' }), loc('98101'), {});
-    expect(line(station, 'door')).toBeUndefined();
-    const standard = priceRecommendation(rec(), loc('98101'), {});
-    expect(line(standard, 'door')).toBeUndefined();
+  it('ramps add 250 with the shed mule and short steps', () => {
+    const rec = recommend(snapshot, { truckAccess: 'no', pathGround: 'shortSteps' });
+    const s = priceRecommendation(rec, loc('98101'), {});
+    if (s.mode !== 'range') throw new Error('expected range');
+    expect(s.lines.find(l => l.id === 'ramps')).toEqual({ id: 'ramps', low: 250, high: 250, andUp: false, reference: false });
   });
 
   it('talk mode', () => {
@@ -213,12 +225,12 @@ describe('priceRecommendation', () => {
   });
 
   it('totals are the sum of the lines', () => {
-    const answers: Answers = { panelDistance: 'gt100', waterDistance: '50to100' };
+    const answers: Answers = { panelDistance: 'gt100' };
     const s = priceRecommendation(
-      rec({ bathroom: 'half', door: 'flipped', method: 'shedMule' }), loc('98101'), answers);
+      rec({ bathroom: 'half', ramps: true, method: 'shedMule' }), loc('98101'), answers);
     const r = range(s);
-    // shipping 1100 + shed mule 2000 + gravel 3000 + power 8081 + plumbing 72*100+1500 = 8700 + door 500
-    expect(r.low).toBe(1100 + 2000 + 3000 + 8081 + 8700 + 500);
+    // shipping 1100 + shed mule 2000 + gravel 3000 + power 8081 + plumbing 72*50+1500 = 5100 + ramps 250
+    expect(r.low).toBe(1100 + 2000 + 3000 + 8081 + 5100 + 250);
     expect(r.high).toBe(r.low);
     expect(r.andUp).toBe(true);
   });
