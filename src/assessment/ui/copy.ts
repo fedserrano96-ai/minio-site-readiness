@@ -66,7 +66,7 @@ export function reasonText(code: ReasonCode): string {
     case 'overheadLow':
       return 'something over the way in (like a wire or a roof edge) is too low for the pod to pass under';
     case 'pathSteep':
-      return "there are steps or steep parts on the way to your spot, and the pod can't be rolled over those";
+      return "the way in has a steep slope or a staircase, and the pod can't be rolled over those";
     case 'pathTurn':
       return "there's a corner on the way in that's too tight to roll the pod around";
     case 'powerLines':

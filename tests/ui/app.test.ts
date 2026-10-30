@@ -501,7 +501,8 @@ describe('createApp', () => {
     expect(answers.pathWidth).toBeUndefined();
     expect(answers.overhead).toBeUndefined();
     expect(answers.truckAccess).toBe('no');
-    expect(qTitle(root)).toBe(questionCopy('pathGround', 'station').title);
+    // The client was on pathGround; the cleared questions come first, so they are asked again.
+    expect(qTitle(root)).toBe(questionCopy('pathWidth', 'station').title);
   });
 
   it('switching model while on a question the cleared answers hid goes back to the path width question', () => {
@@ -533,9 +534,9 @@ describe('createApp', () => {
     expect(qTitle(root)).toBe(questionCopy('pathWidth', 'sixteen').title);
   });
 
-  it('switching model with pathWidth hidden goes to the first visible question', () => {
-    // A truck reaches the spot, so pathWidth is not asked; a stored removable answer is the current
-    // question even though it is hidden. The switch must not land on pathWidth.
+  it('switching model on a visible question with pathWidth hidden stays on that question', () => {
+    // A truck reaches the spot, so pathWidth is not asked (the stored pathWidth answer is stale).
+    // The client is on existingBase, which stays visible, so the switch must not move them to pathWidth.
     const storage = fakeStorage();
     storage.setItem(STORAGE_KEY, JSON.stringify({
       snapshot: { ...snapshot, model: 'twelve' },
@@ -547,6 +548,34 @@ describe('createApp', () => {
     expect(qTitle(root)).toBe(questionCopy('existingBase', 'twelve').title);
     root.dispatchEvent(new CustomEvent('minio:switch-model', { detail: 'sixteen', bubbles: true }));
     expect(qTitle(root)).toBe(questionCopy('existingBase', 'sixteen').title);
+  });
+
+  it('switching model from the end panel clears the turn answer and asks the earliest cleared question', () => {
+    const { root, app, storage } = setup();
+    app.start({ ...snapshot, model: 'twelve' });
+    button(root, 'Skip for now').click();
+    choose(root, 'bathroom', 'shower', 'twelve');
+    choose(root, 'truckAccess', 'no', 'twelve');
+    choose(root, 'pathWidth', 'wide', 'twelve');
+    choose(root, 'turn', 'roomy', 'twelve');
+    choose(root, 'overhead', 'clear', 'twelve');
+    choose(root, 'pathGround', 'solid', 'twelve');
+    choose(root, 'existingBase', 'slab', 'twelve');
+    choose(root, 'panelDistance', 'lt25', 'twelve');
+    choose(root, 'panelRoute', 'soft', 'twelve');
+    expect(root.querySelector('.mo-plan')).not.toBeNull();
+    expect(text(root)).toContain('A turn with plenty of room');
+
+    cardButton(root, 'Switch to the Sixteen').click();
+
+    const answers = JSON.parse(storage.getItem(STORAGE_KEY)!).answers;
+    expect(answers.turn).toBeUndefined();
+    expect(answers.pathWidth).toBeUndefined();
+    expect(answers.truckAccess).toBe('no');
+    expect(root.querySelector('.mo-plan')).toBeNull();
+    expect(qTitle(root)).toBe(questionCopy('pathWidth', 'sixteen').title);
+    // The readable answers (what the print summary and the lead record show) carry no turn line.
+    expect(text(root.querySelector('.print-summary')!)).not.toContain(questionCopy('turn', 'sixteen').title);
   });
 
   it('start() with a model of different clearances clears path width and overhead; the same model keeps them', () => {

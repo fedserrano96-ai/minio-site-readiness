@@ -19,9 +19,9 @@ export interface PlanView {
   offerPrint: boolean;
 }
 
-/** Let's talk leads when there is something to check with the client (spec 6.5). */
+/** Let's talk leads when there is something to check with the client, or the plan itself is a call (spec 6.5). */
 export function talkFirst(rec: Recommendation): boolean {
-  return rec.toCheck.length > 0;
+  return rec.toCheck.length > 0 || rec.method === 'talk';
 }
 
 function h<K extends keyof HTMLElementTagNameMap>(
@@ -104,6 +104,8 @@ export function renderPlan(el: HTMLElement, view: PlanView): void {
   if (rec.notes.includes('twelveHalfBathOnly')) nodes.push(h('p', 'mo-plan__note', noteText('twelveHalfBathOnly')));
 
   const steps = h('ol', 'mo-plan__steps');
+  // list-style: none drops the list role in Safari.
+  steps.setAttribute('role', 'list');
   for (const step of planSteps(rec, location)) steps.append(stepItem(step));
   nodes.push(steps);
 

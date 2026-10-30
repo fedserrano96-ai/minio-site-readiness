@@ -2,7 +2,7 @@
 // the CTAs (spec 5.2, 5.3, 6, 7). Owns the state, keeps it in sessionStorage, and re-renders the pieces.
 // Storage errors are not caught: if sessionStorage fails the client should see it fail.
 import type { Cta, SubmissionPayload } from '../../server/airtable-fields';
-import { MODELS } from '../core/data';
+import { MODELS, MULE_TURN_FT } from '../core/data';
 import { lookupLocation } from '../core/location';
 import { leadTime, priceRecommendation } from '../core/pricing';
 import { QUESTION_ORDER, visibleQuestions } from '../core/questions';
@@ -22,6 +22,7 @@ export interface AppDeps {
   print: () => void;
 }
 
+// Bump the key whenever Answers or the visibility rules change: restore() throws on a hidden current question.
 const STORAGE_KEY = 'minio-assessment-v3';
 const SUBMIT_URL = '/.netlify/functions/submit';
 const CTA_URL = { design: 'https://minioffice.co/quote', talk: 'https://minioffice.co/lets-talk' } as const;
@@ -51,16 +52,19 @@ function div(className: string): HTMLDivElement {
 }
 
 /**
- * The path width and overhead answers are relative to the model ("12 ft or wider", "nothing lower
- * than 13 ft"). When the model changes to one with other clearances, those answers no longer mean
- * what the client picked, so they are cleared and asked again.
+ * The path width, overhead and turn answers are relative to the model ("12 ft or wider", "nothing
+ * lower than 13 ft", "a turn about 20 ft across"). When the model changes to one with other
+ * clearances or another turning space, those answers no longer mean what the client picked, so they
+ * are cleared and asked again. Returns the ids it cleared.
  */
-function clearModelRelativeAnswers(answers: Answers, from: ModelId, to: ModelId): void {
+function clearModelRelativeAnswers(answers: Answers, from: ModelId, to: ModelId): QuestionId[] {
   const a = MODELS[from];
   const b = MODELS[to];
-  if (a.minPathWidth === b.minPathWidth && a.minOverhead === b.minOverhead) return;
-  delete answers.pathWidth;
-  delete answers.overhead;
+  const cleared: QuestionId[] = [];
+  if (a.minPathWidth !== b.minPathWidth || a.minOverhead !== b.minOverhead) cleared.push('pathWidth', 'overhead');
+  if (MULE_TURN_FT[from] !== MULE_TURN_FT[to]) cleared.push('turn');
+  for (const id of cleared) delete answers[id];
+  return cleared;
 }
 
 function messageOf(body: unknown): string | null {
@@ -240,12 +244,17 @@ export function createApp(root: HTMLElement, deps: AppDeps) {
   on<Cta>('minio:cta', onCta);
   on<ModelId>('minio:switch-model', (model) => {
     const s = current();
-    clearModelRelativeAnswers(s.answers, s.modelOverride ?? s.snapshot.model, model);
+    const cleared = clearModelRelativeAnswers(s.answers, s.modelOverride ?? s.snapshot.model, model);
     s.modelOverride = model;
-    // Clearing pathWidth can hide the question the client is on (it may have shown removable or
-    // ruled out the mule). Then ask pathWidth again if it is asked at all, else start from the top.
     const visible = visibleQuestions(s.answers);
-    if (s.currentId !== 'end' && !visible.includes(s.currentId)) {
+    // Go to the earliest cleared question that is asked, so the client answers it again, even from
+    // the end panel. If none is asked, stay; but clearing pathWidth can hide the question the client
+    // is on (it may have shown removable or ruled out the mule). Then ask pathWidth again if it is
+    // asked at all, else start from the top.
+    const reask = visible.find((id) => cleared.includes(id));
+    if (reask) {
+      s.currentId = reask;
+    } else if (s.currentId !== 'end' && !visible.includes(s.currentId)) {
       s.currentId = visible.includes('pathWidth') ? 'pathWidth' : visible[0]!;
     }
     change = null;

@@ -44,6 +44,7 @@ describe('renderPlan', () => {
     renderPlan(el, { rec: r, cost: priceRecommendation(r, null, {}), lead: leadTime(r, null), location: null, offerPrint: false });
     expect(el.querySelector('h2')!.textContent).toBe(headline(r));
     expect(el.querySelectorAll('ol > li').length).toBe(3);
+    expect(el.querySelector('ol')!.getAttribute('role')).toBe('list');
     expect(text(el)).toContain("We'll check these with you on the call");
     expect(text(el)).toContain("Book a call and we'll go over these with you.");
     expect(Array.from(el.querySelectorAll('ul li')).map((li) => li.textContent)).toContain(toCheckText('truckAccess'));
@@ -149,6 +150,15 @@ describe('renderPlan', () => {
 });
 
 describe('talkFirst', () => {
+    it("a talk recommendation leads with Let's talk even when the rep list is empty", () => {
+    const rec = { ...recommend(snapshot, {}), method: 'talk' as const, toCheck: [] };
+    expect(talkFirst(rec)).toBe(true);
+    renderPlan(el, { rec, cost: { mode: 'talk' }, lead: leadTime(rec, null), location: null, offerPrint: false });
+    expect(el.querySelector('.mo-plan__replist')).toBeNull();
+    expect(Array.from(el.querySelectorAll('button')).map((b) => b.textContent).slice(0, 2))
+      .toEqual(["Let's talk", 'Design my pod']);
+  });
+
   it('is true only when the rep list has items', () => {
     expect(talkFirst(recommend(snapshot, {}))).toBe(false);
     expect(talkFirst(recommend(snapshot, { truckAccess: 'unsure' }))).toBe(true);
