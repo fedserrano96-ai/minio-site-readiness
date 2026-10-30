@@ -201,6 +201,7 @@ describe('buildFields', () => {
     });
     const f = buildFields({ ...p, answers, readable }, true);
     expect(String(f['Answers'])).toContain(questionCopy('turn', 'sixteen').title);
+    expect(String(f['Answers'])).toContain('A tight turn');
   });
 
   it('leaves out Submission Date on update', () => {
