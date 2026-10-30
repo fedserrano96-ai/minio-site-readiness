@@ -5,6 +5,8 @@ import type { SubmissionPayload } from '../../src/server/airtable-fields';
 import { priceRecommendation } from '../../src/assessment/core/pricing';
 import { lookupLocation } from '../../src/assessment/core/location';
 import type { Recommendation } from '../../src/assessment/core/types';
+import { buildReadable } from '../../src/assessment/ui/print';
+import { questionCopy } from '../../src/assessment/ui/questions-copy';
 
 const TABLE_URL = 'https://api.airtable.com/v0/appj87SHEgZafCMC2/Submissions';
 const REC_ID = 'recABCDEFGHIJKLMN';
@@ -185,9 +187,20 @@ describe('buildFields', () => {
     expect(f['To Check']).toBe('Panel distance');
     expect(f['Answers']).toBe('ZIP: 98101');
     expect(JSON.parse(String(f['Planner Snapshot'])).yardW).toBe(40);
-    expect(f['Assessment Version']).toBe('v2');
+    expect(f['Assessment Version']).toBe('v3');
+    expect(f['Door']).toBe('Standard');
     expect(f['Submission Date']).toBeTruthy();
     expect(f['Last Updated']).toBeTruthy();
+  });
+
+  it('writes the questions a client answered into Answers', () => {
+    const p = payload();
+    const answers = { zip: '98101', truckAccess: 'no' as const, turn: 'tight' as const };
+    const readable = buildReadable({
+      rec: p.recommendation, cost: p.cost, lead: p.lead, location: p.location, answers,
+    });
+    const f = buildFields({ ...p, answers, readable }, true);
+    expect(String(f['Answers'])).toContain(questionCopy('turn', 'sixteen').title);
   });
 
   it('leaves out Submission Date on update', () => {
