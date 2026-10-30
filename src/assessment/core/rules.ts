@@ -65,8 +65,9 @@ export function recommend(snapshot: PlannerSnapshot, answers: Answers, modelOver
   const { base, baseReason, code } = baseFor(answers);
 
   const bathroom = answers.bathroom === 'half' || answers.bathroom === 'shower' ? answers.bathroom : 'none';
-  const takeDown = method === 'shedMule' && (answers.removable === 'fence' || answers.removable === 'other')
-    ? answers.removable : null;
+  // Only when the question is still asked: a stale fence answer must not survive a change to a wide path.
+  const takeDown = method === 'shedMule' && visible.includes('removable')
+    && (answers.removable === 'fence' || answers.removable === 'other') ? answers.removable : null;
   const ramps = method === 'shedMule' && answers.pathGround === 'shortSteps';
   const hardSurface = answers.panelRoute === 'hard' || answers.panelRoute === 'both';
 

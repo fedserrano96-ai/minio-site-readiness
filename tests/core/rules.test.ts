@@ -112,6 +112,16 @@ describe('recommend', () => {
     expect(r.method).toBe('shedMule');
     expect(r.takeDown).toBe('fence');
   });
+  it('removable other keeps the shed mule and names it', () => {
+    const r = recommend(snapshot, { truckAccess: 'no', pathWidth: 'narrow', removable: 'other' });
+    expect(r.method).toBe('shedMule');
+    expect(r.takeDown).toBe('other');
+  });
+  it('a stale removable answer is ignored once nothing is narrow or tight', () => {
+    const r = recommend(snapshot, { truckAccess: 'no', pathWidth: 'wide', removable: 'fence' });
+    expect(r.method).toBe('shedMule');
+    expect(r.takeDown).toBeNull();
+  });
   it('tight turn that cannot come down -> crane, reason pathTurn', () => {
     const r = recommend(snapshot, { truckAccess: 'no', turn: 'tight', removable: 'no' });
     expect(r.method).toBe('crane');
