@@ -1,6 +1,6 @@
 // Client-facing copy for the recommendation card (spec 5.2, 5.3, 6). Plain English: clients
 // have no construction knowledge. Fred reviews every string here.
-import { KIT_ACCESS_FT, LEVEL_CUTOFF_TEXT, MODELS, PANEL_UPGRADE } from '../core/data';
+import { KIT_ACCESS_FT, MODELS } from '../core/data';
 import type {
   BaseKind, CostSummary, LeadTime, Location, Method, ModelId, NoteCode, ReasonCode, Recommendation,
   SideItem, ToCheckCode,
@@ -15,16 +15,27 @@ export function modelName(model: ModelId): string {
   return `The ${MODELS[model].name}`;
 }
 
-export function methodTitle(model: ModelId, method: Method): string {
-  const name = modelName(model);
-  switch (method) {
-    case 'tiltTrailer':
-    case 'shedMule': return `${name}, delivered ready-built`;
-    case 'crane': return `${name}, lifted in by crane`;
-    case 'kit': return `${name} as a kit, assembled on site`;
-    case 'talk': return `${name}: let's work out the best way in`;
-  }
+const METHOD_PHRASE: Record<Exclude<Method, 'talk'>, string> = {
+  tiltTrailer: 'delivered on a tilt trailer',
+  shedMule: 'delivered by truck and shed mule',
+  crane: 'lifted in by crane',
+  kit: 'brought in as a kit and built on the spot',
+};
+
+/** One sentence: the model, how it gets there, what the client needs to add (spec 6.1). */
+export function headline(rec: Recommendation): string {
+  if (rec.method === 'talk') return "Your yard needs a closer look. Let's work out the best way in together.";
+  const needs: string[] = [];
+  if (rec.base === 'gravel') needs.push('a gravel pad');
+  if (rec.base === 'raised') needs.push('a raised base');
+  needs.push('an outdoor outlet');
+  if (rec.bathroom !== 'none') needs.push('a plumber for the bathroom');
+  const list = needs.length === 1 ? needs[0]! : `${needs.slice(0, -1).join(', ')} and ${needs[needs.length - 1]}`;
+  const onto = rec.base === 'existing' ? ' onto your existing base' : '';
+  return `You can have a ${MODELS[rec.model].name} ${METHOD_PHRASE[rec.method]}${onto}. You'll need ${list}.`;
 }
+
+export const REP_LIST_TITLE = "We'll check these with you on the call";
 
 const DELIVERY_PILL: Record<Method, string> = {
   tiltTrailer: 'tilt trailer',
@@ -52,8 +63,10 @@ export function reasonText(code: ReasonCode): string {
       return 'the way to your spot is too narrow to roll the pod through, so it has to be lifted in';
     case 'overheadLow':
       return 'something over the way in (like a wire or a roof edge) is too low for the pod to pass under';
-    case 'pathSteps':
+    case 'pathSteep':
       return "there are steps or steep parts on the way to your spot, and the pod can't be rolled over those";
+    case 'pathTurn':
+      return "there's a corner on the way in that's too tight to roll the pod around";
     case 'powerLines':
       return "there are power lines over your house or yard, so a crane can't lift the pod in, and it can't be rolled in either";
     case 'tooFar':
@@ -69,23 +82,24 @@ export function reasonText(code: ReasonCode): string {
 
 export function toCheckText(code: ToCheckCode): string {
   switch (code) {
-    case 'zip': return 'Add your ZIP code';
-    case 'truckAccess': return 'Check whether a truck can drive right up to the spot';
-    case 'pathWidth': return 'Measure the narrowest point on the way in';
-    case 'overhead': return 'Check the height of anything over the way in (branches, wires, roof edges)';
-    case 'pathGround': return 'Check the way in for steps, steep parts or soft ground';
-    case 'powerLines': return 'Check for power lines over the house or yard, between the street and the spot';
-    case 'streetDistance': return 'Measure how far the spot is from the street';
-    case 'kitAccess': return `Measure the narrowest way in (we need at least ${KIT_ACCESS_FT} ft)`;
-    case 'existingBase': return "Check whether there's already a base where the pod will go";
-    case 'groundFlat': return `Check whether the ground at the spot is flat (within ${LEVEL_CUTOFF_TEXT})`;
-    case 'bathroom': return 'Decide whether the pod will have a bathroom';
-    case 'waterDistance': return 'Measure how far the water and sewer lines are from the spot';
-    case 'panelDistance': return 'Measure how far the electrical panel is from the spot';
-    case 'door': return 'Decide which way the door should face';
-    case 'baseSlab': return 'Check that your slab or patio is big enough and level';
-    case 'baseGravel': return 'Check that your gravel pad is big enough and level';
-    case 'baseDeck': return "We'll confirm your deck can hold the pod";
+    case 'zip': return 'Your ZIP code';
+    case 'truckAccess': return 'Whether a truck can drive up to the spot';
+    case 'pathWidth': return 'How wide the narrowest point on the way in is';
+    case 'turn': return 'Whether the pod can get around the corner on the way in';
+    case 'removable': return 'Whether the fence or whatever is in the way can come down on delivery day';
+    case 'overhead': return 'How high anything over the way in is (branches, wires, roof edges)';
+    case 'pathGround': return 'Whether the way in has steps, steep parts or soft ground';
+    case 'powerLines': return 'Whether power lines cross over between the street and the spot';
+    case 'streetDistance': return 'How far the spot is from the street';
+    case 'kitAccess': return 'Whether there is a way in wide enough for a kit';
+    case 'existingBase': return 'What base is already where the pod will go';
+    case 'groundFlat': return 'Whether the ground at the spot is flat enough';
+    case 'bathroom': return 'Whether the pod will have a bathroom';
+    case 'panelDistance': return 'How far the electrical panel is from the spot';
+    case 'panelRoute': return 'What the wiring route from the panel to the spot crosses';
+    case 'baseSlab': return 'Whether your slab or patio is big enough and level';
+    case 'baseGravel': return 'Whether your gravel pad is big enough and level';
+    case 'baseDeck': return 'Whether your deck can hold the pod';
   }
 }
 
@@ -93,12 +107,8 @@ export function noteText(code: NoteCode, rec: Recommendation): string {
   switch (code) {
     case 'softGround':
       return 'Soft ground can get marked by the delivery. Stop watering the area a week before.';
-    case 'panelUpgrade':
-      return `Some homes need a panel upgrade (about ${formatMoney(PANEL_UPGRADE)}).`;
     case 'twelveHalfBathOnly':
       return 'The Twelve fits a half bath only.';
-    case 'flipNotAvailable':
-      return `A flipped door isn't available on ${modelName(rec.model)}, so it comes with the standard door.`;
     case 'kitUnloading':
       return "Unloading isn't included in shipping, so you or your contractor unload the kit. It also needs dry storage while it waits for assembly.";
     case 'clearance':
