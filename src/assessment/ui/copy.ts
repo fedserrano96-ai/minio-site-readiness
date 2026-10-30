@@ -86,7 +86,7 @@ export function toCheckText(code: ToCheckCode): string {
     case 'truckAccess': return 'Whether a truck can drive up to the spot';
     case 'pathWidth': return 'How wide the narrowest point on the way in is';
     case 'turn': return 'Whether the pod can get around the corner on the way in';
-    case 'removable': return 'Whether the fence or whatever is in the way can come down on delivery day';
+    case 'removable': return 'Whether what makes the way in narrow or tight can come down and go back up';
     case 'overhead': return 'How high anything over the way in is (branches, wires, roof edges)';
     case 'pathGround': return 'Whether the way in has steps, steep parts or soft ground';
     case 'powerLines': return 'Whether power lines cross over between the street and the spot';

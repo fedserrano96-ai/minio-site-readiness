@@ -60,6 +60,11 @@ describe('planSteps', () => {
     expect(first('kit')).toBe('Your pod arrives as a kit, and a local crew builds it on the spot.');
     expect(first('talk')).toBe("We'll work out the best way in with you on a call.");
   });
+  it('talk: Delivery step has no who-line, covered or not', () => {
+    for (const loc of [seattleCovered, outside]) {
+      expect(planSteps(rec({ method: 'talk' }), loc)[0]!.lines).toEqual(["We'll work out the best way in with you on a call."]);
+    }
+  });
   it('base text per kind', () => {
     const base = (b: Recommendation['base']) => planSteps(rec({ base: b }), null)[1]!;
     expect(base('existing').lines).toEqual(["Your pod goes on your existing base. We'll confirm it's big enough and level."]);

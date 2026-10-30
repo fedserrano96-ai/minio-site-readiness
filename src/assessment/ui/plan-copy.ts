@@ -22,7 +22,7 @@ const WATER_LINE = 'Your pod will need a licensed plumber to connect it to your 
 
 function deliveryStep(rec: Recommendation, location: Location | null): PlanStep {
   const lines = [DELIVERY_LINE[rec.method]];
-  if (location !== null) {
+  if (rec.method !== 'talk' && location !== null) {
     lines.push(location.inCoverage ? 'Mini·O arranges this.' : 'Mini·O ships it; your local crew takes it from there.');
   }
   if (rec.takeDown === 'fence') lines.push('The fence section or gate comes down on delivery day and goes back up after.');
