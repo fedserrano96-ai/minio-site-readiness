@@ -1,5 +1,5 @@
 import { MODELS } from './data';
-import { isCraneRuledOut, isMuleRuledOut, visibleQuestions } from './questions';
+import { isCraneRuledOut, isMuleRuledOut, isRemoved, visibleQuestions } from './questions';
 import type {
   Answers, BaseKind, Method, ModelId, NoteCode, PlannerSnapshot, ReasonCode, Recommendation, ToCheckCode,
 } from './types';
@@ -33,8 +33,11 @@ function methodFor(answers: Answers): Pick<Recommendation, 'method' | 'craneFrom
       ? { method: 'shedMule', craneFrom: null, methodReason: 'truckNo' }
       : { method: 'tiltTrailer', craneFrom: null, methodReason: null };
   }
-  const pathCause: ReasonCode = answers.pathWidth === 'narrow' ? 'pathNarrow'
-    : answers.overhead === 'other' ? 'overheadLow' : 'pathSteps';
+  // A narrow point or tight turn only counts as a cause when it cannot be taken out.
+  const removed = isRemoved(answers);
+  const pathCause: ReasonCode = answers.pathWidth === 'narrow' && !removed ? 'pathNarrow'
+    : answers.turn === 'tight' && !removed ? 'pathTurn'
+    : answers.overhead === 'other' ? 'overheadLow' : 'pathSteep';
   if (!isCraneRuledOut(answers)) {
     return { method: 'crane', craneFrom: answers.streetDistance === '100to150' ? 4000 : 3000, methodReason: pathCause };
   }
@@ -62,20 +65,22 @@ export function recommend(snapshot: PlannerSnapshot, answers: Answers, modelOver
   const { base, baseReason, code } = baseFor(answers);
 
   const bathroom = answers.bathroom === 'half' || answers.bathroom === 'shower' ? answers.bathroom : 'none';
-  // The flipped door only exists on some models; anywhere else the pod comes with the standard door.
-  const flipAvailable = MODELS[model].flipAvailable;
-  const door = answers.door === 'flipped' && flipAvailable ? 'flipped' : 'standard';
+  const takeDown = method === 'shedMule' && (answers.removable === 'fence' || answers.removable === 'other')
+    ? answers.removable : null;
+  const ramps = method === 'shedMule' && answers.pathGround === 'shortSteps';
+  const hardSurface = answers.panelRoute === 'hard' || answers.panelRoute === 'both';
 
   const toCheck: ToCheckCode[] = visible.filter((id) => answers[id] === 'unsure');
   if (code) toCheck.push(code);
 
   const notes: NoteCode[] = [];
   if (visible.includes('pathGround') && answers.pathGround === 'soft') notes.push('softGround');
-  notes.push('panelUpgrade');
   if (model === 'twelve' && bathroom === 'shower') notes.push('twelveHalfBathOnly');
-  if (visible.includes('door') && answers.door === 'flipped' && !flipAvailable) notes.push('flipNotAvailable');
   if (method === 'kit') notes.push('kitUnloading');
   if (minClearance({ ...snapshot, model }) < 3) notes.push('clearance');
 
-  return { model, method, craneFrom, base, methodReason, baseReason, bathroom, door, toCheck, notes };
+  return {
+    model, method, craneFrom, base, methodReason, baseReason, bathroom, door: 'standard',
+    ramps, takeDown, hardSurface, toCheck, notes,
+  };
 }

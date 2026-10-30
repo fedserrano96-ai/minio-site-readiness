@@ -27,15 +27,15 @@ export interface Answers {
 export type QuestionId = keyof Answers;
 export type Method = 'tiltTrailer' | 'shedMule' | 'crane' | 'kit' | 'talk';
 export type BaseKind = 'gravel' | 'existing' | 'raised';
-export type ReasonCode = 'truckNo' | 'pathNarrow' | 'overheadLow' | 'pathSteps'
+export type ReasonCode = 'truckNo' | 'pathNarrow' | 'pathTurn' | 'overheadLow' | 'pathSteep'
   | 'powerLines' | 'tooFar' | 'noKitAccess' | 'existingBase' | 'steepGround';
 export type ToCheckCode = QuestionId | 'baseSlab' | 'baseGravel' | 'baseDeck';
-export type NoteCode = 'softGround' | 'panelUpgrade' | 'twelveHalfBathOnly'
-  | 'flipNotAvailable' | 'kitUnloading' | 'clearance';
+export type NoteCode = 'softGround' | 'twelveHalfBathOnly' | 'kitUnloading' | 'clearance';
 export interface Recommendation {
   model: ModelId; method: Method; craneFrom: 3000 | 4000 | null; base: BaseKind;
   methodReason: ReasonCode | null; baseReason: ReasonCode | null;
   bathroom: 'none' | 'half' | 'shower'; door: 'standard' | 'flipped';
+  ramps: boolean; takeDown: 'fence' | 'other' | null; hardSurface: boolean;
   toCheck: ToCheckCode[]; notes: NoteCode[];
 }
 export type PriceRegion = 'WA' | 'WA_OTHER' | 'CA_NORTH' | 'CA_SOUTH' | 'NJ_NY' | 'VA_PA_MD';
