@@ -45,7 +45,7 @@ export interface Location {
   region: PriceRegion | null; inCoverage: boolean; factory: Factory | null;
 }
 export interface CostLine {
-  id: 'shipping' | 'install' | 'base' | 'power' | 'plumbing' | 'door';
+  id: 'shipping' | 'install' | 'base' | 'power' | 'plumbing' | 'ramps';
   low: number; high: number; andUp: boolean; reference: boolean;
 }
 export interface SideItem { id: 'crane' | 'raisedBase' | 'shippingQuoted'; from: number | null }

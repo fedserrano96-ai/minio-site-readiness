@@ -5,8 +5,8 @@ import type {
   Answers, Band, CostLine, CostSummary, LeadTime, Location, ModelId, PriceRegion, Recommendation, SideItem,
 } from './types';
 import {
-  BATHROOM_LEAD_WEEKS, FLIP_DOOR, GRAVEL, KIT_ASSEMBLY, KIT_ASSEMBLY_REFERENCE,
-  LEAD_WEEKS, MODELS, RAISED_FROM, SHED_MULE,
+  BATHROOM_LEAD_WEEKS, GRAVEL, KIT_ASSEMBLY, KIT_ASSEMBLY_REFERENCE,
+  LEAD_WEEKS, MULE_RAMPS, RAISED_FROM, SHED_MULE,
 } from './data';
 import type { LeadKind } from './data';
 import { SHIPPING } from './shipping';
@@ -140,6 +140,9 @@ export function priceRecommendation(rec: Recommendation, location: Location | nu
     }
   }
 
+  // Ramps for short steps on the shed mule route (spec section 6.4)
+  if (rec.ramps) lines.push(fixed('ramps', MULE_RAMPS));
+
   // Base
   switch (rec.base) {
     case 'existing':
@@ -167,16 +170,13 @@ export function priceRecommendation(rec: Recommendation, location: Location | nu
     lines.push({ id: 'power', ...money, andUp, reference: regional === null || referenceOnly });
   }
 
-  // Plumbing
+  // Plumbing. There is no distance question, so it is always priced at the 25-50 ft band.
   if (rec.bathroom !== 'none') {
-    const { feet, andUp } = bandFeet(answers.waterDistance);
+    const { feet, andUp } = bandFeet(undefined);
     const regional = plumbingFor(region, feet);
     const money = regional ?? plumbingReference(feet);
     lines.push({ id: 'plumbing', ...money, andUp, reference: regional === null || referenceOnly });
   }
-
-  // Door
-  if (rec.door === 'flipped' && MODELS[rec.model].flipAvailable) lines.push(fixed('door', FLIP_DOOR));
 
   return {
     mode: 'range',
