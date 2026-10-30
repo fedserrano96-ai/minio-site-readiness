@@ -11,17 +11,18 @@ export interface Answers {
   zip?: string;
   truckAccess?: 'yes' | 'no' | 'unsure';
   pathWidth?: 'wide' | 'narrow' | 'unsure';
+  turn?: 'none' | 'roomy' | 'tight' | 'unsure';
+  removable?: 'fence' | 'other' | 'no' | 'unsure';
   overhead?: 'clear' | 'branches' | 'other' | 'unsure';
-  pathGround?: 'solid' | 'soft' | 'steps' | 'unsure';
+  pathGround?: 'solid' | 'soft' | 'shortSteps' | 'steep' | 'unsure';
   powerLines?: 'no' | 'yes' | 'unsure';
   streetDistance?: 'upTo100' | '100to150' | 'over150' | 'unsure';
   kitAccess?: 'yes' | 'no' | 'unsure';
   existingBase?: 'slab' | 'gravel' | 'deck' | 'none' | 'unsure';
   groundFlat?: 'flat' | 'steep' | 'unsure';
   bathroom?: 'none' | 'half' | 'shower' | 'unsure';
-  waterDistance?: Band;
   panelDistance?: Band;
-  door?: 'standard' | 'flipped' | 'unsure';
+  panelRoute?: 'soft' | 'hard' | 'both' | 'unsure';
 }
 export type QuestionId = keyof Answers;
 export type Method = 'tiltTrailer' | 'shedMule' | 'crane' | 'kit' | 'talk';
